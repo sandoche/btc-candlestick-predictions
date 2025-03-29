@@ -4,11 +4,12 @@ if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-
 if(!require(caret)) install.packages("caret", repos = "http://cran.us.r-project.org")
 if(!require(httr)) install.packages("httr", repos = "http://cran.us.r-project.org")
 if(!require(jsonlite)) install.packages("jsonlite", repos = "http://cran.us.r-project.org")
-
+if(!require(tidyquant)) install.packages("tidyquant", repos = "http://cran.us.r-project.org")
 library(tidyverse)
 library(caret)
 library(httr)
 library(jsonlite)
+library(tidyquant)
 
 ### Global Variables ###
 
@@ -144,4 +145,25 @@ candles <- read_csv(paste0("data/", trading_pair, "_candles_", start_date, "_", 
 # Explore the data
 head(candles)
 
+# Plot the data to check if everything is good
+candles %>% 
+  ggplot(aes(x = time, y = close)) +
+  geom_line() +
+  theme_minimal() +
+  labs(title = "BTC-USD Candlestick Chart",
+       x = "Time",
+       y = "Price") +
+  scale_y_continuous(labels = scales::comma)
+
+
+# Plot the candlestick chart of the last 24 candles
+candles %>% 
+  tail(24) %>% 
+  ggplot(aes(x = time, y = close)) +
+  geom_candlestick(aes(open = open, high = high, low = low, close = close)) +
+  theme_tq() +
+  labs(title = "BTC-USD Candlestick Chart (Last 24 Candles)",
+       x = "Time",
+       y = "Price") +
+  scale_y_continuous(labels = scales::comma)
 
