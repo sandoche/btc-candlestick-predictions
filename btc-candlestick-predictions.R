@@ -13,8 +13,8 @@ library(jsonlite)
 ### Global Variables ###
 
 trading_pair <- "BTC-USD"
-start_date <- "2024-01-01"  # Changed to historical date
-end_date <- "2025-03-29"    # Changed to historical date
+start_date <- "2024-01-01"
+end_date <- "2025-03-29"
 candlestick_period <- 3600
 
 ### Utilities ###
@@ -135,11 +135,11 @@ get_coinbase_candles <- function(product_id = trading_pair,
 
 ### Script ###
 
-# Get candlestick data
-candles <- get_coinbase_candles()
+# candles <- get_coinbase_candles()
+# write_csv(candles, paste0("data/", trading_pair, "_candles_", start_date, "_", end_date, ".csv"))
 
-# Save the data to a CSV file
-write_csv(candles, paste0("data/", trading_pair, "_candles_", start_date, "_", end_date, ".csv"))
+# Loading the predownloaded data set, uncomment the code above if needed to download another data sets
+candles <- read_csv(paste0("data/", trading_pair, "_candles_", start_date, "_", end_date, ".csv"))
 
 # Explore the data
 head(candles)
