@@ -160,7 +160,7 @@ candles %>%
 candles %>%
   tail(24) %>%
   mutate(direction = ifelse(close >= open, "up", "down")) %>%
-  ggplot(aes(x = time)) +
+  ggplot(aes(x = time,  y = close, volume = volume)) +
   # The shadows (wicks)
   geom_segment(aes(xend = time, y = low, yend = high, color = direction), size = 0.5) +
   # The body
@@ -172,4 +172,14 @@ candles %>%
        x = "Time",
        y = "Price") +
   scale_y_continuous(labels = scales::comma)
+
+# Plotting the volume last 300 candles
+candles %>%
+  tail(300) %>%
+  ggplot(aes(x = time, y = volume)) +
+  geom_segment(aes(xend = time, yend = 0, color = volume)) + 
+  geom_smooth(method = "loess", se = FALSE) +
+  labs(title = "BTC-USD Candlestick Chart (Last 300 candles)", y = "Volume", x = "") +
+  theme_tq() +
+  theme(legend.position = "none") 
 
