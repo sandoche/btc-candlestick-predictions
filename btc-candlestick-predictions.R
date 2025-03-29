@@ -183,3 +183,5 @@ candles %>%
   theme_tq() +
   theme(legend.position = "none") 
 
+# References
+# https://business-science.github.io/tidyquant/articles/TQ04-charting-with-tidyquant.html
