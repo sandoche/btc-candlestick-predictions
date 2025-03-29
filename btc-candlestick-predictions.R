@@ -138,6 +138,9 @@ get_coinbase_candles <- function(product_id = trading_pair,
 # Get candlestick data
 candles <- get_coinbase_candles()
 
+# Save the data to a CSV file
+write_csv(candles, paste0("data/", trading_pair, "_candles_", start_date, "_", end_date, ".csv"))
+
 # Explore the data
 head(candles)
 
