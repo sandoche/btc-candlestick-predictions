@@ -157,11 +157,17 @@ candles %>%
 
 
 # Plot the candlestick chart of the last 24 candles
-candles %>% 
-  tail(24) %>% 
-  ggplot(aes(x = time, y = close)) +
-  geom_candlestick(aes(open = open, high = high, low = low, close = close)) +
+candles %>%
+  tail(24) %>%
+  mutate(direction = ifelse(close >= open, "up", "down")) %>%
+  ggplot(aes(x = time)) +
+  # The shadows (wicks)
+  geom_segment(aes(xend = time, y = low, yend = high, color = direction), size = 0.5) +
+  # The body
+  geom_segment(aes(xend = time, y = open, yend = close, color = direction), size = 5) +
+  scale_color_manual(values = c("up" = "darkgreen", "down" = "red")) +
   theme_tq() +
+  theme(legend.position = "none") +
   labs(title = "BTC-USD Candlestick Chart (Last 24 Candles)",
        x = "Time",
        y = "Price") +
