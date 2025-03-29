@@ -184,4 +184,6 @@ candles %>%
   theme(legend.position = "none") 
 
 # References
+# Coinbase API to get the candlestick data: https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductcandles
 # https://business-science.github.io/tidyquant/articles/TQ04-charting-with-tidyquant.html
+# Fear and Greed Index: https://alternative.me/crypto/fear-and-greed-index/
