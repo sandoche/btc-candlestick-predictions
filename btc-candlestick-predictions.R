@@ -263,6 +263,28 @@ candles_with_fear_and_greed_index <- candles %>%
 
 head(candles_with_fear_and_greed_index)
 
+## Plot the price of bitcoin and color the chart line based on the fear and greed index's value
+candles_with_fear_and_greed_index %>%
+  ggplot(aes(x = time, y = close, color = value)) +
+  geom_line() +
+  theme_minimal() +
+  labs(
+    title = "BTC-USD Price and Fear and Greed Index Value",
+    x = "Time",
+    y = "Price",
+    color = "Fear and Greed Value"
+  ) +
+  scale_y_continuous(labels = scales::comma)
+
+# We can see that when the price is going down the fear and greed index is low, and when the price goes up it's high
+# This could be a good feature to guess the candles color
+
+# If we look at a candle separately we can guess its feature:
+# - Size of the body
+# - Size of the shadow / wicks
+# - Direction / color of the candle (up or down / green or red )
+
+
 
 
 # References
