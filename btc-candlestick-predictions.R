@@ -190,6 +190,10 @@ create_features <- function(candles, fear_and_greed_index) {
       direction = ifelse(close > open, "up", "down"),
     )
 
+  if (sum(is.na(candles_with_fear_and_greed_index)) > 0) {
+    stop("There are NAs in the data")
+  }
+
   return(candles_with_fear_and_greed_index)
 }
 
