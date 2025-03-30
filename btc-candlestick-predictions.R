@@ -177,6 +177,23 @@ get_fear_and_greed_index <- function(start_time = start_date, end_time = end_dat
   return(fear_and_greed_index_data)
 }
 
+create_features <- function(candles, fear_and_greed_index) {
+  candles_with_fear_and_greed_index <- candles %>%
+    mutate(date_only = as.Date(time)) %>%
+    left_join(fear_and_greed_index, by = c("date_only" = "timestamp"))
+
+  candles_with_fear_and_greed_index <- candles_with_fear_and_greed_index %>%
+    mutate(
+      body_size = abs(close - open),
+      upper_shadow_size = high - max(close, open),
+      lower_shadow_size = min(close, open) - low,
+      direction = ifelse(close > open, "up", "down"),
+    )
+
+  return(candles_with_fear_and_greed_index)
+}
+
+
 ### Script ###
 
 ## Loading the data
@@ -289,6 +306,55 @@ candles_with_fear_and_greed_index %>%
 # Instead of using these indicators, we will use the fear and greed index and the trading volume as features
 
 # We will create the data set with 14 previous candles features and the 15th candle's direction as the target
+
+# Check NAs
+sum(is.na(candles_with_fear_and_greed_index))
+
+# Display the NAs
+candles_with_fear_and_greed_index %>% filter(is.na(value))
+
+# we can can see taht the fear and greed index is NA for the date of 2024-10-26
+# we can use the median between the 2024-10-25 and 2024-10-27
+
+date_na <- as.Date("2024-10-26")
+fear_and_greed_index_date_before_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-25"))
+fear_and_greed_index_date_after_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-27"))
+fear_and_greed_value_date_na <- mean(c(fear_and_greed_index_date_before_na$value, fear_and_greed_index_date_after_na$value))
+
+# Add date_na to the fear and greed index which is missing
+fear_and_greed_index <- fear_and_greed_index %>%
+  bind_rows(tibble(timestamp = date_na, value = fear_and_greed_value_date_na, value_classification = "Greed"))
+
+# Check NAs again
+sum(is.na(fear_and_greed_index))
+
+candles_with_fear_and_greed_index <- candles %>%
+  mutate(date_only = as.Date(time)) %>%
+  left_join(fear_and_greed_index, by = c("date_only" = "timestamp"))
+
+sum(is.na(candles_with_fear_and_greed_index))
+
+## Prepare the data for the model
+
+date_na <- as.Date("2024-10-26")
+fear_and_greed_index_date_before_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-25"))
+fear_and_greed_index_date_after_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-27"))
+fear_and_greed_value_date_na <- mean(c(fear_and_greed_index_date_before_na$value, fear_and_greed_index_date_after_na$value))
+
+fear_and_greed_index <- fear_and_greed_index %>%
+  bind_rows(tibble(timestamp = date_na, value = fear_and_greed_value_date_na, value_classification = "Greed"))
+
+dataset <- create_features(candles, fear_and_greed_index)
+
+
+
+
+
+
+
+
+
+
 
 
 # References
