@@ -235,6 +235,20 @@ candles %>%
 
 # Loading the predownloaded fear and greed data set, uncomment the code above if needed to download another data sets
 fear_and_greed_index <- read_csv(paste0("data/", trading_pair, "_fear_and_greed_index_", start_date, "_", end_date, ".csv"))
+fear_and_greed_index <- fear_and_greed_index %>% mutate(value = as.numeric(value))
+
+# Plotting the fear and greed index evolution
+fear_and_greed_index %>%
+  ggplot(aes(x = timestamp, y = value)) +
+  geom_line() +
+  theme_minimal() +
+  labs(
+    title = "BTC-USD Fear and Greed Index Evolution",
+    x = "Time",
+    y = "Fear and Greed Index"
+  ) +
+  scale_y_continuous(labels = scales::comma)
+
 
 # References
 # Coinbase API to get the candlestick data: https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductcandles
