@@ -179,6 +179,8 @@ get_fear_and_greed_index <- function(start_time = start_date, end_time = end_dat
 
 ### Script ###
 
+## Loading the data
+
 # candles <- get_coinbase_candles()
 # write_csv(candles, paste0("data/", trading_pair, "_candles_", start_date, "_", end_date, ".csv"))
 
@@ -187,6 +189,17 @@ candles <- read_csv(paste0("data/", trading_pair, "_candles_", start_date, "_", 
 
 # Explore the data
 head(candles)
+
+# fear_and_greed_index <- get_fear_and_greed_index()
+# write_csv(fear_and_greed_index, paste0("data/", trading_pair, "_fear_and_greed_index_", start_date, "_", end_date, ".csv"))
+
+# Loading the predownloaded fear and greed data set, uncomment the code above if needed to download another data sets
+fear_and_greed_index <- read_csv(paste0("data/", trading_pair, "_fear_and_greed_index_", start_date, "_", end_date, ".csv"))
+fear_and_greed_index <- fear_and_greed_index %>% mutate(value = as.numeric(value))
+
+head(fear_and_greed_index)
+
+## Visualizing the data
 
 # Plot the data to check if everything is good
 candles %>%
@@ -230,13 +243,6 @@ candles %>%
   theme_tq() +
   theme(legend.position = "none")
 
-# fear_and_greed_index <- get_fear_and_greed_index()
-# write_csv(fear_and_greed_index, paste0("data/", trading_pair, "_fear_and_greed_index_", start_date, "_", end_date, ".csv"))
-
-# Loading the predownloaded fear and greed data set, uncomment the code above if needed to download another data sets
-fear_and_greed_index <- read_csv(paste0("data/", trading_pair, "_fear_and_greed_index_", start_date, "_", end_date, ".csv"))
-fear_and_greed_index <- fear_and_greed_index %>% mutate(value = as.numeric(value))
-
 # Plotting the fear and greed index evolution
 fear_and_greed_index %>%
   ggplot(aes(x = timestamp, y = value)) +
@@ -248,6 +254,15 @@ fear_and_greed_index %>%
     y = "Fear and Greed Index"
   ) +
   scale_y_continuous(labels = scales::comma)
+
+## Preparing the data for the model
+
+candles_with_fear_and_greed_index <- candles %>%
+  mutate(date_only = as.Date(time)) %>%
+  left_join(fear_and_greed_index, by = c("date_only" = "timestamp"))
+
+head(candles_with_fear_and_greed_index)
+
 
 
 # References
