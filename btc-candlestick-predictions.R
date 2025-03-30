@@ -281,10 +281,14 @@ candles_with_fear_and_greed_index %>%
 
 # If we look at a candle separately we can guess its feature:
 # - Size of the body
-# - Size of the shadow / wicks
-# - Direction / color of the candle (up or down / green or red )
+# - Size of the upper shadow / wicks
+# - Size of the lower shadow / wicks
+# - Direction / color of the candle (up or down / green or red)
 
+# The overall direction of the market can also be guessed by some technical indicators like the moving average, the relative strength index, the MACD, the Bollinger Bands, etc.
+# Instead of using these indicators, we will use the fear and greed index and the trading volume as features
 
+# We will create the data set with 14 previous candles features and the 15th candle's direction as the target
 
 
 # References
