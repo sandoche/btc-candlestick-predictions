@@ -134,6 +134,42 @@ get_coinbase_candles <- function(product_id = trading_pair,
   return(all_candles)
 }
 
+#' Get fear and greed index data from alternative.me
+#' 
+#' @param start_time Start date (format: "YYYY-MM-DD")
+#' @param end_time End date (format: "YYYY-MM-DD")
+#' @return A tibble containing the fear and greed index data with columns: date, value
+#' 
+get_fear_and_greed_index <- function(start_time = start_date, end_time = end_date) {
+  today <- Sys.Date()
+  number_of_days <- as.numeric(difftime(today, start_time, units = "days"))
+
+  # Get the fear and greed index data from alternative.me
+  response <- GET(
+      url = paste0("https://api.alternative.me/fng/?limit=", number_of_days, "&date_format=kr"),
+    )
+
+    # Check response status
+  if (http_status(response)$category != "Success") {
+    warning("Failed to get fear and greed index: ", http_status(response)$message)
+  }
+
+    # Parse response
+    response_data <- tryCatch({
+      content(response, "text") %>% fromJSON()
+    }, error = function(e) {
+      warning("Failed to parse JSON for chunk ", i, ": ", e$message)
+      return(NULL)
+    })
+
+  fear_and_greed_index_data <- response_data$data %>% 
+    select(value , value_classification, timestamp) %>%
+    mutate(timestamp = as.POSIXct(timestamp, origin = "1970-01-01", tz = "UTC")) %>%
+    filter(timestamp >= as.POSIXct(start_time, origin = "1970-01-01", tz = "UTC") & timestamp <= as.POSIXct(end_time, origin = "1970-01-01", tz = "UTC"))
+
+  return(fear_and_greed_index_data)
+} 
+
 ### Script ###
 
 # candles <- get_coinbase_candles()
@@ -182,6 +218,9 @@ candles %>%
   labs(title = "BTC-USD Candlestick Chart (Last 300 candles)", y = "Volume", x = "") +
   theme_tq() +
   theme(legend.position = "none") 
+
+fear_and_greed_index <- get_fear_and_greed_index()
+fear_and_greed_index
 
 # References
 # Coinbase API to get the candlestick data: https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductcandles
