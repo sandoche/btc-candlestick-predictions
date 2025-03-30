@@ -340,6 +340,10 @@ sum(is.na(candles_with_fear_and_greed_index))
 
 ## Prepare the data for the model
 
+candles <- read_csv(paste0("data/", trading_pair, "_candles_", start_date, "_", end_date, ".csv"))
+fear_and_greed_index <- read_csv(paste0("data/", trading_pair, "_fear_and_greed_index_", start_date, "_", end_date, ".csv"))
+fear_and_greed_index <- fear_and_greed_index %>% mutate(value = as.numeric(value))
+
 date_na <- as.Date("2024-10-26")
 fear_and_greed_index_date_before_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-25"))
 fear_and_greed_index_date_after_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-27"))
