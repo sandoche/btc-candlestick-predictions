@@ -177,12 +177,12 @@ get_fear_and_greed_index <- function(start_time = start_date, end_time = end_dat
   return(fear_and_greed_index_data)
 }
 
-create_features <- function(candles, fear_and_greed_index) {
-  candles_with_fear_and_greed_index <- candles %>%
+create_features <- function(candles_data, fear_and_greed_data) {
+  candles_with_fear_and_greed_data <- candles_data %>%
     mutate(date_only = as.Date(time)) %>%
-    left_join(fear_and_greed_index, by = c("date_only" = "timestamp"))
+    left_join(fear_and_greed_data, by = c("date_only" = "timestamp"))
 
-  candles_with_fear_and_greed_index <- candles_with_fear_and_greed_index %>%
+  candles_with_fear_and_greed_data <- candles_with_fear_and_greed_data %>%
     mutate(
       body_size = abs(close - open),
       upper_shadow_size = high - max(close, open),
@@ -190,11 +190,11 @@ create_features <- function(candles, fear_and_greed_index) {
       direction = ifelse(close > open, "up", "down"),
     )
 
-  if (sum(is.na(candles_with_fear_and_greed_index)) > 0) {
+  if (sum(is.na(candles_with_fear_and_greed_data)) > 0) {
     stop("There are NAs in the data")
   }
 
-  return(candles_with_fear_and_greed_index)
+  return(candles_with_fear_and_greed_data)
 }
 
 
@@ -353,16 +353,6 @@ fear_and_greed_index <- fear_and_greed_index %>%
   bind_rows(tibble(timestamp = date_na, value = fear_and_greed_value_date_na, value_classification = "Greed"))
 
 dataset <- create_features(candles, fear_and_greed_index)
-
-
-
-
-
-
-
-
-
-
 
 
 # References
