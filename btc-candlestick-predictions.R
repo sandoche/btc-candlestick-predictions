@@ -185,14 +185,79 @@ create_features <- function(candles_data, fear_and_greed_data) {
   candles_with_fear_and_greed_data <- candles_with_fear_and_greed_data %>%
     mutate(
       body_size = abs(close - open),
-      upper_shadow_size = high - max(close, open),
-      lower_shadow_size = min(close, open) - low,
+      upper_shadow_size = high - pmax(close, open),
+      lower_shadow_size = pmin(close, open) - low,
       direction = ifelse(close > open, "up", "down"),
     )
 
   if (sum(is.na(candles_with_fear_and_greed_data)) > 0) {
     stop("There are NAs in the data")
   }
+
+  # add 15 lagged candle's features
+  candles_with_fear_and_greed_data <- candles_with_fear_and_greed_data %>%
+    mutate(
+      body_size_lag1 = lag(body_size, 1),
+      upper_shadow_size_lag1 = lag(upper_shadow_size, 1),
+      lower_shadow_size_lag1 = lag(lower_shadow_size, 1),
+      direction_lag1 = lag(direction, 1),
+      body_size_lag2 = lag(body_size, 2),
+      upper_shadow_size_lag2 = lag(upper_shadow_size, 2),
+      lower_shadow_size_lag2 = lag(lower_shadow_size, 2),
+      direction_lag2 = lag(direction, 2),
+      body_size_lag3 = lag(body_size, 3),
+      upper_shadow_size_lag3 = lag(upper_shadow_size, 3),
+      lower_shadow_size_lag3 = lag(lower_shadow_size, 3),
+      direction_lag3 = lag(direction, 3),
+      body_size_lag4 = lag(body_size, 4),
+      upper_shadow_size_lag4 = lag(upper_shadow_size, 4),
+      lower_shadow_size_lag4 = lag(lower_shadow_size, 4),
+      direction_lag4 = lag(direction, 4),
+      body_size_lag5 = lag(body_size, 5),
+      upper_shadow_size_lag5 = lag(upper_shadow_size, 5),
+      lower_shadow_size_lag5 = lag(lower_shadow_size, 5),
+      direction_lag5 = lag(direction, 5),
+      body_size_lag6 = lag(body_size, 6),
+      upper_shadow_size_lag6 = lag(upper_shadow_size, 6),
+      lower_shadow_size_lag6 = lag(lower_shadow_size, 6),
+      direction_lag6 = lag(direction, 6),
+      body_size_lag7 = lag(body_size, 7),
+      upper_shadow_size_lag7 = lag(upper_shadow_size, 7),
+      lower_shadow_size_lag7 = lag(lower_shadow_size, 7),
+      direction_lag7 = lag(direction, 7),
+      body_size_lag8 = lag(body_size, 8),
+      upper_shadow_size_lag8 = lag(upper_shadow_size, 8),
+      lower_shadow_size_lag8 = lag(lower_shadow_size, 8),
+      direction_lag8 = lag(direction, 8),
+      body_size_lag9 = lag(body_size, 9),
+      upper_shadow_size_lag9 = lag(upper_shadow_size, 9),
+      lower_shadow_size_lag9 = lag(lower_shadow_size, 9),
+      direction_lag9 = lag(direction, 9),
+      body_size_lag10 = lag(body_size, 10),
+      upper_shadow_size_lag10 = lag(upper_shadow_size, 10),
+      lower_shadow_size_lag10 = lag(lower_shadow_size, 10),
+      direction_lag10 = lag(direction, 10),
+      body_size_lag11 = lag(body_size, 11),
+      upper_shadow_size_lag11 = lag(upper_shadow_size, 11),
+      lower_shadow_size_lag11 = lag(lower_shadow_size, 11),
+      direction_lag11 = lag(direction, 11),
+      body_size_lag12 = lag(body_size, 12),
+      upper_shadow_size_lag12 = lag(upper_shadow_size, 12),
+      lower_shadow_size_lag12 = lag(lower_shadow_size, 12),
+      direction_lag12 = lag(direction, 12),
+      body_size_lag13 = lag(body_size, 13),
+      upper_shadow_size_lag13 = lag(upper_shadow_size, 13),
+      lower_shadow_size_lag13 = lag(lower_shadow_size, 13),
+      direction_lag13 = lag(direction, 13),
+      body_size_lag14 = lag(body_size, 14),
+      upper_shadow_size_lag14 = lag(upper_shadow_size, 14),
+      lower_shadow_size_lag14 = lag(lower_shadow_size, 14),
+      direction_lag14 = lag(direction, 14),
+      body_size_lag15 = lag(body_size, 15),
+      upper_shadow_size_lag15 = lag(upper_shadow_size, 15),
+      lower_shadow_size_lag15 = lag(lower_shadow_size, 15),
+      direction_lag15 = lag(direction, 15)
+    )
 
   return(candles_with_fear_and_greed_data)
 }
