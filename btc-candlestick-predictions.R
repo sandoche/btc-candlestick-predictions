@@ -421,6 +421,225 @@ fear_and_greed_index <- fear_and_greed_index %>%
 
 dataset <- create_features(candles, fear_and_greed_index)
 
+## Testing machine learning models using a very small sample of the data
+
+# Take last 1000 candles
+small_dataset <- dataset %>% tail(1000)
+set.seed(1)
+
+# Split the data into training and testing sets
+test_index <- createDataPartition(y = small_dataset$direction, times = 1, p = 0.2, list = FALSE)
+train_set <- small_dataset[-test_index, ]
+test_set <- small_dataset[test_index, ]
+
+# Function to create feature sets with different lags
+create_feature_set <- function(n_lags) {
+  features <- c()
+
+  # Add base features for each lag
+  for (i in 1:n_lags) {
+    features <- c(
+      features,
+      paste0("body_size_lag_", i),
+      paste0("upper_shadow_size_lag_", i),
+      paste0("lower_shadow_size_lag_", i),
+      paste0("direction_lag_", i)
+    )
+  }
+
+  # Add volume and fear & greed value
+  features <- c(features, "volume", "value")
+
+  # Create formula for model training
+  formula_str <- paste("direction ~", paste(features, collapse = " + "))
+  return(as.formula(formula_str))
+}
+
+# Create formulas for different lag configurations
+formula_3_lag <- create_feature_set(3)
+formula_5_lag <- create_feature_set(5)
+formula_7_lag <- create_feature_set(7)
+formula_15_lag <- create_feature_set(15)
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Train GLM models
+start_time <- Sys.time()
+glm_3_lags <- train(formula_3_lag, data = train_set, method = "glm", family = "binomial")
+end_time <- Sys.time()
+print(paste("GLM 3 lags training time:", format(end_time - start_time, digits = 2)))
+
+start_time <- Sys.time()
+glm_5_lags <- train(formula_5_lag, data = train_set, method = "glm", family = "binomial")
+end_time <- Sys.time()
+print(paste("GLM 5 lags training time:", format(end_time - start_time, digits = 2)))
+
+start_time <- Sys.time()
+glm_7_lags <- train(formula_7_lag, data = train_set, method = "glm", family = "binomial")
+end_time <- Sys.time()
+print(paste("GLM 7 lags training time:", format(end_time - start_time, digits = 2)))
+
+start_time <- Sys.time()
+glm_15_lags <- train(formula_15_lag, data = train_set, method = "glm", family = "binomial")
+end_time <- Sys.time()
+print(paste("GLM 15 lags training time:", format(end_time - start_time, digits = 2)))
+
+# Train Decision Tree models
+start_time <- Sys.time()
+tree_3_lags <- train(formula_3_lag, data = train_set, method = "rpart")
+end_time <- Sys.time()
+print(paste("Decision Tree 3 lags training time:", format(end_time - start_time, digits = 2)))
+
+start_time <- Sys.time()
+tree_5_lags <- train(formula_5_lag, data = train_set, method = "rpart")
+end_time <- Sys.time()
+print(paste("Decision Tree 5 lags training time:", format(end_time - start_time, digits = 2)))
+
+start_time <- Sys.time()
+tree_7_lags <- train(formula_7_lag, data = train_set, method = "rpart")
+end_time <- Sys.time()
+print(paste("Decision Tree 7 lags training time:", format(end_time - start_time, digits = 2)))
+
+start_time <- Sys.time()
+tree_15_lags <- train(formula_15_lag, data = train_set, method = "rpart")
+end_time <- Sys.time()
+print(paste("Decision Tree 15 lags training time:", format(end_time - start_time, digits = 2)))
+
+# Train Random Forest models
+start_time <- Sys.time()
+rf_3_lags <- train(formula_3_lag, data = train_set, method = "rf", ntree = 100)
+end_time <- Sys.time()
+print(paste("Random Forest 3 lags training time:", format(end_time - start_time, digits = 2)))
+
+start_time <- Sys.time()
+rf_5_lags <- train(formula_5_lag, data = train_set, method = "rf", ntree = 100)
+end_time <- Sys.time()
+print(paste("Random Forest 5 lags training time:", format(end_time - start_time, digits = 2)))
+
+start_time <- Sys.time()
+rf_7_lags <- train(formula_7_lag, data = train_set, method = "rf", ntree = 100)
+end_time <- Sys.time()
+print(paste("Random Forest 7 lags training time:", format(end_time - start_time, digits = 2)))
+
+start_time <- Sys.time()
+rf_15_lags <- train(formula_15_lag, data = train_set, method = "rf", ntree = 100)
+end_time <- Sys.time()
+print(paste("Random Forest 15 lags training time:", format(end_time - start_time, digits = 2)))
+
+# Train KNN models
+start_time <- Sys.time()
+knn_3_lags <- train(formula_3_lag,
+  data = train_set, method = "knn",
+  preProcess = c("center", "scale"),
+  tuneGrid = data.frame(k = seq(3, 15, 2))
+)
+end_time <- Sys.time()
+print(paste("KNN 3 lags training time:", format(end_time - start_time, digits = 2)))
+
+start_time <- Sys.time()
+knn_5_lags <- train(formula_5_lag,
+  data = train_set, method = "knn",
+  preProcess = c("center", "scale"),
+  tuneGrid = data.frame(k = seq(3, 15, 2))
+)
+end_time <- Sys.time()
+print(paste("KNN 5 lags training time:", format(end_time - start_time, digits = 2)))
+
+start_time <- Sys.time()
+knn_7_lags <- train(formula_7_lag,
+  data = train_set, method = "knn",
+  preProcess = c("center", "scale"),
+  tuneGrid = data.frame(k = seq(3, 15, 2))
+)
+end_time <- Sys.time()
+print(paste("KNN 7 lags training time:", format(end_time - start_time, digits = 2)))
+
+start_time <- Sys.time()
+knn_15_lags <- train(formula_15_lag,
+  data = train_set, method = "knn",
+  preProcess = c("center", "scale"),
+  tuneGrid = data.frame(k = seq(3, 15, 2))
+)
+end_time <- Sys.time()
+print(paste("KNN 15 lags training time:", format(end_time - start_time, digits = 2)))
+
+# Calculate accuracies
+results <- data.frame(
+  model = character(),
+  n_lags = numeric(),
+  accuracy = numeric(),
+  stringsAsFactors = FALSE
+)
+
+# Function to add model results
+add_model_results <- function(model, model_name, n_lags) {
+  predictions <- predict(model, test_set)
+  accuracy <- mean(predictions == test_set$direction)
+  data.frame(
+    model = model_name,
+    n_lags = n_lags,
+    accuracy = accuracy
+  )
+}
+
+# Add results for all models
+results <- rbind(
+  # GLM results
+  add_model_results(glm_3_lags, "GLM", 3),
+  add_model_results(glm_5_lags, "GLM", 5),
+  add_model_results(glm_7_lags, "GLM", 7),
+  add_model_results(glm_15_lags, "GLM", 15),
+
+  # Decision Tree results
+  add_model_results(tree_3_lags, "Decision Tree", 3),
+  add_model_results(tree_5_lags, "Decision Tree", 5),
+  add_model_results(tree_7_lags, "Decision Tree", 7),
+  add_model_results(tree_15_lags, "Decision Tree", 15),
+
+  # Random Forest results
+  add_model_results(rf_3_lags, "Random Forest", 3),
+  add_model_results(rf_5_lags, "Random Forest", 5),
+  add_model_results(rf_7_lags, "Random Forest", 7),
+  add_model_results(rf_15_lags, "Random Forest", 15),
+
+  # KNN results
+  add_model_results(knn_3_lags, "KNN", 3),
+  add_model_results(knn_5_lags, "KNN", 5),
+  add_model_results(knn_7_lags, "KNN", 7),
+  add_model_results(knn_15_lags, "KNN", 15)
+)
+
+# Display results
+results %>%
+  arrange(desc(accuracy)) %>%
+  mutate(accuracy = scales::percent(accuracy, accuracy = 0.01)) %>%
+  print()
+
+# Plot results
+ggplot(results, aes(x = factor(n_lags), y = accuracy, fill = model)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_minimal() +
+  labs(
+    title = "Model Performance Comparison",
+    x = "Number of Lags",
+    y = "Accuracy",
+    fill = "Model Type"
+  ) +
+  scale_y_continuous(labels = scales::percent) +
+  theme(legend.position = "bottom")
+
+# Find best model
+best_result <- results %>%
+  arrange(desc(accuracy)) %>%
+  slice(1)
+
+message(sprintf(
+  "\nBest model: %s with %d lags (Accuracy: %s)",
+  best_result$model,
+  best_result$n_lags,
+  best_result$accuracy
+))
 
 # References
 # Coinbase API to get the candlestick data: https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductcandles
