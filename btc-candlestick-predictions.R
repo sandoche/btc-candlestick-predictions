@@ -257,7 +257,9 @@ create_features <- function(candles_data, fear_and_greed_data) {
       upper_shadow_size_lag_15 = lag(upper_shadow_size, 15),
       lower_shadow_size_lag_15 = lag(lower_shadow_size, 15),
       direction_lag_15 = lag(direction, 15)
-    )
+    ) %>%
+    drop_na()
+
 
   return(candles_with_fear_and_greed_data)
 }
