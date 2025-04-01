@@ -641,6 +641,8 @@ message(sprintf(
   best_result$accuracy
 ))
 
+# VOLUME SHOULD BE INCLUDED IN THE LAGS
+
 # References
 # Coinbase API to get the candlestick data: https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductcandles
 # https://business-science.github.io/tidyquant/articles/TQ04-charting-with-tidyquant.html
