@@ -642,6 +642,7 @@ message(sprintf(
 ))
 
 # VOLUME SHOULD BE INCLUDED IN THE LAGS
+# https://www.neuroquantology.com/open-access/An+Optimized+Machine+Learning+Model+for+Candlestick+Chart+Analysis+to+Predict+Stock+Market+Trends_9861/?download=true
 
 # References
 # Coinbase API to get the candlestick data: https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductcandles
