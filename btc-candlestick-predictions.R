@@ -195,68 +195,85 @@ create_features <- function(candles_data, fear_and_greed_data) {
   }
 
   # add 15 lagged candle's features
+
+  # add 15 lagged candle's features
   candles_with_fear_and_greed_data <- candles_with_fear_and_greed_data %>%
     mutate(
       body_size_lag_1 = lag(body_size, 1),
       upper_shadow_size_lag_1 = lag(upper_shadow_size, 1),
       lower_shadow_size_lag_1 = lag(lower_shadow_size, 1),
       direction_lag_1 = lag(direction, 1),
+      volume_lag_1 = lag(volume, 1),
       body_size_lag_2 = lag(body_size, 2),
       upper_shadow_size_lag_2 = lag(upper_shadow_size, 2),
       lower_shadow_size_lag_2 = lag(lower_shadow_size, 2),
       direction_lag_2 = lag(direction, 2),
+      volume_lag_2 = lag(volume, 2),
       body_size_lag_3 = lag(body_size, 3),
       upper_shadow_size_lag_3 = lag(upper_shadow_size, 3),
       lower_shadow_size_lag_3 = lag(lower_shadow_size, 3),
       direction_lag_3 = lag(direction, 3),
+      volume_lag_3 = lag(volume, 3),
       body_size_lag_4 = lag(body_size, 4),
       upper_shadow_size_lag_4 = lag(upper_shadow_size, 4),
       lower_shadow_size_lag_4 = lag(lower_shadow_size, 4),
       direction_lag_4 = lag(direction, 4),
+      volume_lag_4 = lag(volume, 4),
       body_size_lag_5 = lag(body_size, 5),
       upper_shadow_size_lag_5 = lag(upper_shadow_size, 5),
       lower_shadow_size_lag_5 = lag(lower_shadow_size, 5),
       direction_lag_5 = lag(direction, 5),
+      volume_lag_5 = lag(volume, 5),
       body_size_lag_6 = lag(body_size, 6),
       upper_shadow_size_lag_6 = lag(upper_shadow_size, 6),
       lower_shadow_size_lag_6 = lag(lower_shadow_size, 6),
       direction_lag_6 = lag(direction, 6),
+      volume_lag_6 = lag(volume, 6),
       body_size_lag_7 = lag(body_size, 7),
       upper_shadow_size_lag_7 = lag(upper_shadow_size, 7),
       lower_shadow_size_lag_7 = lag(lower_shadow_size, 7),
       direction_lag_7 = lag(direction, 7),
+      volume_lag_7 = lag(volume, 7),
       body_size_lag_8 = lag(body_size, 8),
       upper_shadow_size_lag_8 = lag(upper_shadow_size, 8),
       lower_shadow_size_lag_8 = lag(lower_shadow_size, 8),
       direction_lag_8 = lag(direction, 8),
+      volume_lag_8 = lag(volume, 8),
       body_size_lag_9 = lag(body_size, 9),
       upper_shadow_size_lag_9 = lag(upper_shadow_size, 9),
       lower_shadow_size_lag_9 = lag(lower_shadow_size, 9),
       direction_lag_9 = lag(direction, 9),
+      volume_lag_9 = lag(volume, 9),
       body_size_lag_10 = lag(body_size, 10),
       upper_shadow_size_lag_10 = lag(upper_shadow_size, 10),
       lower_shadow_size_lag_10 = lag(lower_shadow_size, 10),
       direction_lag_10 = lag(direction, 10),
+      volume_lag_10 = lag(volume, 10),
       body_size_lag_11 = lag(body_size, 11),
       upper_shadow_size_lag_11 = lag(upper_shadow_size, 11),
       lower_shadow_size_lag_11 = lag(lower_shadow_size, 11),
       direction_lag_11 = lag(direction, 11),
+      volume_lag_11 = lag(volume, 11),
       body_size_lag_12 = lag(body_size, 12),
       upper_shadow_size_lag_12 = lag(upper_shadow_size, 12),
       lower_shadow_size_lag_12 = lag(lower_shadow_size, 12),
       direction_lag_12 = lag(direction, 12),
+      volume_lag_12 = lag(volume, 12),
       body_size_lag_13 = lag(body_size, 13),
       upper_shadow_size_lag_13 = lag(upper_shadow_size, 13),
       lower_shadow_size_lag_13 = lag(lower_shadow_size, 13),
       direction_lag_13 = lag(direction, 13),
+      volume_lag_13 = lag(volume, 13),
       body_size_lag_14 = lag(body_size, 14),
       upper_shadow_size_lag_14 = lag(upper_shadow_size, 14),
       lower_shadow_size_lag_14 = lag(lower_shadow_size, 14),
       direction_lag_14 = lag(direction, 14),
+      volume_lag_14 = lag(volume, 14),
       body_size_lag_15 = lag(body_size, 15),
       upper_shadow_size_lag_15 = lag(upper_shadow_size, 15),
       lower_shadow_size_lag_15 = lag(lower_shadow_size, 15),
-      direction_lag_15 = lag(direction, 15)
+      direction_lag_15 = lag(direction, 15),
+      volume_lag_15 = lag(volume, 15)
     ) %>%
     drop_na()
 
@@ -424,7 +441,7 @@ dataset <- create_features(candles, fear_and_greed_index)
 ## Testing machine learning models using a very small sample of the data
 
 # Take last 1000 candles
-small_dataset <- dataset %>% tail(1000)
+small_dataset <- dataset
 set.seed(1)
 
 # Split the data into training and testing sets
@@ -443,7 +460,8 @@ create_feature_set <- function(n_lags) {
       paste0("body_size_lag_", i),
       paste0("upper_shadow_size_lag_", i),
       paste0("lower_shadow_size_lag_", i),
-      paste0("direction_lag_", i)
+      paste0("direction_lag_", i),
+      paste0("volume_lag_", i)
     )
   }
 
@@ -564,6 +582,33 @@ knn_15_lags <- train(formula_15_lag,
 end_time <- Sys.time()
 print(paste("KNN 15 lags training time:", format(end_time - start_time, digits = 2)))
 
+# Train nnet
+start_time <- Sys.time()
+nnet_3_lags <- train(formula_3_lag, data = train_set, method = "nnet")
+end_time <- Sys.time()
+print(paste("nnet 3 lags training time:", format(end_time - start_time, digits = 2)))
+
+start_time <- Sys.time()
+nnet_5_lags <- train(formula_5_lag, data = train_set, method = "nnet")
+end_time <- Sys.time()
+print(paste("nnet 5 lags training time:", format(end_time - start_time, digits = 2)))
+
+start_time <- Sys.time()
+nnet_7_lags <- train(formula_7_lag, data = train_set, method = "nnet")
+end_time <- Sys.time()
+print(paste("nnet 7 lags training time:", format(end_time - start_time, digits = 2)))
+
+start_time <- Sys.time()
+nnet_15_lags <- train(formula_15_lag, data = train_set, method = "nnet")
+end_time <- Sys.time()
+print(paste("nnet 15 lags training time:", format(end_time - start_time, digits = 2)))
+
+
+
+
+
+
+
 # Calculate accuracies
 results <- data.frame(
   model = character(),
@@ -607,7 +652,13 @@ results <- rbind(
   add_model_results(knn_3_lags, "KNN", 3),
   add_model_results(knn_5_lags, "KNN", 5),
   add_model_results(knn_7_lags, "KNN", 7),
-  add_model_results(knn_15_lags, "KNN", 15)
+  add_model_results(knn_15_lags, "KNN", 15),
+
+  # nnet results
+  add_model_results(nnet_3_lags, "nnet", 3),
+  add_model_results(nnet_5_lags, "nnet", 5),
+  add_model_results(nnet_7_lags, "nnet", 7),
+  add_model_results(nnet_15_lags, "nnet", 15)
 )
 
 # Display results
