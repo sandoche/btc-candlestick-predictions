@@ -581,10 +581,10 @@ results <- rbind(
   add_model_results(knn_15_lags, "KNN", 15),
 
   # nnet results
-  add_model_results(nnet_3_lags, "nnet", 3),
-  add_model_results(nnet_5_lags, "nnet", 5),
-  add_model_results(nnet_7_lags, "nnet", 7),
-  add_model_results(nnet_15_lags, "nnet", 15)
+#  add_model_results(nnet_3_lags, "nnet", 3),
+#  add_model_results(nnet_5_lags, "nnet", 5),
+#  add_model_results(nnet_7_lags, "nnet", 7),
+#  add_model_results(nnet_15_lags, "nnet", 15)
 )
 
 # Display results
