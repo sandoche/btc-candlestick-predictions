@@ -136,3 +136,60 @@ And close price
 18           KNN     15   50.10%
 19          nnet      3   49.71%
 20          nnet      5   48.74%
+
+
+## Test 3
+
+WITH EVERYTHING
+
+           model n_lags accuracy
+1  Decision Tree      3   64.98%
+2  Decision Tree      5   64.98%
+3  Decision Tree      7   64.98%
+4  Decision Tree     15   64.98%
+5            GLM      3   64.65%
+6            GLM      5   64.65%
+7            GLM      7   64.65%
+8  Random Forest      5   62.63%
+9            GLM     15   60.27%
+10 Random Forest      3   60.27%
+11           KNN     15   59.93%
+12 Random Forest      7   59.60%
+13 Random Forest     15   59.60%
+14           KNN      3   59.26%
+15           KNN      7   56.23%
+16           KNN      5   55.89%
+17          nnet      3   51.18%
+18          nnet      5   51.18%
+19          nnet      7   51.18%
+20          nnet     15   51.18%
+
+WITHOUT 
+
+#      paste0("hash_rate_lag_", i),
+#      paste0("avg_block_size_lag_", i),
+#      paste0("n_transactions_lag_", i),
+#      paste0("utxo_count_lag_", i)
+
+
+           model n_lags accuracy
+1            GLM      3   65.32%
+2  Decision Tree      3   64.98%
+3  Decision Tree      5   64.98%
+4  Decision Tree      7   64.98%
+5  Decision Tree     15   64.98%
+6            GLM      5   62.29%
+7            GLM     15   61.95%
+8            GLM      7   61.28%
+9  Random Forest      5   60.27%
+10 Random Forest      3   59.26%
+11 Random Forest     15   59.26%
+12 Random Forest      7   58.25%
+13           KNN      3   56.90%
+14           KNN      5   56.57%
+15           KNN     15   55.22%
+16          nnet      3   52.86%
+17           KNN      7   52.53%
+18          nnet      7   52.19%
+19          nnet     15   52.19%
+20          nnet      5   47.81%

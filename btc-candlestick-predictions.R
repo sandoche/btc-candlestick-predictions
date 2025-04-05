@@ -179,10 +179,14 @@ get_fear_and_greed_index <- function(start_time = start_date, end_time = end_dat
   return(fear_and_greed_index_data)
 }
 
-create_features <- function(candles_data, fear_and_greed_data) {
+create_features <- function(candles_data, fear_and_greed_data, hash_rate_data, average_block_size_data, n_transactions_data, utxo_count_data) {
   candles_with_fear_and_greed_data <- candles_data %>%
     mutate(date_only = as.Date(time)) %>%
-    left_join(fear_and_greed_data, by = c("date_only" = "timestamp"))
+    left_join(fear_and_greed_data, by = c("date_only" = "timestamp")) %>%
+    left_join(hash_rate_data, by = c("date_only" = "timestamp")) %>%
+    left_join(average_block_size_data, by = c("date_only" = "timestamp")) %>%
+    left_join(n_transactions_data, by = c("date_only" = "timestamp")) %>%
+    left_join(utxo_count_data, by = c("date_only" = "timestamp"))
 
   candles_with_fear_and_greed_data <- candles_with_fear_and_greed_data %>%
     mutate(
@@ -205,6 +209,10 @@ create_features <- function(candles_data, fear_and_greed_data) {
     candles_with_fear_and_greed_data[[paste0("volume_lag_", i)]] <- lag(candles_with_fear_and_greed_data$volume, i)
     candles_with_fear_and_greed_data[[paste0("value_lag_", i)]] <- lag(candles_with_fear_and_greed_data$value, i)
     candles_with_fear_and_greed_data[[paste0("close_price_lag_", i)]] <- lag(candles_with_fear_and_greed_data$close, i)
+    candles_with_fear_and_greed_data[[paste0("hash_rate_lag_", i)]] <- lag(candles_with_fear_and_greed_data$hash_rate, i)
+    candles_with_fear_and_greed_data[[paste0("avg_block_size_lag_", i)]] <- lag(candles_with_fear_and_greed_data$avg_block_size, i)
+    candles_with_fear_and_greed_data[[paste0("n_transactions_lag_", i)]] <- lag(candles_with_fear_and_greed_data$n_transactions, i)
+    candles_with_fear_and_greed_data[[paste0("utxo_count_lag_", i)]] <- lag(candles_with_fear_and_greed_data$utxo_count, i)
   }
 
   candles_with_fear_and_greed_data <- candles_with_fear_and_greed_data %>%
@@ -466,7 +474,7 @@ fear_and_greed_value_date_na <- mean(c(fear_and_greed_index_date_before_na$value
 fear_and_greed_index <- fear_and_greed_index %>%
   bind_rows(tibble(timestamp = date_na, value = fear_and_greed_value_date_na, value_classification = "Greed"))
 
-dataset <- create_features(candles, fear_and_greed_index)
+dataset <- create_features(candles, fear_and_greed_index, hash_rate, average_block_size, n_transactions, utxo_count)
 
 ## Testing machine learning models using a very small sample of the data
 
@@ -494,6 +502,10 @@ create_feature_set <- function(n_lags) {
       paste0("volume_lag_", i),
       paste0("value_lag_", i),
       paste0("close_price_lag_", i)
+#      paste0("hash_rate_lag_", i),
+#      paste0("avg_block_size_lag_", i),
+#      paste0("n_transactions_lag_", i),
+#      paste0("utxo_count_lag_", i)
     )
   }
 
