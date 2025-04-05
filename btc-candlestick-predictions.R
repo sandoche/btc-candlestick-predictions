@@ -5,11 +5,13 @@ if (!require(caret)) install.packages("caret", repos = "http://cran.us.r-project
 if (!require(httr)) install.packages("httr", repos = "http://cran.us.r-project.org")
 if (!require(jsonlite)) install.packages("jsonlite", repos = "http://cran.us.r-project.org")
 if (!require(tidyquant)) install.packages("tidyquant", repos = "http://cran.us.r-project.org")
+if (!require(patchwork)) install.packages("patchwork", repos = "http://cran.us.r-project.org")
 library(tidyverse)
 library(caret)
 library(httr)
 library(jsonlite)
 library(tidyquant)
+library(patchwork)
 
 ### Global Variables ###
 
@@ -235,24 +237,80 @@ fear_and_greed_index <- fear_and_greed_index %>% mutate(value = as.numeric(value
 head(fear_and_greed_index)
 
 hash_rate <- jsonlite::fromJSON("data/hash-rate.json")$`hash-rate` %>%
-  rename(timestamp = x, hash_rate = y)
+  rename(timestamp = x, hash_rate = y) %>%
+  mutate(timestamp = as.POSIXct(timestamp / 1000, origin = "1970-01-01", tz = "UTC")) %>%
+  filter(timestamp >= as.POSIXct(start_date, origin = "1970-01-01", tz = "UTC") & timestamp <= as.POSIXct(end_date, origin = "1970-01-01", tz = "UTC"))
 head(hash_rate)
 
 average_block_size <- jsonlite::fromJSON("data/avg-block-size.json")$`avg-block-size` %>%
-  rename(timestamp = x, avg_block_size = y)
+  rename(timestamp = x, avg_block_size = y) %>%
+  mutate(timestamp = as.POSIXct(timestamp / 1000, origin = "1970-01-01", tz = "UTC")) %>%
+  filter(timestamp >= as.POSIXct(start_date, origin = "1970-01-01", tz = "UTC") & timestamp <= as.POSIXct(end_date, origin = "1970-01-01", tz = "UTC"))
 head(average_block_size)
 
 n_transactions <- jsonlite::fromJSON("data/n-transactions.json")$`n-transactions` %>%
-  rename(timestamp = x, n_transactions = y)  
+  rename(timestamp = x, n_transactions = y) %>%
+  mutate(timestamp = as.POSIXct(timestamp / 1000, origin = "1970-01-01", tz = "UTC")) %>%
+  filter(timestamp >= as.POSIXct(start_date, origin = "1970-01-01", tz = "UTC") & timestamp <= as.POSIXct(end_date, origin = "1970-01-01", tz = "UTC"))
 head(n_transactions)
 
 utxo_count <- jsonlite::fromJSON("data/utxo-count.json")$`utxo-count` %>%
-  rename(timestamp = x, utxo_count = y)    
+  rename(timestamp = x, utxo_count = y) %>%
+  mutate(timestamp = as.POSIXct(timestamp / 1000, origin = "1970-01-01", tz = "UTC")) %>%
+  filter(timestamp >= as.POSIXct(start_date, origin = "1970-01-01", tz = "UTC") & timestamp <= as.POSIXct(end_date, origin = "1970-01-01", tz = "UTC"))
 head(utxo_count)
 
 ## Visualizing the data
 
 # Plot the data to check if everything is good
+
+# Create the multi-panel plot
+p1 <- candles %>%
+  ggplot(aes(x = time, y = close)) +
+  geom_line(color = "blue") +
+  theme_minimal() +
+  labs(title = "BTC-USD Price", y = "Price") +
+  scale_y_continuous(labels = scales::comma)
+
+p2 <- hash_rate %>%
+  ggplot(aes(x = timestamp, y = hash_rate)) +
+  geom_line(color = "red") +
+  theme_minimal() +
+  labs(title = "Hash Rate", y = "Hash Rate") +
+  scale_y_continuous(labels = scales::comma)
+
+p3 <- average_block_size %>%
+  ggplot(aes(x = timestamp, y = avg_block_size)) +
+  geom_line(color = "green4") +
+  theme_minimal() +
+  labs(title = "Average Block Size", y = "Size") +
+  scale_y_continuous(labels = scales::comma)
+
+p4 <- n_transactions %>%
+  ggplot(aes(x = timestamp, y = n_transactions)) +
+  geom_line(color = "purple") +
+  theme_minimal() +
+  labs(title = "Number of Transactions", y = "Count") +
+  scale_y_continuous(labels = scales::comma)
+
+p5 <- utxo_count %>%
+  ggplot(aes(x = timestamp, y = utxo_count)) +
+  geom_line(color = "orange") +
+  theme_minimal() +
+  labs(title = "UTXO Count", y = "Count") +
+  scale_y_continuous(labels = scales::comma)
+
+combined_plot <- (p1 / p2 / p3 / p4 / p5) +
+  plot_layout(ncol = 1, heights = c(1, 1, 1, 1, 1)) +
+  plot_annotation(
+    title = "Bitcoin Price and Blockchain Metrics",
+    theme = theme(plot.title = element_text(hjust = 0.5, size = 16))
+  ) &
+  theme(axis.title.x = element_blank())
+
+print(combined_plot)
+
+# Original single plot kept for reference
 candles %>%
   ggplot(aes(x = time, y = close)) +
   geom_line() +
