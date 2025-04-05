@@ -194,87 +194,17 @@ create_features <- function(candles_data, fear_and_greed_data) {
     stop("There are NAs in the data")
   }
 
-  # add 15 lagged candle's features
-  candles_with_fear_and_greed_data <- candles_with_fear_and_greed_data %>%
-    mutate(
-      body_size_lag_1 = lag(body_size, 1),
-      upper_shadow_size_lag_1 = lag(upper_shadow_size, 1),
-      lower_shadow_size_lag_1 = lag(lower_shadow_size, 1),
-      direction_lag_1 = lag(direction, 1),
-      volume_lag_1 = lag(volume, 1),
-      body_size_lag_2 = lag(body_size, 2),
-      upper_shadow_size_lag_2 = lag(upper_shadow_size, 2),
-      lower_shadow_size_lag_2 = lag(lower_shadow_size, 2),
-      direction_lag_2 = lag(direction, 2),
-      volume_lag_2 = lag(volume, 2),
-      body_size_lag_3 = lag(body_size, 3),
-      upper_shadow_size_lag_3 = lag(upper_shadow_size, 3),
-      lower_shadow_size_lag_3 = lag(lower_shadow_size, 3),
-      direction_lag_3 = lag(direction, 3),
-      volume_lag_3 = lag(volume, 3),
-      body_size_lag_4 = lag(body_size, 4),
-      upper_shadow_size_lag_4 = lag(upper_shadow_size, 4),
-      lower_shadow_size_lag_4 = lag(lower_shadow_size, 4),
-      direction_lag_4 = lag(direction, 4),
-      volume_lag_4 = lag(volume, 4),
-      body_size_lag_5 = lag(body_size, 5),
-      upper_shadow_size_lag_5 = lag(upper_shadow_size, 5),
-      lower_shadow_size_lag_5 = lag(lower_shadow_size, 5),
-      direction_lag_5 = lag(direction, 5),
-      volume_lag_5 = lag(volume, 5),
-      body_size_lag_6 = lag(body_size, 6),
-      upper_shadow_size_lag_6 = lag(upper_shadow_size, 6),
-      lower_shadow_size_lag_6 = lag(lower_shadow_size, 6),
-      direction_lag_6 = lag(direction, 6),
-      volume_lag_6 = lag(volume, 6),
-      body_size_lag_7 = lag(body_size, 7),
-      upper_shadow_size_lag_7 = lag(upper_shadow_size, 7),
-      lower_shadow_size_lag_7 = lag(lower_shadow_size, 7),
-      direction_lag_7 = lag(direction, 7),
-      volume_lag_7 = lag(volume, 7),
-      body_size_lag_8 = lag(body_size, 8),
-      upper_shadow_size_lag_8 = lag(upper_shadow_size, 8),
-      lower_shadow_size_lag_8 = lag(lower_shadow_size, 8),
-      direction_lag_8 = lag(direction, 8),
-      volume_lag_8 = lag(volume, 8),
-      body_size_lag_9 = lag(body_size, 9),
-      upper_shadow_size_lag_9 = lag(upper_shadow_size, 9),
-      lower_shadow_size_lag_9 = lag(lower_shadow_size, 9),
-      direction_lag_9 = lag(direction, 9),
-      volume_lag_9 = lag(volume, 9),
-      body_size_lag_10 = lag(body_size, 10),
-      upper_shadow_size_lag_10 = lag(upper_shadow_size, 10),
-      lower_shadow_size_lag_10 = lag(lower_shadow_size, 10),
-      direction_lag_10 = lag(direction, 10),
-      volume_lag_10 = lag(volume, 10),
-      body_size_lag_11 = lag(body_size, 11),
-      upper_shadow_size_lag_11 = lag(upper_shadow_size, 11),
-      lower_shadow_size_lag_11 = lag(lower_shadow_size, 11),
-      direction_lag_11 = lag(direction, 11),
-      volume_lag_11 = lag(volume, 11),
-      body_size_lag_12 = lag(body_size, 12),
-      upper_shadow_size_lag_12 = lag(upper_shadow_size, 12),
-      lower_shadow_size_lag_12 = lag(lower_shadow_size, 12),
-      direction_lag_12 = lag(direction, 12),
-      volume_lag_12 = lag(volume, 12),
-      body_size_lag_13 = lag(body_size, 13),
-      upper_shadow_size_lag_13 = lag(upper_shadow_size, 13),
-      lower_shadow_size_lag_13 = lag(lower_shadow_size, 13),
-      direction_lag_13 = lag(direction, 13),
-      volume_lag_13 = lag(volume, 13),
-      body_size_lag_14 = lag(body_size, 14),
-      upper_shadow_size_lag_14 = lag(upper_shadow_size, 14),
-      lower_shadow_size_lag_14 = lag(lower_shadow_size, 14),
-      direction_lag_14 = lag(direction, 14),
-      volume_lag_14 = lag(volume, 14),
-      body_size_lag_15 = lag(body_size, 15),
-      upper_shadow_size_lag_15 = lag(upper_shadow_size, 15),
-      lower_shadow_size_lag_15 = lag(lower_shadow_size, 15),
-      direction_lag_15 = lag(direction, 15),
-      volume_lag_15 = lag(volume, 15)
-    ) %>%
-    drop_na()
+  # add 15 lagged candle's features using a loop instead of manual listing
+  for (i in 1:15) {
+    candles_with_fear_and_greed_data[[paste0("body_size_lag_", i)]] <- lag(candles_with_fear_and_greed_data$body_size, i)
+    candles_with_fear_and_greed_data[[paste0("upper_shadow_size_lag_", i)]] <- lag(candles_with_fear_and_greed_data$upper_shadow_size, i)
+    candles_with_fear_and_greed_data[[paste0("lower_shadow_size_lag_", i)]] <- lag(candles_with_fear_and_greed_data$lower_shadow_size, i)
+    candles_with_fear_and_greed_data[[paste0("direction_lag_", i)]] <- lag(candles_with_fear_and_greed_data$direction, i)
+    candles_with_fear_and_greed_data[[paste0("volume_lag_", i)]] <- lag(candles_with_fear_and_greed_data$volume, i)
+  }
 
+  candles_with_fear_and_greed_data <- candles_with_fear_and_greed_data %>%
+    drop_na()
 
   return(candles_with_fear_and_greed_data)
 }
