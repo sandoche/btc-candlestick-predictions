@@ -353,7 +353,7 @@ sum(is.na(candles_with_fear_and_greed_index))
 
 ## Prepare the data for the model
 
-candles <- read_csv(paste0("data/", trading_pair, "_candles_", start_date, "_", end_date, ".csv"))
+candles <- read_csv(paste0("data/", trading_pair, "_candles_", start_date, "_", end_date, "_", candlestick_period, ".csv"))
 fear_and_greed_index <- read_csv(paste0("data/", trading_pair, "_fear_and_greed_index_", start_date, "_", end_date, ".csv"))
 fear_and_greed_index <- fear_and_greed_index %>% mutate(value = as.numeric(value))
 
