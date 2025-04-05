@@ -201,7 +201,7 @@ create_features <- function(candles_data, fear_and_greed_data) {
     candles_with_fear_and_greed_data[[paste0("lower_shadow_size_lag_", i)]] <- lag(candles_with_fear_and_greed_data$lower_shadow_size, i)
     candles_with_fear_and_greed_data[[paste0("direction_lag_", i)]] <- lag(candles_with_fear_and_greed_data$direction, i)
     candles_with_fear_and_greed_data[[paste0("volume_lag_", i)]] <- lag(candles_with_fear_and_greed_data$volume, i)
-    candles_with_fear_and_greed_data[[paste0("value_lag_", i)]] <- lag(candles_with_fear_and_greed_data$value, i)
+    # candles_with_fear_and_greed_data[[paste0("value_lag_", i)]] <- lag(candles_with_fear_and_greed_data$value, i)
   }
 
   candles_with_fear_and_greed_data <- candles_with_fear_and_greed_data %>%
@@ -311,6 +311,25 @@ candles_with_fear_and_greed_index %>%
   ) +
   scale_y_continuous(labels = scales::comma)
 
+
+# Chart to compare the number of up vs down candles
+candles %>%
+  mutate(direction = ifelse(close >= open, "up", "down")) %>%
+  summarise(
+    up = sum(direction == "up"),
+    down = sum(direction == "down")
+  ) %>%
+  pivot_longer(cols = everything(), names_to = "direction", values_to = "count") %>%
+  ggplot(aes(x = direction, y = count)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(
+    title = "Number of Up vs Down Candles",
+    x = "Direction",
+    y = "Count"
+  )
+
+
 # We can see that when the price is going down the fear and greed index is low, and when the price goes up it's high
 # This could be a good feature to guess the candles color
 
@@ -391,8 +410,8 @@ create_feature_set <- function(n_lags) {
       paste0("upper_shadow_size_lag_", i),
       paste0("lower_shadow_size_lag_", i),
       paste0("direction_lag_", i),
-      paste0("volume_lag_", i),
-      paste0("value_lag_", i)
+      paste0("volume_lag_", i)
+      #      paste0("value_lag_", i)
     )
   }
 
