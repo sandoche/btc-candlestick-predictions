@@ -256,8 +256,11 @@ head(n_transactions)
 
 utxo_count <- jsonlite::fromJSON("data/utxo-count.json")$`utxo-count` %>%
   rename(timestamp = x, utxo_count = y) %>%
-  mutate(timestamp = as.POSIXct(timestamp / 1000, origin = "1970-01-01", tz = "UTC")) %>%
-  filter(timestamp >= as.POSIXct(start_date, origin = "1970-01-01", tz = "UTC") & timestamp <= as.POSIXct(end_date, origin = "1970-01-01", tz = "UTC"))
+  mutate(
+    timestamp = as.POSIXct(timestamp / 1000, origin = "1970-01-01", tz = "UTC"),
+    timestamp = as.Date(timestamp)
+  ) %>%
+  filter(timestamp >= as.Date(start_date) & timestamp <= as.Date(end_date))
 head(utxo_count)
 
 ## Visualizing the data
@@ -368,7 +371,11 @@ fear_and_greed_index %>%
 
 candles_with_fear_and_greed_index <- candles %>%
   mutate(date_only = as.Date(time)) %>%
-  left_join(fear_and_greed_index, by = c("date_only" = "timestamp"))
+  left_join(fear_and_greed_index, by = c("date_only" = "timestamp")) %>%
+  left_join(hash_rate, by = c("date_only" = "timestamp")) %>%
+  left_join(average_block_size, by = c("date_only" = "timestamp")) %>%
+  left_join(n_transactions, by = c("date_only" = "timestamp")) %>%
+  left_join(utxo_count, by = c("date_only" = "timestamp"))
 
 head(candles_with_fear_and_greed_index)
 
