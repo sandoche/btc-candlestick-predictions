@@ -232,8 +232,23 @@ head(candles)
 # Loading the predownloaded fear and greed data set, uncomment the code above if needed to download another data sets
 fear_and_greed_index <- read_csv(paste0("data/", trading_pair, "_fear_and_greed_index_", start_date, "_", end_date, ".csv"))
 fear_and_greed_index <- fear_and_greed_index %>% mutate(value = as.numeric(value))
-
 head(fear_and_greed_index)
+
+hash_rate <- jsonlite::fromJSON("data/hash-rate.json")$`hash-rate` %>%
+  rename(timestamp = x, hash_rate = y)
+head(hash_rate)
+
+average_block_size <- jsonlite::fromJSON("data/avg-block-size.json")$`avg-block-size` %>%
+  rename(timestamp = x, avg_block_size = y)
+head(average_block_size)
+
+n_transactions <- jsonlite::fromJSON("data/n-transactions.json")$`n-transactions` %>%
+  rename(timestamp = x, n_transactions = y)  
+head(n_transactions)
+
+utxo_count <- jsonlite::fromJSON("data/utxo-count.json")$`utxo-count` %>%
+  rename(timestamp = x, utxo_count = y)    
+head(utxo_count)
 
 ## Visualizing the data
 
