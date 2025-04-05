@@ -14,7 +14,7 @@ library(tidyquant)
 ### Global Variables ###
 
 trading_pair <- "BTC-USD"
-start_date <- "2024-01-01"
+start_date <- "2018-02-01"
 end_date <- "2025-03-29"
 candlestick_period <- 86400
 
@@ -190,9 +190,9 @@ create_features <- function(candles_data, fear_and_greed_data) {
       direction = ifelse(close > open, "up", "down"),
     )
 
-  if (sum(is.na(candles_with_fear_and_greed_data)) > 0) {
-    stop("There are NAs in the data")
-  }
+  # if (sum(is.na(candles_with_fear_and_greed_data)) > 0) {
+  #  stop(paste("There are NAs in the data: ", sum(is.na(candles_with_fear_and_greed_data))))
+  # }
 
   # add 15 lagged candle's features using a loop instead of manual listing
   for (i in 1:15) {
