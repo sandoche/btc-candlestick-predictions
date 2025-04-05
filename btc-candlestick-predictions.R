@@ -16,7 +16,7 @@ library(tidyquant)
 trading_pair <- "BTC-USD"
 start_date <- "2024-01-01"
 end_date <- "2025-03-29"
-candlestick_period <- 3600
+candlestick_period <- 86400
 
 ### Utilities ###
 
@@ -214,11 +214,12 @@ create_features <- function(candles_data, fear_and_greed_data) {
 
 ## Loading the data
 
-# candles <- get_coinbase_candles()
-# write_csv(candles, paste0("data/", trading_pair, "_candles_", start_date, "_", end_date, ".csv"))
+candles <- get_coinbase_candles()
+write_csv(candles, paste0("data/", trading_pair, "_candles_", start_date, "_", end_date, "_", candlestick_period, ".csv"))
 
 # Loading the predownloaded data set, uncomment the code above if needed to download another data sets
-candles <- read_csv(paste0("data/", trading_pair, "_candles_", start_date, "_", end_date, ".csv"))
+candles <- read_csv(paste0("data/", trading_pair, "_candles_", start_date, "_", end_date, "_", candlestick_period, ".csv"))
+
 
 # Explore the data
 head(candles)
