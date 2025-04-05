@@ -110,3 +110,29 @@ With Fear and greed index
 18          nnet     15   50.68%
 19 Random Forest      5   49.71%
 20 Random Forest     15   49.52%
+
+### With Fear and Greed Index
+
+And close price
+
+           model n_lags accuracy
+1  Decision Tree     15   55.90%
+2            GLM      3   54.93%
+3            GLM      5   54.93%
+4  Decision Tree      7   53.38%
+5            GLM     15   53.00%
+6            GLM      7   52.61%
+7  Random Forest      7   52.61%
+8            KNN      7   52.61%
+9            KNN      5   52.03%
+10 Random Forest      3   51.45%
+11 Random Forest      5   51.06%
+12 Random Forest     15   51.06%
+13 Decision Tree      3   50.87%
+14 Decision Tree      5   50.87%
+15           KNN      3   50.87%
+16          nnet      7   50.87%
+17          nnet     15   50.87%
+18           KNN     15   50.10%
+19          nnet      3   49.71%
+20          nnet      5   48.74%

@@ -201,7 +201,8 @@ create_features <- function(candles_data, fear_and_greed_data) {
     candles_with_fear_and_greed_data[[paste0("lower_shadow_size_lag_", i)]] <- lag(candles_with_fear_and_greed_data$lower_shadow_size, i)
     candles_with_fear_and_greed_data[[paste0("direction_lag_", i)]] <- lag(candles_with_fear_and_greed_data$direction, i)
     candles_with_fear_and_greed_data[[paste0("volume_lag_", i)]] <- lag(candles_with_fear_and_greed_data$volume, i)
-    # candles_with_fear_and_greed_data[[paste0("value_lag_", i)]] <- lag(candles_with_fear_and_greed_data$value, i)
+    candles_with_fear_and_greed_data[[paste0("value_lag_", i)]] <- lag(candles_with_fear_and_greed_data$value, i)
+    candles_with_fear_and_greed_data[[paste0("close_price_lag_", i)]] <- lag(candles_with_fear_and_greed_data$close, i)
   }
 
   candles_with_fear_and_greed_data <- candles_with_fear_and_greed_data %>%
@@ -410,8 +411,9 @@ create_feature_set <- function(n_lags) {
       paste0("upper_shadow_size_lag_", i),
       paste0("lower_shadow_size_lag_", i),
       paste0("direction_lag_", i),
-      paste0("volume_lag_", i)
-      #      paste0("value_lag_", i)
+      paste0("volume_lag_", i),
+      paste0("value_lag_", i),
+      paste0("close_price_lag_", i)
     )
   }
 
