@@ -195,8 +195,6 @@ create_features <- function(candles_data, fear_and_greed_data) {
   }
 
   # add 15 lagged candle's features
-
-  # add 15 lagged candle's features
   candles_with_fear_and_greed_data <- candles_with_fear_and_greed_data %>%
     mutate(
       body_size_lag_1 = lag(body_size, 1),
@@ -464,9 +462,6 @@ create_feature_set <- function(n_lags) {
       paste0("volume_lag_", i)
     )
   }
-
-  # Add volume and fear & greed value
-  features <- c(features, "volume", "value")
 
   # Create formula for model training
   formula_str <- paste("direction ~", paste(features, collapse = " + "))
