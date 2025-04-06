@@ -495,6 +495,17 @@ create_feature_set <- function(n_lags) {
   for (i in 1:n_lags) {
     features <- c(
       features,
+      paste0("body_size_lag_", i),
+      paste0("upper_shadow_size_lag_", i),
+      paste0("lower_shadow_size_lag_", i),
+      paste0("direction_lag_", i),
+      paste0("volume_lag_", i),
+      paste0("value_lag_", i),
+      paste0("close_price_lag_", i)
+      #      paste0("hash_rate_lag_", i),
+      #      paste0("avg_block_size_lag_", i),
+      #      paste0("n_transactions_lag_", i),
+      #      paste0("utxo_count_lag_", i)
     )
   }
 
