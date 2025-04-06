@@ -6,12 +6,14 @@ if (!require(httr)) install.packages("httr", repos = "http://cran.us.r-project.o
 if (!require(jsonlite)) install.packages("jsonlite", repos = "http://cran.us.r-project.org")
 if (!require(tidyquant)) install.packages("tidyquant", repos = "http://cran.us.r-project.org")
 if (!require(patchwork)) install.packages("patchwork", repos = "http://cran.us.r-project.org")
+if (!require(randomForest)) install.packages("randomForest", repos = "http://cran.us.r-project.org")
 library(tidyverse)
 library(caret)
 library(httr)
 library(jsonlite)
 library(tidyquant)
 library(patchwork)
+library(randomForest)
 
 ### Global Variables ###
 
@@ -501,11 +503,11 @@ create_feature_set <- function(n_lags) {
       paste0("direction_lag_", i),
       paste0("volume_lag_", i),
       paste0("value_lag_", i),
-      paste0("close_price_lag_", i)
-      #      paste0("hash_rate_lag_", i),
-      #      paste0("avg_block_size_lag_", i),
-      #      paste0("n_transactions_lag_", i),
-      #      paste0("utxo_count_lag_", i)
+      paste0("close_price_lag_", i),
+      paste0("hash_rate_lag_", i),
+      paste0("avg_block_size_lag_", i),
+      paste0("n_transactions_lag_", i),
+      paste0("utxo_count_lag_", i)
     )
   }
 
