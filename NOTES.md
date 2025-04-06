@@ -230,3 +230,19 @@ candlestick_period <- 3600
 9            GLM      5   63.15%
 10           GLM      7   63.15%
 11           GLM     15   62.93%
+
+
+With all
+
+           model n_lags accuracy
+1  Random Forest      5   66.72%
+2  Random Forest      3   64.58%
+3  Decision Tree      3   64.11%
+4  Decision Tree      5   64.11%
+5  Decision Tree      7   64.11%
+6  Decision Tree     15   64.11%
+7            KNN      3   63.24%
+8            GLM      3   63.21%
+9            GLM      5   63.21%
+10           GLM      7   63.12%
+11           GLM     15   62.90%
