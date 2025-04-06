@@ -193,3 +193,40 @@ WITHOUT
 18          nnet      7   52.19%
 19          nnet     15   52.19%
 20          nnet      5   47.81%
+
+
+## Test 4
+
+trading_pair <- "BTC-USD"
+start_date <- "2024-01-01"
+end_date <- "2025-03-29"
+candlestick_period <- 3600
+
+    features <- c(
+      features,
+      paste0("body_size_lag_", i),
+      paste0("upper_shadow_size_lag_", i),
+      paste0("lower_shadow_size_lag_", i),
+      paste0("direction_lag_", i),
+      paste0("volume_lag_", i),
+      paste0("value_lag_", i),
+      paste0("close_price_lag_", i)
+      #      paste0("hash_rate_lag_", i),
+      #      paste0("avg_block_size_lag_", i),
+      #      paste0("n_transactions_lag_", i),
+      #      paste0("utxo_count_lag_", i)
+    )
+    
+    
+           model n_lags accuracy
+1  Random Forest      5   65.57%
+2  Random Forest      3   65.51%
+3            KNN      3   64.58%
+4  Decision Tree      3   64.11%
+5  Decision Tree      5   64.11%
+6  Decision Tree      7   64.11%
+7  Decision Tree     15   64.11%
+8            GLM      3   63.37%
+9            GLM      5   63.15%
+10           GLM      7   63.15%
+11           GLM     15   62.93%
