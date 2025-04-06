@@ -246,3 +246,34 @@ With all
 9            GLM      5   63.21%
 10           GLM      7   63.12%
 11           GLM     15   62.90%
+
+with this
+
+    features <- c(
+      features,
+#      paste0("body_size_lag_", i)
+#      paste0("upper_shadow_size_lag_", i),
+#      paste0("lower_shadow_size_lag_", i),
+      paste0("direction_lag_", i),
+#      paste0("volume_lag_", i),
+      paste0("value_lag_", i)
+#      paste0("close_price_lag_", i),
+#      paste0("hash_rate_lag_", i),
+#      paste0("avg_block_size_lag_", i),
+#      paste0("n_transactions_lag_", i),
+#      paste0("utxo_count_lag_", i)
+    )
+  }
+  
+           model n_lags accuracy
+1  Random Forest      5   65.73%
+2            KNN      3   65.04%
+3  Random Forest      3   64.95%
+4  Decision Tree      3   64.11%
+5  Decision Tree      5   64.11%
+6  Decision Tree      7   64.11%
+7  Decision Tree     15   64.11%
+8            GLM      7   63.12%
+9            GLM      3   63.09%
+10           GLM      5   63.09%
+11           GLM     15   63.09%
