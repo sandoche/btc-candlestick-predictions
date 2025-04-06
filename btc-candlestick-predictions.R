@@ -16,9 +16,9 @@ library(patchwork)
 ### Global Variables ###
 
 trading_pair <- "BTC-USD"
-start_date <- "2018-02-01"
+start_date <- "2024-01-01"
 end_date <- "2025-03-29"
-candlestick_period <- 86400
+candlestick_period <- 3600
 
 ### Utilities ###
 
@@ -495,17 +495,6 @@ create_feature_set <- function(n_lags) {
   for (i in 1:n_lags) {
     features <- c(
       features,
-      paste0("body_size_lag_", i),
-      paste0("upper_shadow_size_lag_", i),
-      paste0("lower_shadow_size_lag_", i),
-      paste0("direction_lag_", i),
-      paste0("volume_lag_", i),
-      paste0("value_lag_", i),
-      paste0("close_price_lag_", i)
-#      paste0("hash_rate_lag_", i),
-#      paste0("avg_block_size_lag_", i),
-#      paste0("n_transactions_lag_", i),
-#      paste0("utxo_count_lag_", i)
     )
   }
 
@@ -576,17 +565,17 @@ rf_5_lags <- train(formula_5_lag, data = train_set, method = "rf", ntree = 100)
 end_time <- Sys.time()
 print(paste("Random Forest 5 lags training time:", format(end_time - start_time, digits = 2)))
 
-start_time <- Sys.time()
-rf_7_lags <- train(formula_7_lag, data = train_set, method = "rf", ntree = 100)
-end_time <- Sys.time()
-print(paste("Random Forest 7 lags training time:", format(end_time - start_time, digits = 2)))
+# start_time <- Sys.time()
+# rf_7_lags <- train(formula_7_lag, data = train_set, method = "rf", ntree = 100)
+# end_time <- Sys.time()
+# print(paste("Random Forest 7 lags training time:", format(end_time - start_time, digits = 2)))
 
-start_time <- Sys.time()
-rf_15_lags <- train(formula_15_lag, data = train_set, method = "rf", ntree = 100)
-end_time <- Sys.time()
-print(paste("Random Forest 15 lags training time:", format(end_time - start_time, digits = 2)))
+# start_time <- Sys.time()
+# rf_15_lags <- train(formula_15_lag, data = train_set, method = "rf", ntree = 100)
+# end_time <- Sys.time()
+# print(paste("Random Forest 15 lags training time:", format(end_time - start_time, digits = 2)))
 
-# Train KNN models
+# # Train KNN models
 start_time <- Sys.time()
 knn_3_lags <- train(formula_3_lag,
   data = train_set, method = "knn",
@@ -596,53 +585,53 @@ knn_3_lags <- train(formula_3_lag,
 end_time <- Sys.time()
 print(paste("KNN 3 lags training time:", format(end_time - start_time, digits = 2)))
 
-start_time <- Sys.time()
-knn_5_lags <- train(formula_5_lag,
-  data = train_set, method = "knn",
-  preProcess = c("center", "scale"),
-  tuneGrid = data.frame(k = seq(3, 15, 2))
-)
-end_time <- Sys.time()
-print(paste("KNN 5 lags training time:", format(end_time - start_time, digits = 2)))
+# start_time <- Sys.time()
+# knn_5_lags <- train(formula_5_lag,
+#   data = train_set, method = "knn",
+#   preProcess = c("center", "scale"),
+#   tuneGrid = data.frame(k = seq(3, 15, 2))
+# )
+# end_time <- Sys.time()
+# print(paste("KNN 5 lags training time:", format(end_time - start_time, digits = 2)))
 
-start_time <- Sys.time()
-knn_7_lags <- train(formula_7_lag,
-  data = train_set, method = "knn",
-  preProcess = c("center", "scale"),
-  tuneGrid = data.frame(k = seq(3, 15, 2))
-)
-end_time <- Sys.time()
-print(paste("KNN 7 lags training time:", format(end_time - start_time, digits = 2)))
+# start_time <- Sys.time()
+# knn_7_lags <- train(formula_7_lag,
+#   data = train_set, method = "knn",
+#   preProcess = c("center", "scale"),
+#   tuneGrid = data.frame(k = seq(3, 15, 2))
+# )
+# end_time <- Sys.time()
+# print(paste("KNN 7 lags training time:", format(end_time - start_time, digits = 2)))
 
-start_time <- Sys.time()
-knn_15_lags <- train(formula_15_lag,
-  data = train_set, method = "knn",
-  preProcess = c("center", "scale"),
-  tuneGrid = data.frame(k = seq(3, 15, 2))
-)
-end_time <- Sys.time()
-print(paste("KNN 15 lags training time:", format(end_time - start_time, digits = 2)))
+# start_time <- Sys.time()
+# knn_15_lags <- train(formula_15_lag,
+#   data = train_set, method = "knn",
+#   preProcess = c("center", "scale"),
+#   tuneGrid = data.frame(k = seq(3, 15, 2))
+# )
+# end_time <- Sys.time()
+# print(paste("KNN 15 lags training time:", format(end_time - start_time, digits = 2)))
 
-# Train nnet
-start_time <- Sys.time()
-nnet_3_lags <- train(formula_3_lag, data = train_set, method = "nnet")
-end_time <- Sys.time()
-print(paste("nnet 3 lags training time:", format(end_time - start_time, digits = 2)))
+# # Train nnet
+# start_time <- Sys.time()
+# nnet_3_lags <- train(formula_3_lag, data = train_set, method = "nnet")
+# end_time <- Sys.time()
+# print(paste("nnet 3 lags training time:", format(end_time - start_time, digits = 2)))
 
-start_time <- Sys.time()
-nnet_5_lags <- train(formula_5_lag, data = train_set, method = "nnet")
-end_time <- Sys.time()
-print(paste("nnet 5 lags training time:", format(end_time - start_time, digits = 2)))
+# start_time <- Sys.time()
+# nnet_5_lags <- train(formula_5_lag, data = train_set, method = "nnet")
+# end_time <- Sys.time()
+# print(paste("nnet 5 lags training time:", format(end_time - start_time, digits = 2)))
 
-start_time <- Sys.time()
-nnet_7_lags <- train(formula_7_lag, data = train_set, method = "nnet")
-end_time <- Sys.time()
-print(paste("nnet 7 lags training time:", format(end_time - start_time, digits = 2)))
+# start_time <- Sys.time()
+# nnet_7_lags <- train(formula_7_lag, data = train_set, method = "nnet")
+# end_time <- Sys.time()
+# print(paste("nnet 7 lags training time:", format(end_time - start_time, digits = 2)))
 
-start_time <- Sys.time()
-nnet_15_lags <- train(formula_15_lag, data = train_set, method = "nnet")
-end_time <- Sys.time()
-print(paste("nnet 15 lags training time:", format(end_time - start_time, digits = 2)))
+# start_time <- Sys.time()
+# nnet_15_lags <- train(formula_15_lag, data = train_set, method = "nnet")
+# end_time <- Sys.time()
+# print(paste("nnet 15 lags training time:", format(end_time - start_time, digits = 2)))
 
 
 
@@ -686,20 +675,20 @@ results <- rbind(
   # Random Forest results
   add_model_results(rf_3_lags, "Random Forest", 3),
   add_model_results(rf_5_lags, "Random Forest", 5),
-  add_model_results(rf_7_lags, "Random Forest", 7),
-  add_model_results(rf_15_lags, "Random Forest", 15),
+  #  add_model_results(rf_7_lags, "Random Forest", 7),
+  #  add_model_results(rf_15_lags, "Random Forest", 15),
 
   # KNN results
-  add_model_results(knn_3_lags, "KNN", 3),
-  add_model_results(knn_5_lags, "KNN", 5),
-  add_model_results(knn_7_lags, "KNN", 7),
-  add_model_results(knn_15_lags, "KNN", 15),
+  add_model_results(knn_3_lags, "KNN", 3)
+  #  add_model_results(knn_5_lags, "KNN", 5),
+  #  add_model_results(knn_7_lags, "KNN", 7),
+  #  add_model_results(knn_15_lags, "KNN", 15),
 
   # nnet results
-  add_model_results(nnet_3_lags, "nnet", 3),
-  add_model_results(nnet_5_lags, "nnet", 5),
-  add_model_results(nnet_7_lags, "nnet", 7),
-  add_model_results(nnet_15_lags, "nnet", 15)
+  #  add_model_results(nnet_3_lags, "nnet", 3),
+  #  add_model_results(nnet_5_lags, "nnet", 5),
+  #  add_model_results(nnet_7_lags, "nnet", 7),
+  #  add_model_results(nnet_15_lags, "nnet", 15)
 )
 
 # Display results
