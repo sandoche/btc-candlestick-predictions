@@ -314,3 +314,31 @@ Adding OHLC to the previous all
 9            GLM      5   63.86%
 10           GLM      7   63.71%
 11           KNN      3   62.93%
+
+
+  for (i in 1:n_lags) {
+    features <- c(
+      features,
+      paste0("body_size_lag_", i),
+      paste0("upper_shadow_size_lag_", i),
+      paste0("lower_shadow_size_lag_", i),
+      paste0("direction_lag_", i),
+      paste0("volume_lag_", i),
+      paste0("value_lag_", i),
+      paste0("close_price_lag_", i),
+      paste0("hash_rate_lag_", i),
+      paste0("avg_block_size_lag_", i),
+      paste0("n_transactions_lag_", i),
+      paste0("utxo_count_lag_", i),
+      #            paste0("open_lag_", i),
+      #            paste0("high_lag_", i),
+      #            paste0("low_lag_", i),
+      #            paste0("close_lag_", i),
+      paste0("roc_lag_", i),
+      paste0("macd_lag_", i),
+      paste0("signal_lag_", i),
+      paste0("rsi_lag_", i),
+      paste0("up_bband_lag_", i),
+      paste0("dn_bband_lag_", i)
+    )
+  }

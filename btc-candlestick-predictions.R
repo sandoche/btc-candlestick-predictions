@@ -209,25 +209,28 @@ create_features <- function(candles_data, fear_and_greed_data, hash_rate_data, a
       select = close,
       mutate_fun = ROC,
       n = 14,
-      col_rename = "roc_14"
+      col_rename = "roc"
     ) %>%
     tq_mutate( # https://www.keenbase-trading.com/find-best-macd-settings/#t-1719588154943
       select = close,
       mutate_fun = MACD,
       nFast = 12,
       nSlow = 26,
-      nSig = 9
+      nSig = 9,
+      col_rename = c("macd", "signal")
     ) %>%
     tq_mutate(
       select = close,
       mutate_fun = RSI,
-      n = 14
+      n = 14,
+      col_rename = "rsi"
     ) %>%
     tq_mutate(
       select = close,
       mutate_fun = BBands,
       n = 20,
-      sd = 2
+      sd = 2,
+      col_rename = "bband"
     )
 
   # add 15 lagged candle's features using a loop instead of manual listing
@@ -247,10 +250,10 @@ create_features <- function(candles_data, fear_and_greed_data, hash_rate_data, a
     candles_with_fear_and_greed_data_and_ta[[paste0("high_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$high, i)
     candles_with_fear_and_greed_data_and_ta[[paste0("low_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$low, i)
     candles_with_fear_and_greed_data_and_ta[[paste0("close_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$close, i)
-    candles_with_fear_and_greed_data_and_ta[[paste0("roc_14_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$roc_14, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("roc_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$roc, i)
     candles_with_fear_and_greed_data_and_ta[[paste0("macd_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$macd, i)
     candles_with_fear_and_greed_data_and_ta[[paste0("signal_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$signal, i)
-    candles_with_fear_and_greed_data_and_ta[[paste0("rsi_14_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$rsi_14, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("rsi_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$rsi, i)
     candles_with_fear_and_greed_data_and_ta[[paste0("up_bband_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$up, i)
     candles_with_fear_and_greed_data_and_ta[[paste0("dn_bband_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$dn, i)
   }
@@ -550,10 +553,10 @@ create_feature_set <- function(n_lags) {
       #            paste0("high_lag_", i),
       #            paste0("low_lag_", i),
       #            paste0("close_lag_", i),
-      paste0("roc_14_lag_", i),
+      paste0("roc_lag_", i),
       paste0("macd_lag_", i),
       paste0("signal_lag_", i),
-      paste0("rsi_14_lag_", i),
+      paste0("rsi_lag_", i),
       paste0("up_bband_lag_", i),
       paste0("dn_bband_lag_", i)
     )
