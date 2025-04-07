@@ -280,6 +280,8 @@ with this
 
 ### Test 5
 
+
+
 Adding OHLC to the previous all
 
       features,
@@ -300,3 +302,15 @@ Adding OHLC to the previous all
       paste0("close_lag_", i),
     )
 
+           model n_lags accuracy
+1  Random Forest      5   66.47%
+2  Random Forest      3   65.29%
+3  Decision Tree      3   64.11%
+4  Decision Tree      5   64.11%
+5  Decision Tree      7   64.11%
+6  Decision Tree     15   64.11%
+7            GLM      3   64.02%
+8            GLM     15   64.02%
+9            GLM      5   63.86%
+10           GLM      7   63.71%
+11           KNN      3   62.93%
