@@ -232,21 +232,21 @@ create_features <- function(candles_data, fear_and_greed_data, hash_rate_data, a
 
   # add 15 lagged candle's features using a loop instead of manual listing
   for (i in 1:15) {
-    candles_with_fear_and_greed_data[[paste0("body_size_lag_", i)]] <- lag(candles_with_fear_and_greed_data$body_size, i)
-    candles_with_fear_and_greed_data[[paste0("upper_shadow_size_lag_", i)]] <- lag(candles_with_fear_and_greed_data$upper_shadow_size, i)
-    candles_with_fear_and_greed_data[[paste0("lower_shadow_size_lag_", i)]] <- lag(candles_with_fear_and_greed_data$lower_shadow_size, i)
-    candles_with_fear_and_greed_data[[paste0("direction_lag_", i)]] <- lag(candles_with_fear_and_greed_data$direction, i)
-    candles_with_fear_and_greed_data[[paste0("volume_lag_", i)]] <- lag(candles_with_fear_and_greed_data$volume, i)
-    candles_with_fear_and_greed_data[[paste0("value_lag_", i)]] <- lag(candles_with_fear_and_greed_data$value, i)
-    candles_with_fear_and_greed_data[[paste0("close_price_lag_", i)]] <- lag(candles_with_fear_and_greed_data$close, i)
-    candles_with_fear_and_greed_data[[paste0("hash_rate_lag_", i)]] <- lag(candles_with_fear_and_greed_data$hash_rate, i)
-    candles_with_fear_and_greed_data[[paste0("avg_block_size_lag_", i)]] <- lag(candles_with_fear_and_greed_data$avg_block_size, i)
-    candles_with_fear_and_greed_data[[paste0("n_transactions_lag_", i)]] <- lag(candles_with_fear_and_greed_data$n_transactions, i)
-    candles_with_fear_and_greed_data[[paste0("utxo_count_lag_", i)]] <- lag(candles_with_fear_and_greed_data$utxo_count, i)
-    candles_with_fear_and_greed_data[[paste0("open_lag_", i)]] <- lag(candles_with_fear_and_greed_data$open, i)
-    candles_with_fear_and_greed_data[[paste0("high_lag_", i)]] <- lag(candles_with_fear_and_greed_data$high, i)
-    candles_with_fear_and_greed_data[[paste0("low_lag_", i)]] <- lag(candles_with_fear_and_greed_data$low, i)
-    candles_with_fear_and_greed_data[[paste0("close_lag_", i)]] <- lag(candles_with_fear_and_greed_data$close, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("body_size_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$body_size, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("upper_shadow_size_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$upper_shadow_size, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("lower_shadow_size_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$lower_shadow_size, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("direction_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$direction, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("volume_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$volume, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("value_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$value, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("close_price_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$close, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("hash_rate_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$hash_rate, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("avg_block_size_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$avg_block_size, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("n_transactions_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$n_transactions, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("utxo_count_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$utxo_count, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("open_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$open, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("high_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$high, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("low_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$low, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("close_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$close, i)
     candles_with_fear_and_greed_data_and_ta[[paste0("roc_14_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$roc_14, i)
     candles_with_fear_and_greed_data_and_ta[[paste0("macd_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$macd, i)
     candles_with_fear_and_greed_data_and_ta[[paste0("signal_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$signal, i)
@@ -255,10 +255,10 @@ create_features <- function(candles_data, fear_and_greed_data, hash_rate_data, a
     candles_with_fear_and_greed_data_and_ta[[paste0("dn_bband_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$dn, i)
   }
 
-  candles_with_fear_and_greed_data <- candles_with_fear_and_greed_data %>%
+  candles_with_fear_and_greed_data_and_ta <- candles_with_fear_and_greed_data_and_ta %>%
     drop_na()
 
-  return(candles_with_fear_and_greed_data)
+  return(candles_with_fear_and_greed_data_and_ta)
 }
 
 
@@ -546,10 +546,10 @@ create_feature_set <- function(n_lags) {
       paste0("avg_block_size_lag_", i),
       paste0("n_transactions_lag_", i),
       paste0("utxo_count_lag_", i),
-      paste0("open_lag_", i),
-      paste0("high_lag_", i),
-      paste0("low_lag_", i),
-      paste0("close_lag_", i),
+      #            paste0("open_lag_", i),
+      #            paste0("high_lag_", i),
+      #            paste0("low_lag_", i),
+      #            paste0("close_lag_", i),
       paste0("roc_14_lag_", i),
       paste0("macd_lag_", i),
       paste0("signal_lag_", i),
@@ -694,6 +694,58 @@ print(paste("KNN 3 lags training time:", format(end_time - start_time, digits = 
 # end_time <- Sys.time()
 # print(paste("nnet 15 lags training time:", format(end_time - start_time, digits = 2)))
 
+# Train SVM models
+start_time <- Sys.time()
+svm_3_lags <- train(formula_3_lag, data = train_set, method = "svmRadial")
+end_time <- Sys.time()
+print(paste("SVM 3 lags training time:", format(end_time - start_time, digits = 2)))
+
+# start_time <- Sys.time()
+# svm_5_lags <- train(formula_5_lag, data = train_set, method = "svmRadial")
+# end_time <- Sys.time()
+# print(paste("SVM 5 lags training time:", format(end_time - start_time, digits = 2)))
+
+# start_time <- Sys.time()
+# svm_7_lags <- train(formula_7_lag, data = train_set, method = "svmRadial")
+# end_time <- Sys.time()
+# print(paste("SVM 7 lags training time:", format(end_time - start_time, digits = 2)))
+
+# start_time <- Sys.time()
+# svm_15_lags <- train(formula_15_lag, data = train_set, method = "svmRadial")
+# end_time <- Sys.time()
+# print(paste("SVM 15 lags training time:", format(end_time - start_time, digits = 2)))
+
+# Train GBM models
+start_time <- Sys.time()
+gbm_3_lags <- train(formula_3_lag, data = train_set, method = "gbm")
+end_time <- Sys.time()
+print(paste("GBM 3 lags training time:", format(end_time - start_time, digits = 2)))
+
+# start_time <- Sys.time()
+# gbm_5_lags <- train(formula_5_lag, data = train_set, method = "gbm")
+# end_time <- Sys.time()
+# print(paste("GBM 5 lags training time:", format(end_time - start_time, digits = 2)))
+
+# start_time <- Sys.time()
+# gbm_7_lags <- train(formula_7_lag, data = train_set, method = "gbm")
+# end_time <- Sys.time()
+# print(paste("GBM 7 lags training time:", format(end_time - start_time, digits = 2)))
+
+# start_time <- Sys.time()
+# gbm_15_lags <- train(formula_15_lag, data = train_set, method = "gbm")
+# end_time <- Sys.time()
+# print(paste("GBM 15 lags training time:", format(end_time - start_time, digits = 2)))
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -740,7 +792,7 @@ results <- rbind(
   #  add_model_results(rf_15_lags, "Random Forest", 15),
 
   # KNN results
-  add_model_results(knn_3_lags, "KNN", 3)
+  add_model_results(knn_3_lags, "KNN", 3),
   #  add_model_results(knn_5_lags, "KNN", 5),
   #  add_model_results(knn_7_lags, "KNN", 7),
   #  add_model_results(knn_15_lags, "KNN", 15),
@@ -750,6 +802,18 @@ results <- rbind(
   #  add_model_results(nnet_5_lags, "nnet", 5),
   #  add_model_results(nnet_7_lags, "nnet", 7),
   #  add_model_results(nnet_15_lags, "nnet", 15)
+
+  # SVM results
+  add_model_results(svm_3_lags, "SVM", 3),
+  # add_model_results(svm_5_lags, "SVM", 5),
+  # add_model_results(svm_7_lags, "SVM", 7),
+  # add_model_results(svm_15_lags, "SVM", 15),
+
+  # GBM results
+  add_model_results(gbm_3_lags, "GBM", 3)
+  # add_model_results(gbm_5_lags, "GBM", 5),
+  # add_model_results(gbm_7_lags, "GBM", 7),
+  # add_model_results(gbm_15_lags, "GBM", 15)
 )
 
 # Display results
@@ -785,6 +849,13 @@ message(sprintf(
 
 # According to this we should try SVM, KNN, LR, DT, RF
 # https://www.neuroquantology.com/open-access/An+Optimized+Machine+Learning+Model+for+Candlestick+Chart+Analysis+to+Predict+Stock+Market+Trends_9861/?download=true
+
+# rf, svmRadial, and gbm for classification
+# https://arxiv.org/pdf/1606.00930
+
+# LSTM (not found in caret), GBM
+# https://www.diva-portal.org/smash/get/diva2:1778251/FULLTEXT03.pdf
+
 
 # Other dataset
 # https://www.blockchain.com/explorer/charts/total-bitcoins
