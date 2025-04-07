@@ -277,3 +277,26 @@ with this
 9            GLM      3   63.09%
 10           GLM      5   63.09%
 11           GLM     15   63.09%
+
+### Test 5
+
+Adding OHLC to the previous all
+
+      features,
+      paste0("body_size_lag_", i),
+      paste0("upper_shadow_size_lag_", i),
+      paste0("lower_shadow_size_lag_", i),
+      paste0("direction_lag_", i),
+      paste0("volume_lag_", i),
+      paste0("value_lag_", i),
+      paste0("close_price_lag_", i),
+      paste0("hash_rate_lag_", i),
+      paste0("avg_block_size_lag_", i),
+      paste0("n_transactions_lag_", i),
+      paste0("utxo_count_lag_", i),
+      paste0("open_lag_", i),
+      paste0("high_lag_", i),
+      paste0("low_lag_", i),
+      paste0("close_lag_", i),
+    )
+

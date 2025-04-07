@@ -7,6 +7,7 @@ if (!require(jsonlite)) install.packages("jsonlite", repos = "http://cran.us.r-p
 if (!require(tidyquant)) install.packages("tidyquant", repos = "http://cran.us.r-project.org")
 if (!require(patchwork)) install.packages("patchwork", repos = "http://cran.us.r-project.org")
 if (!require(randomForest)) install.packages("randomForest", repos = "http://cran.us.r-project.org")
+if (!require(TTR)) install.packages("TTR", repos = "http://cran.us.r-project.org")
 library(tidyverse)
 library(caret)
 library(httr)
@@ -14,6 +15,7 @@ library(jsonlite)
 library(tidyquant)
 library(patchwork)
 library(randomForest)
+library(TTR)
 
 ### Global Variables ###
 
@@ -202,6 +204,32 @@ create_features <- function(candles_data, fear_and_greed_data, hash_rate_data, a
   #  stop(paste("There are NAs in the data: ", sum(is.na(candles_with_fear_and_greed_data))))
   # }
 
+  candles_with_fear_and_greed_data_and_ta <- candles_with_fear_and_greed_data %>%
+    tq_mutate(
+      select = close,
+      mutate_fun = ROC,
+      n = 14,
+      col_rename = "roc_14"
+    ) %>%
+    tq_mutate( # https://www.keenbase-trading.com/find-best-macd-settings/#t-1719588154943
+      select = close,
+      mutate_fun = MACD,
+      nFast = 12,
+      nSlow = 26,
+      nSig = 9
+    ) %>%
+    tq_mutate(
+      select = close,
+      mutate_fun = RSI,
+      n = 14
+    ) %>%
+    tq_mutate(
+      select = close,
+      mutate_fun = BBands,
+      n = 20,
+      sd = 2
+    )
+
   # add 15 lagged candle's features using a loop instead of manual listing
   for (i in 1:15) {
     candles_with_fear_and_greed_data[[paste0("body_size_lag_", i)]] <- lag(candles_with_fear_and_greed_data$body_size, i)
@@ -219,6 +247,12 @@ create_features <- function(candles_data, fear_and_greed_data, hash_rate_data, a
     candles_with_fear_and_greed_data[[paste0("high_lag_", i)]] <- lag(candles_with_fear_and_greed_data$high, i)
     candles_with_fear_and_greed_data[[paste0("low_lag_", i)]] <- lag(candles_with_fear_and_greed_data$low, i)
     candles_with_fear_and_greed_data[[paste0("close_lag_", i)]] <- lag(candles_with_fear_and_greed_data$close, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("roc_14_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$roc_14, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("macd_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$macd, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("signal_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$signal, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("rsi_14_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$rsi_14, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("up_bband_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$up, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("dn_bband_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$dn, i)
   }
 
   candles_with_fear_and_greed_data <- candles_with_fear_and_greed_data %>%
@@ -515,7 +549,13 @@ create_feature_set <- function(n_lags) {
       paste0("open_lag_", i),
       paste0("high_lag_", i),
       paste0("low_lag_", i),
-      paste0("close_lag_", i)
+      paste0("close_lag_", i),
+      paste0("roc_14_lag_", i),
+      paste0("macd_lag_", i),
+      paste0("signal_lag_", i),
+      paste0("rsi_14_lag_", i),
+      paste0("up_bband_lag_", i),
+      paste0("dn_bband_lag_", i)
     )
   }
 
