@@ -215,6 +215,10 @@ create_features <- function(candles_data, fear_and_greed_data, hash_rate_data, a
     candles_with_fear_and_greed_data[[paste0("avg_block_size_lag_", i)]] <- lag(candles_with_fear_and_greed_data$avg_block_size, i)
     candles_with_fear_and_greed_data[[paste0("n_transactions_lag_", i)]] <- lag(candles_with_fear_and_greed_data$n_transactions, i)
     candles_with_fear_and_greed_data[[paste0("utxo_count_lag_", i)]] <- lag(candles_with_fear_and_greed_data$utxo_count, i)
+    candles_with_fear_and_greed_data[[paste0("open_lag_", i)]] <- lag(candles_with_fear_and_greed_data$open, i)
+    candles_with_fear_and_greed_data[[paste0("high_lag_", i)]] <- lag(candles_with_fear_and_greed_data$high, i)
+    candles_with_fear_and_greed_data[[paste0("low_lag_", i)]] <- lag(candles_with_fear_and_greed_data$low, i)
+    candles_with_fear_and_greed_data[[paste0("close_lag_", i)]] <- lag(candles_with_fear_and_greed_data$close, i)
   }
 
   candles_with_fear_and_greed_data <- candles_with_fear_and_greed_data %>%
@@ -497,17 +501,21 @@ create_feature_set <- function(n_lags) {
   for (i in 1:n_lags) {
     features <- c(
       features,
-#      paste0("body_size_lag_", i)
-#      paste0("upper_shadow_size_lag_", i),
-#      paste0("lower_shadow_size_lag_", i),
+      paste0("body_size_lag_", i),
+      paste0("upper_shadow_size_lag_", i),
+      paste0("lower_shadow_size_lag_", i),
       paste0("direction_lag_", i),
-#      paste0("volume_lag_", i),
-      paste0("value_lag_", i)
-#      paste0("close_price_lag_", i),
-#      paste0("hash_rate_lag_", i),
-#      paste0("avg_block_size_lag_", i),
-#      paste0("n_transactions_lag_", i),
-#      paste0("utxo_count_lag_", i)
+      paste0("volume_lag_", i),
+      paste0("value_lag_", i),
+      paste0("close_price_lag_", i),
+      paste0("hash_rate_lag_", i),
+      paste0("avg_block_size_lag_", i),
+      paste0("n_transactions_lag_", i),
+      paste0("utxo_count_lag_", i),
+      paste0("open_lag_", i),
+      paste0("high_lag_", i),
+      paste0("low_lag_", i),
+      paste0("close_lag_", i)
     )
   }
 
@@ -735,7 +743,7 @@ message(sprintf(
   best_result$accuracy
 ))
 
-# VOLUME SHOULD BE INCLUDED IN THE LAGS
+# According to this we should try SVM, KNN, LR, DT, RF
 # https://www.neuroquantology.com/open-access/An+Optimized+Machine+Learning+Model+for+Candlestick+Chart+Analysis+to+Predict+Stock+Market+Trends_9861/?download=true
 
 # Other dataset
