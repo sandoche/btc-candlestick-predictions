@@ -342,3 +342,18 @@ Adding OHLC to the previous all
       paste0("dn_bband_lag_", i)
     )
   }
+  
+  
+1  Random Forest      5   66.52%
+2  Random Forest      3   65.78%
+3            GLM     15   65.37%
+4  Decision Tree      3   65.22%
+5  Decision Tree      5   65.22%
+6  Decision Tree      7   65.22%
+7  Decision Tree     15   65.22%
+8            GBM      3   65.22%
+9            GLM      3   65.12%
+10           GLM      7   64.91%
+11           SVM      3   64.69%
+12           GLM      5   64.63%
+13           KNN      3   62.36%
