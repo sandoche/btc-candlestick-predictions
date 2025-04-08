@@ -807,7 +807,7 @@ results <- rbind(
   #  add_model_results(nnet_15_lags, "nnet", 15)
 
   # SVM results
-  add_model_results(svm_3_lags, "SVM", 3),
+  # add_model_results(svm_3_lags, "SVM", 3), <-- too slow results not great
   # add_model_results(svm_5_lags, "SVM", 5),
   # add_model_results(svm_7_lags, "SVM", 7),
   # add_model_results(svm_15_lags, "SVM", 15),
