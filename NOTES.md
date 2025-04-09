@@ -357,3 +357,51 @@ Adding OHLC to the previous all
 11           SVM      3   64.69%
 12           GLM      5   64.63%
 13           KNN      3   62.36%
+
+---
+
+      paste0("body_size_lag_", i),
+      paste0("upper_shadow_size_lag_", i),
+      paste0("lower_shadow_size_lag_", i),
+      paste0("direction_lag_", i),
+      paste0("volume_lag_", i),
+      paste0("value_lag_", i),
+      paste0("close_price_lag_", i),
+      paste0("hash_rate_lag_", i),
+      paste0("avg_block_size_lag_", i),
+      paste0("n_transactions_lag_", i),
+      paste0("utxo_count_lag_", i),
+      paste0("open_lag_", i),
+      paste0("high_lag_", i),
+      paste0("low_lag_", i),
+      paste0("close_lag_", i),
+      paste0("roc_lag_", i),
+      paste0("macd_lag_", i),
+      paste0("signal_lag_", i),
+      paste0("rsi_lag_", i),
+      paste0("up_bband_lag_", i),
+      paste0("mavg_lag_", i),
+      paste0("dn_bband_lag_", i),
+      paste0("pctB_lag_", i)
+
+           model n_lags accuracy
+1  Random Forest      5   67.49%
+2  Random Forest      7   66.65%
+3  Random Forest      3   66.52%
+4  Random Forest     15   66.18%
+5            GLM      7   65.96%
+6            GLM      3   65.90%
+7            GLM     15   65.90%
+8            GBM      7   65.78%
+9            GBM      3   65.65%
+10           GLM      5   65.37%
+11           GBM     15   65.28%
+12 Decision Tree      3   65.22%
+13 Decision Tree      5   65.22%
+14 Decision Tree      7   65.22%
+15 Decision Tree     15   65.22%
+16           GBM      5   64.94%
+17           KNN      3   62.36%
+18           KNN     15   60.96%
+19           KNN      7   60.90%
+20           KNN      5   60.30%

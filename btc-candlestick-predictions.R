@@ -255,7 +255,9 @@ create_features <- function(candles_data, fear_and_greed_data, hash_rate_data, a
     candles_with_fear_and_greed_data_and_ta[[paste0("signal_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$signal, i)
     candles_with_fear_and_greed_data_and_ta[[paste0("rsi_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$rsi, i)
     candles_with_fear_and_greed_data_and_ta[[paste0("up_bband_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$up, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("mavg_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$mavg, i)
     candles_with_fear_and_greed_data_and_ta[[paste0("dn_bband_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$dn, i)
+    candles_with_fear_and_greed_data_and_ta[[paste0("pctB_lag_", i)]] <- lag(candles_with_fear_and_greed_data_and_ta$pctB, i)
   }
 
   candles_with_fear_and_greed_data_and_ta <- candles_with_fear_and_greed_data_and_ta %>%
@@ -549,16 +551,18 @@ create_feature_set <- function(n_lags) {
       paste0("avg_block_size_lag_", i),
       paste0("n_transactions_lag_", i),
       paste0("utxo_count_lag_", i),
-      #            paste0("open_lag_", i),
-      #            paste0("high_lag_", i),
-      #            paste0("low_lag_", i),
-      #            paste0("close_lag_", i),
+      paste0("open_lag_", i),
+      paste0("high_lag_", i),
+      paste0("low_lag_", i),
+      paste0("close_lag_", i),
       paste0("roc_lag_", i),
       paste0("macd_lag_", i),
       paste0("signal_lag_", i),
       paste0("rsi_lag_", i),
       paste0("up_bband_lag_", i),
-      paste0("dn_bband_lag_", i)
+      paste0("mavg_lag_", i),
+      paste0("dn_bband_lag_", i),
+      paste0("pctB_lag_", i)
     )
   }
 
@@ -581,63 +585,75 @@ start_time <- Sys.time()
 glm_3_lags <- train(formula_3_lag, data = train_set, method = "glm", family = "binomial")
 end_time <- Sys.time()
 print(paste("GLM 3 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(glm_3_lags, paste0("models/glm_3_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
 start_time <- Sys.time()
 glm_5_lags <- train(formula_5_lag, data = train_set, method = "glm", family = "binomial")
 end_time <- Sys.time()
 print(paste("GLM 5 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(glm_5_lags, paste0("models/glm_5_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
 start_time <- Sys.time()
 glm_7_lags <- train(formula_7_lag, data = train_set, method = "glm", family = "binomial")
 end_time <- Sys.time()
 print(paste("GLM 7 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(glm_7_lags, paste0("models/glm_7_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
 start_time <- Sys.time()
 glm_15_lags <- train(formula_15_lag, data = train_set, method = "glm", family = "binomial")
 end_time <- Sys.time()
 print(paste("GLM 15 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(glm_15_lags, paste0("models/glm_15_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
 # Train Decision Tree models
 start_time <- Sys.time()
 tree_3_lags <- train(formula_3_lag, data = train_set, method = "rpart")
 end_time <- Sys.time()
 print(paste("Decision Tree 3 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(tree_3_lags, paste0("models/tree_3_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
 start_time <- Sys.time()
 tree_5_lags <- train(formula_5_lag, data = train_set, method = "rpart")
 end_time <- Sys.time()
 print(paste("Decision Tree 5 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(tree_5_lags, paste0("models/tree_5_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
 start_time <- Sys.time()
 tree_7_lags <- train(formula_7_lag, data = train_set, method = "rpart")
 end_time <- Sys.time()
 print(paste("Decision Tree 7 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(tree_7_lags, paste0("models/tree_7_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
 start_time <- Sys.time()
 tree_15_lags <- train(formula_15_lag, data = train_set, method = "rpart")
 end_time <- Sys.time()
 print(paste("Decision Tree 15 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(tree_15_lags, paste0("models/tree_15_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
 # Train Random Forest models
 start_time <- Sys.time()
 rf_3_lags <- train(formula_3_lag, data = train_set, method = "rf", ntree = 100)
 end_time <- Sys.time()
 print(paste("Random Forest 3 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_3_lags, paste0("models/rf_3_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
 start_time <- Sys.time()
 rf_5_lags <- train(formula_5_lag, data = train_set, method = "rf", ntree = 100)
 end_time <- Sys.time()
 print(paste("Random Forest 5 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_5_lags, paste0("models/rf_5_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
 # start_time <- Sys.time()
-# rf_7_lags <- train(formula_7_lag, data = train_set, method = "rf", ntree = 100)
-# end_time <- Sys.time()
-# print(paste("Random Forest 7 lags training time:", format(end_time - start_time, digits = 2)))
+rf_7_lags <- train(formula_7_lag, data = train_set, method = "rf", ntree = 100)
+end_time <- Sys.time()
+print(paste("Random Forest 7 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_7_lags, paste0("models/rf_7_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
 # start_time <- Sys.time()
-# rf_15_lags <- train(formula_15_lag, data = train_set, method = "rf", ntree = 100)
-# end_time <- Sys.time()
-# print(paste("Random Forest 15 lags training time:", format(end_time - start_time, digits = 2)))
+rf_15_lags <- train(formula_15_lag, data = train_set, method = "rf", ntree = 100)
+end_time <- Sys.time()
+print(paste("Random Forest 15 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_15_lags, paste0("models/rf_15_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
 # # Train KNN models
 start_time <- Sys.time()
@@ -648,112 +664,62 @@ knn_3_lags <- train(formula_3_lag,
 )
 end_time <- Sys.time()
 print(paste("KNN 3 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(knn_3_lags, paste0("models/knn_3_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
-# start_time <- Sys.time()
-# knn_5_lags <- train(formula_5_lag,
-#   data = train_set, method = "knn",
-#   preProcess = c("center", "scale"),
-#   tuneGrid = data.frame(k = seq(3, 15, 2))
-# )
-# end_time <- Sys.time()
-# print(paste("KNN 5 lags training time:", format(end_time - start_time, digits = 2)))
-
-# start_time <- Sys.time()
-# knn_7_lags <- train(formula_7_lag,
-#   data = train_set, method = "knn",
-#   preProcess = c("center", "scale"),
-#   tuneGrid = data.frame(k = seq(3, 15, 2))
-# )
-# end_time <- Sys.time()
-# print(paste("KNN 7 lags training time:", format(end_time - start_time, digits = 2)))
-
-# start_time <- Sys.time()
-# knn_15_lags <- train(formula_15_lag,
-#   data = train_set, method = "knn",
-#   preProcess = c("center", "scale"),
-#   tuneGrid = data.frame(k = seq(3, 15, 2))
-# )
-# end_time <- Sys.time()
-# print(paste("KNN 15 lags training time:", format(end_time - start_time, digits = 2)))
-
-# # Train nnet
-# start_time <- Sys.time()
-# nnet_3_lags <- train(formula_3_lag, data = train_set, method = "nnet")
-# end_time <- Sys.time()
-# print(paste("nnet 3 lags training time:", format(end_time - start_time, digits = 2)))
-
-# start_time <- Sys.time()
-# nnet_5_lags <- train(formula_5_lag, data = train_set, method = "nnet")
-# end_time <- Sys.time()
-# print(paste("nnet 5 lags training time:", format(end_time - start_time, digits = 2)))
-
-# start_time <- Sys.time()
-# nnet_7_lags <- train(formula_7_lag, data = train_set, method = "nnet")
-# end_time <- Sys.time()
-# print(paste("nnet 7 lags training time:", format(end_time - start_time, digits = 2)))
-
-# start_time <- Sys.time()
-# nnet_15_lags <- train(formula_15_lag, data = train_set, method = "nnet")
-# end_time <- Sys.time()
-# print(paste("nnet 15 lags training time:", format(end_time - start_time, digits = 2)))
-
-# Train SVM models
 start_time <- Sys.time()
-svm_3_lags <- train(formula_3_lag, data = train_set, method = "svmRadial")
+knn_5_lags <- train(formula_5_lag,
+  data = train_set, method = "knn",
+  preProcess = c("center", "scale"),
+  tuneGrid = data.frame(k = seq(3, 15, 2))
+)
 end_time <- Sys.time()
-print(paste("SVM 3 lags training time:", format(end_time - start_time, digits = 2)))
+print(paste("KNN 5 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(knn_5_lags, paste0("models/knn_5_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
-# start_time <- Sys.time()
-# svm_5_lags <- train(formula_5_lag, data = train_set, method = "svmRadial")
-# end_time <- Sys.time()
-# print(paste("SVM 5 lags training time:", format(end_time - start_time, digits = 2)))
+start_time <- Sys.time()
+knn_7_lags <- train(formula_7_lag,
+  data = train_set, method = "knn",
+  preProcess = c("center", "scale"),
+  tuneGrid = data.frame(k = seq(3, 15, 2))
+)
+end_time <- Sys.time()
+print(paste("KNN 7 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(knn_7_lags, paste0("models/knn_7_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
-# start_time <- Sys.time()
-# svm_7_lags <- train(formula_7_lag, data = train_set, method = "svmRadial")
-# end_time <- Sys.time()
-# print(paste("SVM 7 lags training time:", format(end_time - start_time, digits = 2)))
-
-# start_time <- Sys.time()
-# svm_15_lags <- train(formula_15_lag, data = train_set, method = "svmRadial")
-# end_time <- Sys.time()
-# print(paste("SVM 15 lags training time:", format(end_time - start_time, digits = 2)))
+start_time <- Sys.time()
+knn_15_lags <- train(formula_15_lag,
+  data = train_set, method = "knn",
+  preProcess = c("center", "scale"),
+  tuneGrid = data.frame(k = seq(3, 15, 2))
+)
+end_time <- Sys.time()
+print(paste("KNN 15 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(knn_15_lags, paste0("models/knn_15_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
 # Train GBM models
 start_time <- Sys.time()
 gbm_3_lags <- train(formula_3_lag, data = train_set, method = "gbm")
 end_time <- Sys.time()
 print(paste("GBM 3 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(gbm_3_lags, paste0("models/gbm_3_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
-# start_time <- Sys.time()
-# gbm_5_lags <- train(formula_5_lag, data = train_set, method = "gbm")
-# end_time <- Sys.time()
-# print(paste("GBM 5 lags training time:", format(end_time - start_time, digits = 2)))
+start_time <- Sys.time()
+gbm_5_lags <- train(formula_5_lag, data = train_set, method = "gbm")
+end_time <- Sys.time()
+print(paste("GBM 5 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(gbm_5_lags, paste0("models/gbm_5_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
-# start_time <- Sys.time()
-# gbm_7_lags <- train(formula_7_lag, data = train_set, method = "gbm")
-# end_time <- Sys.time()
-# print(paste("GBM 7 lags training time:", format(end_time - start_time, digits = 2)))
+start_time <- Sys.time()
+gbm_7_lags <- train(formula_7_lag, data = train_set, method = "gbm")
+end_time <- Sys.time()
+print(paste("GBM 7 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(gbm_7_lags, paste0("models/gbm_7_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
-# start_time <- Sys.time()
-# gbm_15_lags <- train(formula_15_lag, data = train_set, method = "gbm")
-# end_time <- Sys.time()
-# print(paste("GBM 15 lags training time:", format(end_time - start_time, digits = 2)))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+start_time <- Sys.time()
+gbm_15_lags <- train(formula_15_lag, data = train_set, method = "gbm")
+end_time <- Sys.time()
+print(paste("GBM 15 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(gbm_15_lags, paste0("models/gbm_15_lags_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds"))
 
 # Calculate accuracies
 results <- data.frame(
@@ -791,32 +757,20 @@ results <- rbind(
   # Random Forest results
   add_model_results(rf_3_lags, "Random Forest", 3),
   add_model_results(rf_5_lags, "Random Forest", 5),
-  #  add_model_results(rf_7_lags, "Random Forest", 7),
-  #  add_model_results(rf_15_lags, "Random Forest", 15),
+  add_model_results(rf_7_lags, "Random Forest", 7),
+  add_model_results(rf_15_lags, "Random Forest", 15),
 
   # KNN results
   add_model_results(knn_3_lags, "KNN", 3),
-  #  add_model_results(knn_5_lags, "KNN", 5),
-  #  add_model_results(knn_7_lags, "KNN", 7),
-  #  add_model_results(knn_15_lags, "KNN", 15),
-
-  # nnet results
-  #  add_model_results(nnet_3_lags, "nnet", 3),
-  #  add_model_results(nnet_5_lags, "nnet", 5),
-  #  add_model_results(nnet_7_lags, "nnet", 7),
-  #  add_model_results(nnet_15_lags, "nnet", 15)
-
-  # SVM results
-  # add_model_results(svm_3_lags, "SVM", 3), <-- too slow results not great
-  # add_model_results(svm_5_lags, "SVM", 5),
-  # add_model_results(svm_7_lags, "SVM", 7),
-  # add_model_results(svm_15_lags, "SVM", 15),
+  add_model_results(knn_5_lags, "KNN", 5),
+  add_model_results(knn_7_lags, "KNN", 7),
+  add_model_results(knn_15_lags, "KNN", 15),
 
   # GBM results
-  add_model_results(gbm_3_lags, "GBM", 3)
-  # add_model_results(gbm_5_lags, "GBM", 5),
-  # add_model_results(gbm_7_lags, "GBM", 7),
-  # add_model_results(gbm_15_lags, "GBM", 15)
+  add_model_results(gbm_3_lags, "GBM", 3),
+  add_model_results(gbm_5_lags, "GBM", 5),
+  add_model_results(gbm_7_lags, "GBM", 7),
+  add_model_results(gbm_15_lags, "GBM", 15)
 )
 
 # Display results
