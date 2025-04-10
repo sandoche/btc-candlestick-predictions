@@ -1725,3 +1725,91 @@ top_features %>%
     x = "Feature",
     y = "Importance"
   )
+
+# Train random forest with the initial features from 1 to 7 lags and store the model
+formula_1_lag <- create_feature_set(1)
+formula_2_lags <- create_feature_set(2)
+formula_3_lags <- create_feature_set(3)
+formula_4_lags <- create_feature_set(4)
+formula_5_lags <- create_feature_set(5)
+formula_6_lags <- create_feature_set(6)
+formula_7_lags <- create_feature_set(7)
+
+# This time I will use cross validation to train the model
+# I will use 5 folds
+folds <- createFolds(train_set$direction, k = 5)
+train_control <- trainControl(method = "cv", number = 5)
+fine
+
+# Train the model
+start_time <- Sys.time()
+rf_1_lag <- train(formula_1_lag, data = train_set, method = "rf", ntree = 100, trControl = train_control)
+end_time <- Sys.time()
+print(paste("Random Forest 1 lag training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_1_lag, "models/rf_1_lag.rds")
+
+start_time <- Sys.time()
+rf_2_lags <- train(formula_2_lags, data = train_set, method = "rf", ntree = 100, trControl = train_control)
+end_time <- Sys.time()
+print(paste("Random Forest 2 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_2_lags, "models/rf_2_lags.rds")
+
+start_time <- Sys.time()
+rf_3_lags <- train(formula_3_lags, data = train_set, method = "rf", ntree = 100, trControl = train_control)
+end_time <- Sys.time()
+print(paste("Random Forest 3 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_3_lags, "models/rf_3_lags.rds")
+
+start_time <- Sys.time()
+rf_4_lags <- train(formula_4_lags, data = train_set, method = "rf", ntree = 100, trControl = train_control)
+end_time <- Sys.time()
+print(paste("Random Forest 4 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_4_lags, "models/rf_4_lags.rds")
+
+start_time <- Sys.time()
+rf_5_lags <- train(formula_5_lags, data = train_set, method = "rf", ntree = 100, trControl = train_control)
+end_time <- Sys.time()
+print(paste("Random Forest 5 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_5_lags, "models/rf_5_lags.rds")
+
+start_time <- Sys.time()
+rf_6_lags <- train(formula_6_lags, data = train_set, method = "rf", ntree = 100, trControl = train_control)
+end_time <- Sys.time()
+print(paste("Random Forest 6 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_6_lags, "models/rf_6_lags.rds")
+
+start_time <- Sys.time()
+rf_7_lags <- train(formula_7_lags, data = train_set, method = "rf", ntree = 100, trControl = train_control)
+end_time <- Sys.time()
+print(paste("Random Forest 7 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_7_lags, "models/rf_7_lags.rds")
+
+# plot the accuracy of the best result for each model like comparing the bestTune for each result
+# Extract best accuracies for each model
+accuracies <- c(
+  rf_1_lag$results$Accuracy[rf_1_lag$results$mtry == rf_1_lag$bestTune$mtry],
+  rf_2_lags$results$Accuracy[rf_2_lags$results$mtry == rf_2_lags$bestTune$mtry],
+  rf_3_lags$results$Accuracy[rf_3_lags$results$mtry == rf_3_lags$bestTune$mtry],
+  rf_4_lags$results$Accuracy[rf_4_lags$results$mtry == rf_4_lags$bestTune$mtry],
+  rf_5_lags$results$Accuracy[rf_5_lags$results$mtry == rf_5_lags$bestTune$mtry],
+  rf_6_lags$results$Accuracy[rf_6_lags$results$mtry == rf_6_lags$bestTune$mtry],
+  rf_7_lags$results$Accuracy[rf_7_lags$results$mtry == rf_7_lags$bestTune$mtry]
+)
+
+# Create data frame for plotting
+plot_data <- data.frame(
+  Lags = 1:7,
+  Accuracy = accuracies
+)
+
+# Create the plot
+ggplot(plot_data, aes(x = Lags, y = Accuracy)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Best Accuracy by Number of Lags",
+    x = "Number of Lags",
+    y = "Accuracy"
+  ) +
+  theme_minimal() +
+  scale_x_continuous(breaks = 1:7)

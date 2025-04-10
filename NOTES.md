@@ -405,3 +405,14 @@ Adding OHLC to the previous all
 18           KNN     15   60.96%
 19           KNN      7   60.90%
 20           KNN      5   60.30%
+
+## RF Only with cross validation
+
+          model n_lags accuracy
+1 Random Forest      2   67.42%
+2 Random Forest      7   66.86%
+3 Random Forest      4   66.68%
+4 Random Forest      6   66.58%
+5 Random Forest      3   66.49%
+6 Random Forest      5   66.18%
+7 Random Forest      1   51.17%
