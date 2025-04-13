@@ -1813,3 +1813,98 @@ ggplot(plot_data, aes(x = Lags, y = Accuracy)) +
   ) +
   theme_minimal() +
   scale_x_continuous(breaks = 1:7)
+
+
+### Fine tuning
+
+# Fine tuning the 3 best models, 2, 4, 5
+
+grid <- data.frame(mtry = c(1, 5, 10, 25, 50, 100, 200))
+
+start_time <- Sys.time()
+rf_2_lags_fine_tuned_100 <- train(formula_2_lags, data = train_set, method = "rf", trControl = train_control, tuneGrid = grid, ntree = 100)
+end_time <- Sys.time()
+print(paste("Random Forest 2 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_2_lags_fine_tuned_100, "models/rf_2_lags_fine_tuned_100.rds")
+
+start_time <- Sys.time()
+rf_2_lags_fine_tuned_200 <- train(formula_2_lags, data = train_set, method = "rf", trControl = train_control, tuneGrid = grid, ntree = 200)
+end_time <- Sys.time()
+print(paste("Random Forest 2 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_2_lags_fine_tuned_200, "models/rf_2_lags_fine_tuned_200.rds")
+
+start_time <- Sys.time()
+rf_2_lags_fine_tuned_300 <- train(formula_2_lags, data = train_set, method = "rf", trControl = train_control, tuneGrid = grid, ntree = 300)
+end_time <- Sys.time()
+print(paste("Random Forest 2 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_2_lags_fine_tuned_300, "models/rf_2_lags_fine_tuned_300.rds")
+
+
+start_time <- Sys.time()
+rf_4_lags_fine_tuned_100 <- train(formula_4_lags, data = train_set, method = "rf", trControl = train_control, tuneGrid = grid, ntree = 100)
+end_time <- Sys.time()
+print(paste("Random Forest 4 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_4_lags_fine_tuned_100, "models/rf_4_lags_fine_tuned_100.rds")
+
+start_time <- Sys.time()
+rf_4_lags_fine_tuned_200 <- train(formula_4_lags, data = train_set, method = "rf", trControl = train_control, tuneGrid = grid, ntree = 200)
+end_time <- Sys.time()
+print(paste("Random Forest 4 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_4_lags_fine_tuned_200, "models/rf_4_lags_fine_tuned_200.rds")
+
+start_time <- Sys.time()
+rf_4_lags_fine_tuned_300 <- train(formula_4_lags, data = train_set, method = "rf", trControl = train_control, tuneGrid = grid, ntree = 300)
+end_time <- Sys.time()
+print(paste("Random Forest 4 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_4_lags_fine_tuned_300, "models/rf_4_lags_fine_tuned_300.rds")
+
+
+start_time <- Sys.time()
+rf_5_lags_fine_tuned_100 <- train(formula_5_lags, data = train_set, method = "rf", trControl = train_control, tuneGrid = grid, ntree = 100)
+end_time <- Sys.time()
+print(paste("Random Forest 5 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_5_lags_fine_tuned_100, "models/rf_5_lags_fine_tuned_100.rds")
+
+start_time <- Sys.time()
+rf_5_lags_fine_tuned_200 <- train(formula_5_lags, data = train_set, method = "rf", trControl = train_control, tuneGrid = grid, ntree = 200)
+end_time <- Sys.time()
+print(paste("Random Forest 5 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_5_lags_fine_tuned_200, "models/rf_5_lags_fine_tuned_200.rds")
+
+start_time <- Sys.time()
+rf_5_lags_fine_tuned_300 <- train(formula_5_lags, data = train_set, method = "rf", trControl = train_control, tuneGrid = grid, ntree = 300)
+end_time <- Sys.time()
+print(paste("Random Forest 5 lags training time:", format(end_time - start_time, digits = 2)))
+saveRDS(rf_5_lags_fine_tuned_300, "models/rf_5_lags_fine_tuned_300.rds")
+
+accuracies <- c(
+  rf_2_lags_fine_tuned_100$results$Accuracy[rf_2_lags_fine_tuned_100$results$mtry == rf_2_lags_fine_tuned_100$bestTune$mtry],
+  rf_2_lags_fine_tuned_200$results$Accuracy[rf_2_lags_fine_tuned_200$results$mtry == rf_2_lags_fine_tuned_200$bestTune$mtry],
+  rf_2_lags_fine_tuned_300$results$Accuracy[rf_2_lags_fine_tuned_300$results$mtry == rf_2_lags_fine_tuned_300$bestTune$mtry],
+  rf_4_lags_fine_tuned_100$results$Accuracy[rf_4_lags_fine_tuned_100$results$mtry == rf_4_lags_fine_tuned_100$bestTune$mtry],
+  rf_4_lags_fine_tuned_200$results$Accuracy[rf_4_lags_fine_tuned_200$results$mtry == rf_4_lags_fine_tuned_200$bestTune$mtry],
+  rf_4_lags_fine_tuned_300$results$Accuracy[rf_4_lags_fine_tuned_300$results$mtry == rf_4_lags_fine_tuned_300$bestTune$mtry],
+  rf_5_lags_fine_tuned_100$results$Accuracy[rf_5_lags_fine_tuned_100$results$mtry == rf_5_lags_fine_tuned_100$bestTune$mtry],
+  rf_5_lags_fine_tuned_200$results$Accuracy[rf_5_lags_fine_tuned_200$results$mtry == rf_5_lags_fine_tuned_200$bestTune$mtry],
+  rf_5_lags_fine_tuned_300$results$Accuracy[rf_5_lags_fine_tuned_300$results$mtry == rf_5_lags_fine_tuned_300$bestTune$mtry]
+)
+
+# Create a data frame for plotting
+accuracy_df <- data.frame(
+  accuracy = accuracies,
+  lags = rep(c(2, 2, 2, 4, 4, 4, 5, 5, 5), 1),
+  ntrees = rep(c(100, 200, 300), 3)
+)
+
+# Create plot
+ggplot(accuracy_df, aes(x = factor(lags), y = accuracy, color = factor(ntrees), group = factor(ntrees))) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Model Accuracy by Number of Lags and Trees",
+    x = "Number of Lags",
+    y = "Accuracy",
+    color = "Number of Trees"
+  ) +
+  theme_minimal() +
+  scale_color_discrete(name = "Number of Trees")

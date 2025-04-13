@@ -409,10 +409,24 @@ Adding OHLC to the previous all
 ## RF Only with cross validation
 
           model n_lags accuracy
-1 Random Forest      2   67.42%
+1 Random Forest      2   67.42% <-- better no?
 2 Random Forest      7   66.86%
 3 Random Forest      4   66.68%
 4 Random Forest      6   66.58%
 5 Random Forest      3   66.49%
 6 Random Forest      5   66.18%
 7 Random Forest      1   51.17%
+
+
+## With fine tuining and cross validaiton
+
+   accuracy lags ntrees
+1 0.6619248    2    100
+2 0.6585051    2    200
+3 0.6590483    2    300
+4 0.6612236    4    100
+5 0.6641792    4    200
+6 0.6591269    4    300
+7 0.6560940    5    100
+8 0.6581949    5    200
+9 0.6564063    5    300
