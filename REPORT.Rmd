@@ -27,3 +27,10 @@ library(formatR)
 \newpage
 
 # Overview
+
+This last years Bitcoin (BTC) has been gaining attention not only by retail investors but also by institutional investor. In 2025 we've seen the emergence of spot Bitcoin exchange-traded funds (ETF) from institutions such as BlackRock, VanEck, Grayscale. With a 
+
+- started as a decentralized currency
+- now it's becoming a strategic asset
+- at the time of writing the market cap 
+- btc can be traded any time 24/7 which makes it interesting to study
