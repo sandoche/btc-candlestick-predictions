@@ -2,7 +2,7 @@
 
 > coming soon
 
-## Data
+## ⚙️ Dataset
 
 Data are already downloaded and stored in the `data` folder for the following paramters:
 ```R
@@ -14,15 +14,15 @@ candlestick_period <- 3600
 
 If you want to download the data for different parameters, you can run the `data-downloader.R` script.
 
-## Report
+## 📊 Report
 
 coming soon
 
-## Project
+## 🖥️ Training & results
 
 coming soon
 
-## License
+## 📄 License
 
 [MIT](LICENSE)
 
