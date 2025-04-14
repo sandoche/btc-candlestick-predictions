@@ -1,30 +1,29 @@
 ---
-title: "Bitcoin Candlestick  Prediction"
+title: "Bitcoin candlestick predictions using lagged features and machine learning algorithm in R"
+subtitle: "Training various machine learning algorithms to predict the next candlestick of the bitcoin price using various lagged features"
+abstract: "This report explores how to get the best accuracy on predicting the next candlestick of the bitcoin chart using the previous ones. It compares different algorithms: Generalized Linear Model, Decision Tree, Random Forest, KNN and Gradient boosting and different number of lagged features. This project is part of the 'Data Science: Capstone' module of HarvardX PH125.9x from the edx platform."
 author: "Sandoche Adittane"
 date: "`r Sys.Date()`"
-output: pdf_document
+output:
+  pdf_document:
+    fig_caption: true
+    number_sections: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, tidy.opts = list(width.cutoff = 60), tidy = TRUE)
+  
+if(!require(lubridate)) install.packages("lubridate", repos = "http://cran.us.r-project.org")
+if(!require(formatR)) install.packages("formatR", repos = "http://cran.us.r-project.org")
+
+library(lubridate)
+library(formatR)
 ```
 
-## R Markdown
+\newpage
+\tableofcontents
+\listoffigures
+\listoftables
+\newpage
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+# Overview

@@ -1,4 +1,4 @@
-# Bitcoin Candlestick Predictions using Machine Learning in R
+# Bitcoin candlestick predictions using lagged features and machine learning algorithm in R
 
 > coming soon
 
@@ -30,7 +30,7 @@ coming soon
 ```
 @misc{bitcoin-candlestick-predictions,
   author = {Sandoche Adittane},
-  title = {Bitcoin Candlestick Predictions using Machine Learning in R},
+  title = {Bitcoin candlestick predictions using lagged features and machine learning algorithm in R},
   year = {2025},
   publisher = {GitHub},
   journal = {GitHub repository},
