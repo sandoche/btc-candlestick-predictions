@@ -34,6 +34,6 @@ coming soon
   year = {2025},
   publisher = {GitHub},
   journal = {GitHub repository},
-  howpublished = {\url{https://github.com/sandoche/bitcoin-candlestick-predictions}},
+  howpublished = {\url{https://github.com/sandoche/btc-candlestick-predictions}},
 }
 ```

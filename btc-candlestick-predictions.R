@@ -27,6 +27,7 @@ candlestick_period <- 3600
 ### Utilities ###
 
 create_features <- function(candles_data, fear_and_greed_data, hash_rate_data, average_block_size_data, n_transactions_data, utxo_count_data) {
+  # Merging candles with other dataset
   candles_with_fear_and_greed_data <- candles_data %>%
     mutate(date_only = as.Date(time)) %>%
     left_join(fear_and_greed_data, by = c("date_only" = "timestamp")) %>%
@@ -35,6 +36,7 @@ create_features <- function(candles_data, fear_and_greed_data, hash_rate_data, a
     left_join(n_transactions_data, by = c("date_only" = "timestamp")) %>%
     left_join(utxo_count_data, by = c("date_only" = "timestamp"))
 
+  # Creating features that describes candles
   candles_with_fear_and_greed_data <- candles_with_fear_and_greed_data %>%
     mutate(
       body_size = abs(close - open),
@@ -43,10 +45,7 @@ create_features <- function(candles_data, fear_and_greed_data, hash_rate_data, a
       direction = ifelse(close > open, "up", "down"),
     )
 
-  # if (sum(is.na(candles_with_fear_and_greed_data)) > 0) {
-  #  stop(paste("There are NAs in the data: ", sum(is.na(candles_with_fear_and_greed_data))))
-  # }
-
+  # Adding technical analysis data
   candles_with_fear_and_greed_data_and_ta <- candles_with_fear_and_greed_data %>%
     tq_mutate(
       select = close,
@@ -116,7 +115,6 @@ create_features <- function(candles_data, fear_and_greed_data, hash_rate_data, a
 
 # Loading the predownloaded data set, uncomment the code above if needed to download another data sets
 candles <- read_csv(paste0("data/", trading_pair, "_candles_", start_date, "_", end_date, "_", candlestick_period, ".csv"))
-
 
 # Explore the data
 head(candles)
