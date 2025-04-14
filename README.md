@@ -1,4 +1,4 @@
-# Bitcoin Candlestick Predictions in R
+# Bitcoin Candlestick Predictions using Machine Learning in R
 
 > coming soon
 
@@ -26,3 +26,14 @@ coming soon
 
 [MIT](LICENSE)
 
+## 📖 Citation
+```
+@misc{bitcoin-candlestick-predictions,
+  author = {Sandoche Adittane},
+  title = {Bitcoin Candlestick Predictions using Machine Learning in R},
+  year = {2025},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/sandoche/bitcoin-candlestick-predictions}},
+}
+```
