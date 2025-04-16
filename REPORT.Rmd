@@ -63,4 +63,6 @@ TODO: Give some resource to learn about spot vs future.
 
 # Exploratory data analysis
 
-In this section
+In this section we will see what are the are the different dataset available, see what features are available to train the different models, prepare the data, verify it, and choose different machine learning algorithms we will use and compare.
+
+## Data sets
