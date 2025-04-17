@@ -190,14 +190,23 @@ knitr::kable(head(utxo_count), format = "simple", caption = "Overview of the BTC
 This dataset is a time serie of the daily number of UTXO, it is the count of UTXO in the network.
 The data set contains `r nrow(utxo_count)` entries.
 
+As we can see the number of rows of `utxo_count` is different since it has more than 1 entry per day, also `fear_and_greed_index` seems to miss one data point. We will see fix that in the next sections.
 
+We have different dataset that we will use for the predictions but we are still missing one important data used by traders, technical analysis indicator.
 
+Based on a previous research and blog post I wrote, I decided to include a few indicators that are very common in trading:
 
+- Moving average convergence divergence (MACD)
 
+- Rate of change (ROC)
 
+- Bolinger Bands (BB)
 
+- Relative Strenght Index (RSI)
 
+TODO: add https://medium.com/learning-lab/become-a-better-crypto-trader-with-technical-and-chart-analysis-1496b2fc6b85
 
+Before preparing the dataset let's see what would be the features we can extract from the OHLC candlestick data.
 
 
 

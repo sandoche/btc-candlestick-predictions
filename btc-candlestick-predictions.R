@@ -1258,7 +1258,7 @@ create_feature_set <- function(n_lags) {
       paste0("open_lag_", i),
       paste0("high_lag_", i),
       paste0("low_lag_", i),
-      paste0("close_lag_", i),
+      #      paste0("close_lag_", i), <- it seems to be repeated needs to be corrected
       paste0("roc_lag_", i),
       paste0("macd_lag_", i),
       paste0("signal_lag_", i),
