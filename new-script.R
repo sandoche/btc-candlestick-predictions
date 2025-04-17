@@ -54,7 +54,10 @@ utxo_count <- jsonlite::fromJSON("data/utxo-count.json")$`utxo-count` %>%
     timestamp = as.POSIXct(timestamp / 1000, origin = "1970-01-01", tz = "UTC"),
     timestamp = as.Date(timestamp)
   ) %>%
-  filter(timestamp >= as.Date(start_date) & timestamp <= as.Date(end_date))
+  filter(timestamp >= as.Date(start_date) & timestamp <= as.Date(end_date)) %>%
+  group_by(timestamp) %>%
+  summarise(utxo_count = mean(utxo_count)) # Take average for each date
+knitr::kable(head(utxo_count), format = "simple", caption = "Overview of the BTC UTXO count dataset")
 
 
 ### Functions to prepare the data ###
