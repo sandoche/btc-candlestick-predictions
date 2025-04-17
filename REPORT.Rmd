@@ -101,7 +101,7 @@ set.seed(1)
 
 The timeframe is the entire year 2024 and the start of the year 2025 until the day we started the study. Note that since January 2024, Bitcoin ETF has officially been approved. The period `candlestick_period <- 3600` is the time of a candle, the candle closes 1h after it starts. Which means we have 24 candles per day.
 
-I choose this settings to have a dataset of around 100000 candles but also since Bitcoin ETF has been approved the market may have taken a different dynamic than the previous years.
+I choose this settings to have a dataset of around 10000 candles but also since Bitcoin ETF has been approved the market may have taken a different dynamic than the previous years.
 
 Let's see how the dataset looks like.
 
