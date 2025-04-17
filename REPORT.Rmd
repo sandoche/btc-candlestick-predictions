@@ -67,6 +67,10 @@ Source: https://techqualitypedia.com/candlestick-patterns-bullish/
 
 The candle stick chart is defined as a time serie of candles, each candle is defined at a defined time and have a time duration. We will explain more in detail in the exploratory analysis.
 
+## Candlesticks pattern
+
+TODO Talk about chartists and common patterns
+
 ## Goal of the study
 
 The goal of the study is to find a model able to predict the direction of a candlestick using N previous candles. This number N will be also part of the research. We will have to not only find N but also find what are the best features to achieve the best accuracy.
