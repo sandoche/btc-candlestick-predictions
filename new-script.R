@@ -146,9 +146,8 @@ prepare_dataset <- function(candles_data, fear_and_greed_index_data, hash_rate_d
   dataset_with_lagged_candles_without_na
 }
 
-### Clean the data ###
+### Prepare the data ###
 
-date_na <- as.Date("2024-10-26")
 fear_and_greed_index_date_before_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-25"))
 fear_and_greed_index_date_after_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-27"))
 fear_and_greed_value_date_na <- mean(c(fear_and_greed_index_date_before_na$value, fear_and_greed_index_date_after_na$value))
@@ -156,4 +155,12 @@ fear_and_greed_value_date_na <- mean(c(fear_and_greed_index_date_before_na$value
 fear_and_greed_index_corrected <- fear_and_greed_index %>%
   bind_rows(tibble(timestamp = date_na, value = fear_and_greed_value_date_na, value_classification = "Greed"))
 
-### Prepare the data ###
+project_dataset <- prepare_dataset(candles, fear_and_greed_index_corrected, hash_rate, average_block_size, n_transactions, utxo_count)
+
+sum(is.na(project_dataset))
+nrow(project_dataset)
+nrow(candles)
+
+test_index <- createDataPartition(y = project_dataset$direction, times = 1, p = 0.2, list = FALSE)
+train_set <- project_dataset[-test_index, ]
+test_set <- project_dataset[test_index, ]
