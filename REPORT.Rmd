@@ -233,49 +233,54 @@ We are now ready to prepare the dataset for the study.
 ## Preparation
 
 ```{r dataset_preparation, cache=TRUE}
-candles_enhanced <- candles %>%
-  mutate(date_only = as.Date(time)) %>%
-  left_join(fear_and_greed_index, by = c("date_only" = "timestamp")) %>%
-  left_join(hash_rate, by = c("date_only" = "timestamp")) %>%
-  left_join(average_block_size, by = c("date_only" = "timestamp")) %>%
-  left_join(n_transactions, by = c("date_only" = "timestamp")) %>%
-  left_join(utxo_count, by = c("date_only" = "timestamp")) %>%
-  mutate(
-    body_size = abs(close - open),
-    upper_shadow_size = high - pmax(close, open),
-    lower_shadow_size = pmin(close, open) - low,
-    direction = ifelse(close > open, "up", "down"),
-  ) %>%
-  tq_mutate(
-    select = close,
-    mutate_fun = ROC,
-    n = 14,
-    col_rename = "roc"
-  ) %>%
-  tq_mutate( # https://www.keenbase-trading.com/find-best-macd-settings/#t-1719588154943
-    select = close,
-    mutate_fun = MACD,
-    nFast = 12,
-    nSlow = 26,
-    nSig = 9,
-    col_rename = c("macd", "signal")
-  ) %>%
-  tq_mutate(
-    select = close,
-    mutate_fun = RSI,
-    n = 14,
-    col_rename = "rsi"
-  ) %>%
-  tq_mutate(
-    select = close,
-    mutate_fun = BBands,
-    n = 20,
-    sd = 2,
-    col_rename = "bband"
-  )
 
+enhance_dataset <- function(candles_data, fear_and_greed_index_data, hash_rate_data, average_block_size_data, n_transactions_data, utxo_count_data) {
+  candles_enhanced <- candles_data %>%
+    mutate(date_only = as.Date(time)) %>%
+    left_join(fear_and_greed_index_data, by = c("date_only" = "timestamp")) %>%
+    left_join(hash_rate_data, by = c("date_only" = "timestamp")) %>%
+    left_join(average_block_size_data, by = c("date_only" = "timestamp")) %>%
+    left_join(n_transactions_data, by = c("date_only" = "timestamp")) %>%
+    left_join(utxo_count_data, by = c("date_only" = "timestamp")) %>%
+    mutate(
+      body_size = abs(close - open),
+      upper_shadow_size = high - pmax(close, open),
+      lower_shadow_size = pmin(close, open) - low,
+      direction = ifelse(close > open, "up", "down"),
+    ) %>%
+    tq_mutate(
+      select = close,
+      mutate_fun = ROC,
+      n = 14,
+      col_rename = "roc"
+    ) %>%
+    tq_mutate( # https://www.keenbase-trading.com/find-best-macd-settings/#t-1719588154943
+      select = close,
+      mutate_fun = MACD,
+      nFast = 12,
+      nSlow = 26,
+      nSig = 9,
+      col_rename = c("macd", "signal")
+    ) %>%
+    tq_mutate(
+      select = close,
+      mutate_fun = RSI,
+      n = 14,
+      col_rename = "rsi"
+    ) %>%
+    tq_mutate(
+      select = close,
+      mutate_fun = BBands,
+      n = 20,
+      sd = 2,
+      col_rename = "bband"
+    )
+
+  candles_enhanced
+}
+
+candles_enhanced <- enhance_dataset(candles, fear_and_greed_index, hash_rate, average_block_size, n_transactions, utxo_count)
 knitr::kable(head(candles_enhanced), format = "simple", caption = "Overview of the candlestick dataset enhanced")
-
 ```
 
 We have now a table with all the features discussed above. Before adding the lagged features let's explore our set.
@@ -311,6 +316,22 @@ fear_and_greed_index_corrected <- fear_and_greed_index %>%
 fear_and_greed_index %>% filter(timestamp == date_na) %>% nrow()
 fear_and_greed_index_corrected %>% filter(timestamp == date_na) %>% nrow()
 ```
+
+Let's check the NAs again.
+
+```{r dataset_preparation_find_na_corrected}
+candles_enhanced_cleaned <- enhance_dataset(candles, fear_and_greed_index_corrected, hash_rate, average_block_size, n_transactions, utxo_count)
+na_indexes <- which(apply(candles_enhanced_cleaned, 1, function(x) any(is.na(x))))
+knitr::kable(candles_enhanced_cleaned[na_indexes, ], format = "simple", caption = "NAs of the dataset cleaned")
+```
+
+We can see now the only NAs are the missing TA values that we can clean with a simple line of code.
+
+```{r candles_enhanced_cleaned_no_na}
+candles_enhanced_cleaned_no_na <- candles_enhanced_cleaned %>% drop_na()
+sum(is.na(candles_enhanced_cleaned_no_na))
+```
+
 ## Data plot
 
 
