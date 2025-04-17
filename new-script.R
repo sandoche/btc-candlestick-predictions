@@ -184,3 +184,33 @@ create_feature_formula <- function(feature_names, n_lags) {
 
   as.formula(formula_str)
 }
+
+
+train_with_cache <- function(formula, train_set, method) {
+  formula_hash <- digest::digest(formula)
+  filepath <- paste0("models/", method, "_", formula_hash, ".rds")
+  if (file.exists(filepath)) {
+    model <- readRDS(filepath)
+  } else {
+    start_time <- Sys.time()
+    if (method == "rf") {
+      model <- train(formula, data = train_set, method = "rf", ntree = 100)
+    } else if (method == "glm") {
+      model <- train(formula, data = train_set, method = "glm", family = "binomial")
+    } else if (method == "rpart") {
+      model <- train(formula, data = train_set, method = "rpart")
+    } else if (method == "knn") {
+      model <- train(formula, data = train_set, method = "knn", preProcess = c("center", "scale"), tuneGrid = data.frame(k = seq(3, 15, 2)))
+    } else if (method == "gbm") {
+      model <- train(formula, data = train_set, method = "gbm")
+    } else {
+      stop("Invalid method")
+    }
+    end_time <- Sys.time()
+    print(paste("Training time:", end_time - start_time))
+
+    saveRDS(model, filepath)
+  }
+
+  model
+}
