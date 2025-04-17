@@ -292,8 +292,9 @@ candles %>%
     down = sum(direction == "down")
   ) %>%
   pivot_longer(cols = everything(), names_to = "direction", values_to = "count") %>%
-  ggplot(aes(x = direction, y = count)) +
+  ggplot(aes(x = direction, y = count, fill = direction)) +
   geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("up" = "darkgreen", "down" = "red")) +
   theme_minimal() +
   labs(
     title = "Number of Up vs Down Candles",

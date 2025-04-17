@@ -407,7 +407,7 @@ combined_plot <- (p1 / p2 / p3 / p4 / p5 / p6 / p7) +
 combined_plot
 ```
 
-TODO Manually add the one below since it's failing
+Find below the candletick chart of BTC-USD.
 
 ```r
 # For more readability we are only plotting the last 24 candles
@@ -430,5 +430,108 @@ p7 <- candles_enhanced_cleaned_no_na %>%
   scale_y_continuous(labels = scales::comma)
 ```
 
-TODO Add chart of TAs
-TODO When doing the real data don't forget to rm na
+And the plot of the different TA.
+
+
+```{r visual_ta, cache=TRUE}
+plot_data_ta <- candles_enhanced_cleaned_no_na %>% tail(100)
+
+# ROC Plot
+p_roc <- plot_data_ta %>%
+  ggplot(aes(x = time, y = roc)) +
+  geom_line() +
+  labs(title = "Rate of Change (ROC)", y = "ROC") +
+  theme_tq() +
+  theme(axis.title.x = element_blank())
+
+# Bollinger Bands Plot
+p_bbands <- plot_data_ta %>%
+  ggplot(aes(x = time, y = close)) +
+  geom_line(aes(y = close), color = "blue") + # Close price
+  geom_ribbon(aes(ymin = dn, ymax = up), fill = "grey", alpha = 0.4) + # Bollinger Bands area
+  geom_line(aes(y = mavg), color = "red", linetype = "dashed") + # Moving Average
+  labs(title = "Bollinger Bands (BBands)", y = "Price") +
+  theme_tq() +
+  theme(axis.title.x = element_blank()) +
+  scale_y_continuous(labels = scales::comma)
+
+# MACD Plot
+p_macd <- plot_data_ta %>%
+  ggplot(aes(x = time)) +
+  geom_line(aes(y = macd), color = "blue") +  # MACD line
+  geom_line(aes(y = signal), color = "red", linetype = "dashed") + # Signal line
+  geom_col(aes(y = macd - signal), alpha = 0.5) + # Histogram of MACD - Signal
+  labs(title = "MACD", y = "Value") +
+  theme_tq() +
+  theme(axis.title.x = element_blank())
+
+# RSI Plot
+p_rsi <- plot_data_ta %>%
+  ggplot(aes(x = time, y = rsi)) +
+  geom_line() +
+  geom_hline(yintercept = 70, linetype = "dashed", color = "red") +  # Overbought level
+  geom_hline(yintercept = 30, linetype = "dashed", color = "darkgreen") + # Oversold level
+  labs(title = "Relative Strength Index (RSI)", y = "RSI") +
+  theme_tq() +
+  theme(axis.title.x = element_blank())
+
+# Combine TA plots
+combined_ta_plot <- (p_roc / p_bbands) | (p_macd / p_rsi)
+
+combined_ta_plot + plot_annotation(
+  title = "Technical Analysis Indicators (Last 100 Candles)",
+  theme = theme(plot.title = element_text(hjust = 0.5, size = 16))
+)
+
+```
+Comparing with the data from TradingView it seems that all the charts are correct.
+
+Let's now see how is the distribution of "up" and "down" candles.
+
+```{r visual_repartion, cache=TRUE}
+candles_enhanced_cleaned_no_na %>%
+  mutate(direction = ifelse(close >= open, "up", "down")) %>%
+  summarise(
+    up = sum(direction == "up"),
+    down = sum(direction == "down")
+  ) %>%
+  pivot_longer(cols = everything(), names_to = "direction", values_to = "count") %>%
+  ggplot(aes(x = direction, y = count, fill = direction)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("up" = "darkgreen", "down" = "red")) +
+  theme_minimal() +
+  labs(
+    title = "Number of Up vs Down Candles",
+    x = "Direction",
+    y = "Count"
+  )
+```
+
+
+```{r distribution_data, cache=TRUE}
+
+distribution_data <- candles_enhanced_cleaned_no_na %>%
+  mutate(direction = ifelse(close >= open, "up", "down")) %>%
+  summarise(
+    up = sum(direction == "up"),
+    down = sum(direction == "down")
+  ) %>%
+  mutate(
+    total = up + down,
+    up_percentage = up / total,
+    down_percentage = down / total
+  )
+
+knitr::kable(distribution_data, format = "simple", caption = "Distribution of up and down candles")
+```
+
+We can notice that the distribution is not exacly 50%.
+
+## Adding lagged candles
+
+Our study aim at predicting the direction of a candle using the previous candle's data and other features.
+
+So we need to create a function to create a dataset containing lagged candles.
+
+```{r lagged_candles, cache=TRUE}
+```
