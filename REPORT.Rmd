@@ -340,42 +340,42 @@ sum(is.na(candles_enhanced_cleaned_no_na))
 First of all let's plot the data to visually verify the data.
 
 ```{r visual_analysis, cache=TRUE}
-p1 <- candles_enhanced_cleaned %>%
+p1 <- candles_enhanced_cleaned_no_na %>%
   ggplot(aes(x = time, y = close)) +
   geom_line(color = "blue") +
   theme_minimal() +
   labs(title = "BTC-USD Price", y = "Price") +
   scale_y_continuous(labels = scales::comma)
 
-p2 <- candles_enhanced_cleaned %>%
+p2 <- candles_enhanced_cleaned_no_na %>%
   ggplot(aes(x = time, y = hash_rate)) +
   geom_line(color = "red") +
   theme_minimal() +
   labs(title = "Hash Rate", y = "Hash Rate") +
   scale_y_continuous(labels = scales::comma)
 
-p3 <- candles_enhanced_cleaned %>%
+p3 <- candles_enhanced_cleaned_no_na %>%
   ggplot(aes(x = time, y = avg_block_size)) +
   geom_line(color = "green4") +
   theme_minimal() +
   labs(title = "Average Block Size", y = "Size") +
   scale_y_continuous(labels = scales::comma)
 
-p4 <- candles_enhanced_cleaned %>%
+p4 <- candles_enhanced_cleaned_no_na %>%
   ggplot(aes(x = time, y = n_transactions)) +
   geom_line(color = "purple") +
   theme_minimal() +
   labs(title = "Number of Transactions", y = "Count") +
   scale_y_continuous(labels = scales::comma)
 
-p5 <- candles_enhanced_cleaned %>%
+p5 <- candles_enhanced_cleaned_no_na %>%
   ggplot(aes(x = time, y = utxo_count)) +
   geom_line(color = "orange") +
   theme_minimal() +
   labs(title = "UTXO Count", y = "Count") +
   scale_y_continuous(labels = scales::comma)
 
-p6 <- candles_enhanced_cleaned %>%
+p6 <- candles_enhanced_cleaned_no_na %>%
   ggplot(aes(x = time, y = value)) +
   geom_line() +
   theme_minimal() +
@@ -387,7 +387,7 @@ p6 <- candles_enhanced_cleaned %>%
   scale_y_continuous(labels = scales::comma)
 
 # For more readability we are only plotting the last 100 candles
-p7 <- candles_enhanced_cleaned %>%
+p7 <- candles_enhanced_cleaned_no_na %>%
   tail(24) %>%
   ggplot(aes(x = time, y = volume)) +
   geom_segment(aes(xend = time, yend = 0, color = volume)) +
@@ -411,7 +411,7 @@ TODO Manually add the one below since it's failing
 
 ```r
 # For more readability we are only plotting the last 24 candles
-p7 <- candles_enhanced_cleaned %>%
+p7 <- candles_enhanced_cleaned_no_na %>%
   tail(24) %>%
   mutate(direction = ifelse(close >= open, "up", "down")) %>%
   ggplot(aes(x = time, y = close)) +
