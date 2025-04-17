@@ -390,7 +390,7 @@ p6 <- candles_enhanced_cleaned %>%
 p7 <- candles_enhanced_cleaned %>%
   tail(24) %>%
   mutate(direction = ifelse(close >= open, "up", "down")) %>%
-  ggplot(aes(x = time, y = close, volume = volume)) +
+  ggplot(aes(x = time, y = close)) +
   # The shadows (wicks)
   geom_segment(aes(xend = time, y = low, yend = high, color = direction), size = 0.5) +
   # The body
