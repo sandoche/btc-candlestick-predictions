@@ -578,3 +578,26 @@ Using the function `prepare_dataset` and the we can have directly the final data
 
 ## Test and training datasets
 
+We put together the code to fix the fear_and_greed_index and to prepare the datasets and split them in train and test sets.
+
+```{r project_datasets, cache=TRUE}
+fear_and_greed_index_date_before_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-25"))
+fear_and_greed_index_date_after_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-27"))
+fear_and_greed_value_date_na <- mean(c(fear_and_greed_index_date_before_na$value, fear_and_greed_index_date_after_na$value))
+
+fear_and_greed_index_corrected <- fear_and_greed_index %>%
+  bind_rows(tibble(timestamp = date_na, value = fear_and_greed_value_date_na, value_classification = "Greed"))
+
+project_dataset <- prepare_dataset(candles, fear_and_greed_index_corrected, hash_rate, average_block_size, n_transactions, utxo_count)
+
+sum(is.na(project_dataset))
+nrow(project_dataset)
+nrow(candles)
+
+test_index <- createDataPartition(y = project_dataset$direction, times = 1, p = 0.2, list = FALSE)
+train_set <- project_dataset[-test_index, ]
+test_set <- project_dataset[test_index, ]
+```
+The number of rows reduced since adding lags introduced a lot of NAs in the first rows, NAs that we removed. Also we decided not to use cross validation to reduce the time of training for the different machine learnings algorithms. Note that we initiated already the project using `set.seed(1)` part of the global variables.
+
+
