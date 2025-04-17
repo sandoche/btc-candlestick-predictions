@@ -104,13 +104,66 @@ Let's see how the dataset looks like.
 ```{r btc_coinbase_candlestick_chart, cache=TRUE}
 candles <- read_csv(paste0("data/", trading_pair, "_candles_", start_date, "_", end_date, "_", candlestick_period, ".csv"))
 head(candles)
+count_candles <- nrow(candles)
 ```
 
+We have `r format(count_candles, big.mark=",")` entries in our candle stick dataset. As described in the overview it contains the OCLH data, timestamp and the volume of each candles.
 
+Bitcoin is used by 3 types of users: 
+- Traders — they are interested by the price and make profit
+- Users — using the currency to do payments or to transfer money around the world
+- Miners — they mine bitcoin to sell it, their interest is that the price of bitcoin is higher than the cost of mining bitcoin
 
+Keeping this in mind, I tried to find other dataset that could represent each of the type of users that could eventually help in our predictions and I picked the following:
+- Fear and greed index — represents the overall mood of the market (traders)
+- Hash-rate — defines the overall mining power (miners)
+- Average block size — the higher it is the more transactions are happening (users)
+- Number of transactions — defines the activity of the network (users)
+- Number of unspent transaction outputs (UTXO) — defines how many addresses contains bitcoin, and reflects the network activity (users)
+ 
+https://www.blockchain.com/explorer/charts/total-bitcoins
+https://alternative.me/crypto/fear-and-greed-index/
 
+```{r fear_and_greed_index, cache=TRUE}
+fear_and_greed_index <- read_csv(paste0("data/", trading_pair, "_fear_and_greed_index_", start_date, "_", end_date, ".csv"))
+fear_and_greed_index <- fear_and_greed_index %>% mutate(value = as.numeric(value))
+head(fear_and_greed_index)
+```
 
+```{r hash_rate, cache=TRUE}
+hash_rate <- jsonlite::fromJSON("data/hash-rate.json")$`hash-rate` %>%
+  rename(timestamp = x, hash_rate = y) %>%
+  mutate(timestamp = as.POSIXct(timestamp / 1000, origin = "1970-01-01", tz = "UTC")) %>%
+  filter(timestamp >= as.POSIXct(start_date, origin = "1970-01-01", tz = "UTC") & timestamp <= as.POSIXct(end_date, origin = "1970-01-01", tz = "UTC"))
+head(hash_rate)
+```
 
+```{r average_block_size, cache=TRUE}
+average_block_size <- jsonlite::fromJSON("data/avg-block-size.json")$`avg-block-size` %>%
+  rename(timestamp = x, avg_block_size = y) %>%
+  mutate(timestamp = as.POSIXct(timestamp / 1000, origin = "1970-01-01", tz = "UTC")) %>%
+  filter(timestamp >= as.POSIXct(start_date, origin = "1970-01-01", tz = "UTC") & timestamp <= as.POSIXct(end_date, origin = "1970-01-01", tz = "UTC"))
+head(average_block_size)
+```
+
+```{r n_transactions, cache=TRUE}
+n_transactions <- jsonlite::fromJSON("data/n-transactions.json")$`n-transactions` %>%
+  rename(timestamp = x, n_transactions = y) %>%
+  mutate(timestamp = as.POSIXct(timestamp / 1000, origin = "1970-01-01", tz = "UTC")) %>%
+  filter(timestamp >= as.POSIXct(start_date, origin = "1970-01-01", tz = "UTC") & timestamp <= as.POSIXct(end_date, origin = "1970-01-01", tz = "UTC"))
+head(n_transactions)
+```
+
+```{r utxo_count, cache=TRUE}
+utxo_count <- jsonlite::fromJSON("data/utxo-count.json")$`utxo-count` %>%
+  rename(timestamp = x, utxo_count = y) %>%
+  mutate(
+    timestamp = as.POSIXct(timestamp / 1000, origin = "1970-01-01", tz = "UTC"),
+    timestamp = as.Date(timestamp)
+  ) %>%
+  filter(timestamp >= as.Date(start_date) & timestamp <= as.Date(end_date))
+head(utxo_count)
+```
 
 
 
