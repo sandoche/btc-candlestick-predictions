@@ -1282,7 +1282,7 @@ formula_7_lag <- create_feature_set(7)
 formula_15_lag <- create_feature_set(15)
 
 # Set seed for reproducibility
-set.seed(123)
+set.seed(1)
 
 # Train GLM models
 start_time <- Sys.time()

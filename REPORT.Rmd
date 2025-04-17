@@ -15,9 +15,25 @@ knitr::opts_chunk$set(echo = TRUE, tidy.opts = list(width.cutoff = 60), tidy = T
   
 if(!require(lubridate)) install.packages("lubridate", repos = "http://cran.us.r-project.org")
 if(!require(formatR)) install.packages("formatR", repos = "http://cran.us.r-project.org")
+if (!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+if (!require(caret)) install.packages("caret", repos = "http://cran.us.r-project.org")
+if (!require(httr)) install.packages("httr", repos = "http://cran.us.r-project.org")
+if (!require(jsonlite)) install.packages("jsonlite", repos = "http://cran.us.r-project.org")
+if (!require(tidyquant)) install.packages("tidyquant", repos = "http://cran.us.r-project.org")
+if (!require(patchwork)) install.packages("patchwork", repos = "http://cran.us.r-project.org")
+if (!require(randomForest)) install.packages("randomForest", repos = "http://cran.us.r-project.org")
+if (!require(TTR)) install.packages("TTR", repos = "http://cran.us.r-project.org")
 
 library(lubridate)
 library(formatR)
+library(tidyverse)
+library(caret)
+library(httr)
+library(jsonlite)
+library(tidyquant)
+library(patchwork)
+library(randomForest)
+library(TTR)
 ```
 
 \newpage
@@ -66,3 +82,49 @@ TODO: Give some resource to learn about spot vs future.
 In this section we will see what are the are the different dataset available, see what features are available to train the different models, prepare the data, verify it, and choose different machine learning algorithms we will use and compare.
 
 ## Data sets
+
+In order to conduct this study we used as a the main data set the historic rates for the trading pair BTC-USD using Coinbase API.
+TODO: add reference https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductcandles
+
+We used the following global variables for the full project:
+```{r global_variables}
+trading_pair <- "BTC-USD"
+start_date <- "2024-01-01"
+end_date <- "2025-03-29"
+candlestick_period <- 3600
+set.seed(1)
+```
+
+The timeframe is the entire year 2024 and the start of the year 2025 until the day we started the study. Note that since January 2024, Bitcoin ETF has officially been approved. The period `candlestick_period <- 3600` is the time of a candle, the candle closes 1h after it starts. Which means we have 24 candles per day.
+
+I choose this settings to have a dataset of around 100000 candles but also since Bitcoin ETF has been approved the market may have taken a different dynamic than the previous years.
+
+Let's see how the dataset looks like.
+
+```{r btc_coinbase_candlestick_chart, cache=TRUE}
+candles <- read_csv(paste0("data/", trading_pair, "_candles_", start_date, "_", end_date, "_", candlestick_period, ".csv"))
+head(candles)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
