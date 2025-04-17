@@ -107,6 +107,44 @@ enhance_dataset <- function(candles_data, fear_and_greed_index_data, hash_rate_d
   candles_enhanced
 }
 
+add_lagged_candles <- function(enhanced_clean_dataset, n_lag) {
+  dataset_with_lagged_candles <- enhanced_clean_dataset
+
+  for (i in 1:n_lag) {
+    dataset_with_lagged_candles[[paste0("body_size_lag_", i)]] <- lag(dataset_with_lagged_candles$body_size, i)
+    dataset_with_lagged_candles[[paste0("upper_shadow_size_lag_", i)]] <- lag(dataset_with_lagged_candles$upper_shadow_size, i)
+    dataset_with_lagged_candles[[paste0("lower_shadow_size_lag_", i)]] <- lag(dataset_with_lagged_candles$lower_shadow_size, i)
+    dataset_with_lagged_candles[[paste0("direction_lag_", i)]] <- lag(dataset_with_lagged_candles$direction, i)
+    dataset_with_lagged_candles[[paste0("volume_lag_", i)]] <- lag(dataset_with_lagged_candles$volume, i)
+    dataset_with_lagged_candles[[paste0("value_lag_", i)]] <- lag(dataset_with_lagged_candles$value, i)
+    dataset_with_lagged_candles[[paste0("close_lag_", i)]] <- lag(dataset_with_lagged_candles$close, i)
+    dataset_with_lagged_candles[[paste0("hash_rate_lag_", i)]] <- lag(dataset_with_lagged_candles$hash_rate, i)
+    dataset_with_lagged_candles[[paste0("avg_block_size_lag_", i)]] <- lag(dataset_with_lagged_candles$avg_block_size, i)
+    dataset_with_lagged_candles[[paste0("n_transactions_lag_", i)]] <- lag(dataset_with_lagged_candles$n_transactions, i)
+    dataset_with_lagged_candles[[paste0("utxo_count_lag_", i)]] <- lag(dataset_with_lagged_candles$utxo_count, i)
+    dataset_with_lagged_candles[[paste0("open_lag_", i)]] <- lag(dataset_with_lagged_candles$open, i)
+    dataset_with_lagged_candles[[paste0("high_lag_", i)]] <- lag(dataset_with_lagged_candles$high, i)
+    dataset_with_lagged_candles[[paste0("low_lag_", i)]] <- lag(dataset_with_lagged_candles$low, i)
+    dataset_with_lagged_candles[[paste0("roc_lag_", i)]] <- lag(dataset_with_lagged_candles$roc, i)
+    dataset_with_lagged_candles[[paste0("macd_lag_", i)]] <- lag(dataset_with_lagged_candles$macd, i)
+    dataset_with_lagged_candles[[paste0("signal_lag_", i)]] <- lag(dataset_with_lagged_candles$signal, i)
+    dataset_with_lagged_candles[[paste0("rsi_lag_", i)]] <- lag(dataset_with_lagged_candles$rsi, i)
+    dataset_with_lagged_candles[[paste0("up_bband_lag_", i)]] <- lag(dataset_with_lagged_candles$up, i)
+    dataset_with_lagged_candles[[paste0("mavg_lag_", i)]] <- lag(dataset_with_lagged_candles$mavg, i)
+    dataset_with_lagged_candles[[paste0("dn_bband_lag_", i)]] <- lag(dataset_with_lagged_candles$dn, i)
+    dataset_with_lagged_candles[[paste0("pctB_lag_", i)]] <- lag(dataset_with_lagged_candles$pctB, i)
+  }
+
+  dataset_with_lagged_candles
+}
+
+prepare_dataset <- function(candles_data, fear_and_greed_index_data, hash_rate_data, average_block_size_data, n_transactions_data, utxo_count_data) {
+  enhanced_clean_dataset <- enhance_dataset(candles_data, fear_and_greed_index_data, hash_rate_data, average_block_size_data, n_transactions_data, utxo_count_data)
+  enhanced_clean_dataset_without_na <- enhanced_clean_dataset %>% drop_na()
+  dataset_with_lagged_candles <- add_lagged_candles(enhanced_clean_dataset_without_na, 15)
+  dataset_with_lagged_candles
+}
+
 ### Clean the data ###
 
 date_na <- as.Date("2024-10-26")
