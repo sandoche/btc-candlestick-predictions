@@ -164,3 +164,23 @@ nrow(candles)
 test_index <- createDataPartition(y = project_dataset$direction, times = 1, p = 0.2, list = FALSE)
 train_set <- project_dataset[-test_index, ]
 test_set <- project_dataset[test_index, ]
+
+
+### Utility functions ###
+
+create_feature_set <- function(feature_names, n_lags) {
+  features <- c()
+
+  for (feature_name in feature_names) {
+    for (i in 1:n_lags) {
+      features <- c(
+        features,
+        paste0(feature_name, "_lag_", i)
+      )
+    }
+  }
+
+  formula_str <- paste("direction ~", paste(features, collapse = " + "))
+
+  as.formula(formula_str)
+}
