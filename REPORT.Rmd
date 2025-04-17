@@ -334,11 +334,6 @@ candles_enhanced_cleaned_no_na <- candles_enhanced_cleaned %>% drop_na()
 sum(is.na(candles_enhanced_cleaned_no_na))
 ```
 
-We can notice that we have a difference of number of rows between `candles_enhanced_cleaned_no_na` and `candles`
-```{r nrow_comparison}
-nrow(candles)
-nrow(candles_enhanced_cleaned_no_na)
-```
 
 ## Visual analysis
 
