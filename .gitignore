@@ -5,3 +5,4 @@
 .RDataTmp*
 *.rds
 REPORT_cache
+REPORT_files
