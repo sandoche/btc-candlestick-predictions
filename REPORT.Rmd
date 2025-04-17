@@ -287,7 +287,7 @@ We have now a table with all the features discussed above. Before adding the lag
 
 First let's see if we have NAs.
 
-```{r dataset_preparation_find_na}
+```{r dataset_preparation_find_na, cache=TRUE}
 na_indexes <- which(apply(candles_enhanced, 1, function(x) any(is.na(x))))
 knitr::kable(candles_enhanced[na_indexes, ], format = "simple", caption = "NAs of the dataset")
 ```
@@ -304,7 +304,7 @@ As concern the fear and greed index missing value we can notice that we are miss
 
 It's important to do so to have coherant lagged values.
 
-```{r fear_and_greed_index_corrected}
+```{r fear_and_greed_index_corrected, cache=TRUE}
 date_na <- as.Date("2024-10-26")
 fear_and_greed_index_date_before_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-25"))
 fear_and_greed_index_date_after_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-27"))
@@ -319,7 +319,7 @@ fear_and_greed_index_corrected %>% filter(timestamp == date_na) %>% nrow()
 
 Let's check the NAs again.
 
-```{r dataset_preparation_find_na_corrected}
+```{r dataset_preparation_find_na_corrected, cache=TRUE}
 candles_enhanced_cleaned <- enhance_dataset(candles, fear_and_greed_index_corrected, hash_rate, average_block_size, n_transactions, utxo_count)
 na_indexes <- which(apply(candles_enhanced_cleaned, 1, function(x) any(is.na(x))))
 knitr::kable(candles_enhanced_cleaned[na_indexes, ], format = "simple", caption = "NAs of the dataset cleaned")
@@ -327,14 +327,101 @@ knitr::kable(candles_enhanced_cleaned[na_indexes, ], format = "simple", caption 
 
 We can see now the only NAs are the missing TA values that we can clean with a simple line of code.
 
-```{r candles_enhanced_cleaned_no_na}
+```{r candles_enhanced_cleaned_no_na, cache=TRUE}
 candles_enhanced_cleaned_no_na <- candles_enhanced_cleaned %>% drop_na()
 sum(is.na(candles_enhanced_cleaned_no_na))
 ```
 
-## Data plot
+## Visual analysis
 
+First of all let's plot the data to visually verify the data.
 
+```{r visual_analysis, cache=TRUE}
+p1 <- candles_enhanced_cleaned %>%
+  ggplot(aes(x = time, y = close)) +
+  geom_line(color = "blue") +
+  theme_minimal() +
+  labs(title = "BTC-USD Price", y = "Price") +
+  scale_y_continuous(labels = scales::comma)
+
+p2 <- candles_enhanced_cleaned %>%
+  ggplot(aes(x = timestamp, y = hash_rate)) +
+  geom_line(color = "red") +
+  theme_minimal() +
+  labs(title = "Hash Rate", y = "Hash Rate") +
+  scale_y_continuous(labels = scales::comma)
+
+p3 <- candles_enhanced_cleaned %>%
+  ggplot(aes(x = timestamp, y = avg_block_size)) +
+  geom_line(color = "green4") +
+  theme_minimal() +
+  labs(title = "Average Block Size", y = "Size") +
+  scale_y_continuous(labels = scales::comma)
+
+p4 <- candles_enhanced_cleaned %>%
+  ggplot(aes(x = timestamp, y = n_transactions)) +
+  geom_line(color = "purple") +
+  theme_minimal() +
+  labs(title = "Number of Transactions", y = "Count") +
+  scale_y_continuous(labels = scales::comma)
+
+p5 <- candles_enhanced_cleaned %>%
+  ggplot(aes(x = timestamp, y = utxo_count)) +
+  geom_line(color = "orange") +
+  theme_minimal() +
+  labs(title = "UTXO Count", y = "Count") +
+  scale_y_continuous(labels = scales::comma)
+
+p6 <- candles_enhanced_cleaned %>%
+  ggplot(aes(x = timestamp, y = value)) +
+  geom_line() +
+  theme_minimal() +
+  labs(
+    title = "BTC-USD Fear and Greed Index Evolution",
+    x = "Time",
+    y = "Fear and Greed Index"
+  ) +
+  scale_y_continuous(labels = scales::comma)
+
+# For more readability we are only plotting the last 100 candles
+p7 <- candles_enhanced_cleaned %>%
+  tail(100) %>%
+  mutate(direction = ifelse(close >= open, "up", "down")) %>%
+  ggplot(aes(x = time, y = close, volume = volume)) +
+  # The shadows (wicks)
+  geom_segment(aes(xend = time, y = low, yend = high, color = direction), size = 0.5) +
+  # The body
+  geom_segment(aes(xend = time, y = open, yend = close, color = direction), size = 5) +
+  scale_color_manual(values = c("up" = "darkgreen", "down" = "red")) +
+  theme_tq() +
+  theme(legend.position = "none") +
+  labs(
+    title = "BTC-USD Candlestick Chart (Last 100 Candles)",
+    x = "Time",
+    y = "Price"
+  ) +
+  scale_y_continuous(labels = scales::comma)
+
+# For more readability we are only plotting the last 100 candles
+p8 <- candles_enhanced_cleaned %>%
+  tail(100) %>%
+  ggplot(aes(x = time, y = volume)) +
+  geom_segment(aes(xend = time, yend = 0, color = volume)) +
+  geom_smooth(method = "loess", se = FALSE) +
+  labs(title = "BTC-USD Candlestick Chart (Last 100 candles)", y = "Volume", x = "") +
+  theme_tq() +
+  theme(legend.position = "none")
+
+combined_plot <- (p1 / p2 / p3 / p4 / p5 / p6 / p7 / p8) +
+  plot_layout(ncol = 1, heights = c(1, 1, 1, 1, 1)) +
+  plot_annotation(
+    title = "Bitcoin Price and Blockchain Metrics",
+    theme = theme(plot.title = element_text(hjust = 0.5, size = 16))
+  ) &
+  theme(axis.title.x = element_blank())
+
+combined_plot
+```
 
 
 
