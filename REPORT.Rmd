@@ -620,3 +620,7 @@ https://arxiv.org/pdf/1606.00930
 
 We will also compare these algorithms with Random guess as a reference.
 
+## Utility functions
+
+Since we want to compare each algorithms for a different set of features we need a function to create the formula that we will pass to the machine learning function.
+
