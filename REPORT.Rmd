@@ -572,6 +572,9 @@ prepare_dataset <- function(candles_data, fear_and_greed_index_data, hash_rate_d
   dataset_with_lagged_candles_without_na <- dataset_with_lagged_candles %>% drop_na()
   dataset_with_lagged_candles_without_na
 }
-
-dataset_prepared <- add_lagged_candles(candles_enhanced_cleaned_no_na, 15)
 ```
+
+Using the function `prepare_dataset` and the we can have directly the final dataset with lagged data.
+
+## Test and training datasets
+
