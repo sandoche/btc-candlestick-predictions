@@ -624,3 +624,21 @@ We will also compare these algorithms with Random guess as a reference.
 
 Since we want to compare each algorithms for a different set of features we need a function to create the formula that we will pass to the machine learning function.
 
+```{r utility_functions, cache=TRUE}
+create_feature_formula <- function(feature_names, n_lags) {
+  features <- c()
+
+  for (feature_name in feature_names) {
+    for (i in 1:n_lags) {
+      features <- c(
+        features,
+        paste0(feature_name, "_lag_", i)
+      )
+    }
+  }
+
+  formula_str <- paste("direction ~", paste(features, collapse = " + "))
+
+  as.formula(formula_str)
+}
+```

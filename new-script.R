@@ -168,7 +168,7 @@ test_set <- project_dataset[test_index, ]
 
 ### Utility functions ###
 
-create_feature_set <- function(feature_names, n_lags) {
+create_feature_formula <- function(feature_names, n_lags) {
   features <- c()
 
   for (feature_name in feature_names) {
