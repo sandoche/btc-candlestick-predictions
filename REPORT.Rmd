@@ -232,7 +232,7 @@ We are now ready to prepare the dataset for the study.
 
 ## Preparation
 
-```{r dataset_preparation}
+```{r dataset_preparation, cache=TRUE}
 candles_enhanced <- candles %>%
   mutate(date_only = as.Date(time)) %>%
   left_join(fear_and_greed_index, by = c("date_only" = "timestamp")) %>%
@@ -278,8 +278,40 @@ knitr::kable(head(candles_enhanced), format = "simple", caption = "Overview of t
 
 ```
 
+We have now a table with all the features discussed above. Before adding the lagged features let's explore our set.
 
+First let's see if we have NAs.
 
+```{r dataset_preparation_find_na}
+na_indexes <- which(apply(candles_enhanced, 1, function(x) any(is.na(x))))
+knitr::kable(candles_enhanced[na_indexes, ], format = "simple", caption = "NAs of the dataset")
+```
+
+We can see in the table above that there are 2 types of NAs:
+
+1. Technical analisis indicators
+
+2. Fear and greed index
+
+The technical analysis indicators are located at the start of the table which is normal since to calculate these indicators you need to have a certain number of previous values. Clearing those NAs will be enough.
+
+As concern the fear and greed index missing value we can notice that we are missing the values of the day `2024-10-26` so we will add the values of the average between the day before and after manually.
+
+It's important to do so to have coherant lagged values.
+
+```{r fear_and_greed_index_corrected}
+date_na <- as.Date("2024-10-26")
+fear_and_greed_index_date_before_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-25"))
+fear_and_greed_index_date_after_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-27"))
+fear_and_greed_value_date_na <- mean(c(fear_and_greed_index_date_before_na$value, fear_and_greed_index_date_after_na$value))
+
+fear_and_greed_index_corrected <- fear_and_greed_index %>%
+  bind_rows(tibble(timestamp = date_na, value = fear_and_greed_value_date_na, value_classification = "Greed"))
+
+fear_and_greed_index %>% filter(timestamp == date_na) %>% nrow()
+fear_and_greed_index_corrected %>% filter(timestamp == date_na) %>% nrow()
+```
+## Data plot
 
 
 
