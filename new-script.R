@@ -394,3 +394,5 @@ accuracy_glm_model_OHLC_lag_7 <- confusionMatrix(factor(predictions_glm_model_OH
 
 predictions_glm_model_OHLC_lag_15 <- predict(glm_model_OHLC_lag_15, test_set)
 accuracy_glm_model_OHLC_lag_15 <- confusionMatrix(factor(predictions_glm_model_OHLC_lag_15, levels = c("down", "up"), labels = c("down", "up")), factor(test_set$direction, levels = c("down", "up")))$overall["Accuracy"]
+
+# TODO MAKE A FUNCTION TO DISPLAY ALL THE RESULTS IN TABLES
