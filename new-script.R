@@ -142,7 +142,8 @@ prepare_dataset <- function(candles_data, fear_and_greed_index_data, hash_rate_d
   enhanced_clean_dataset <- enhance_dataset(candles_data, fear_and_greed_index_data, hash_rate_data, average_block_size_data, n_transactions_data, utxo_count_data)
   enhanced_clean_dataset_without_na <- enhanced_clean_dataset %>% drop_na()
   dataset_with_lagged_candles <- add_lagged_candles(enhanced_clean_dataset_without_na, 15)
-  dataset_with_lagged_candles
+  dataset_with_lagged_candles_without_na <- dataset_with_lagged_candles %>% drop_na()
+  dataset_with_lagged_candles_without_na
 }
 
 ### Clean the data ###
