@@ -214,3 +214,37 @@ train_with_cache <- function(formula, train_set, method) {
 
   model
 }
+
+### Creating the formulas ###
+
+formula_OHLC_lag_3 <- create_feature_formula(c("open", "high", "low", "close"), 3)
+formula_OHLC_lag_5 <- create_feature_formula(c("open", "high", "low", "close"), 5)
+formula_OHLC_lag_7 <- create_feature_formula(c("open", "high", "low", "close"), 7)
+formula_OHLC_lag_15 <- create_feature_formula(c("open", "high", "low", "close"), 15)
+
+formula_candles_features_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close"), 3)
+formula_candles_features_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close"), 5)
+formula_candles_features_lag_7 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close"), 7)
+formula_candles_features_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close"), 15)
+
+formula_candles_features_with_fear_and_greed_index_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value"), 3)
+formula_candles_features_with_fear_and_greed_index_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value"), 5)
+formula_candles_features_with_fear_and_greed_index_lag_7 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value"), 7)
+formula_candles_features_with_fear_and_greed_index_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value"), 15)
+
+formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count"), 3)
+formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count"), 5)
+formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_7 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count"), 7)
+formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count"), 15)
+
+formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "bband", "mavg", "dn_bband", "pctB"), 3)
+formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "bband", "mavg", "dn_bband", "pctB"), 5)
+formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_7 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "bband", "mavg", "dn_bband", "pctB"), 7)
+formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "bband", "mavg", "dn_bband", "pctB"), 15)
+
+
+### Training the models ###
+
+rf_model_OHLC_lag_3 <- train_with_cache(formula_OHLC_lag_3, train_set, "glm")
+predictions <- predict(rf_model_OHLC_lag_3, test_set)
+confusionMatrix(factor(predictions, levels = c("down", "up"), labels = c("down", "up")), factor(test_set$direction, levels = c("down", "up")))$overall["Accuracy"]
