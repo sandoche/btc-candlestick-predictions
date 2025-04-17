@@ -389,6 +389,30 @@ p6 <- candles_enhanced_cleaned %>%
 # For more readability we are only plotting the last 100 candles
 p7 <- candles_enhanced_cleaned %>%
   tail(24) %>%
+  ggplot(aes(x = time, y = volume)) +
+  geom_segment(aes(xend = time, yend = 0, color = volume)) +
+  geom_smooth(method = "loess", se = FALSE) +
+  labs(title = "BTC-USD Volume Chart (Last 24 candles)", y = "Volume", x = "") +
+  theme_tq() +
+  theme(legend.position = "none")
+
+combined_plot <- (p1 / p2 / p3 / p4 / p5 / p6 / p7) +
+  plot_layout(ncol = 2, heights = c(1, 1, 1, 1)) +
+  plot_annotation(
+    title = "Bitcoin Price and Blockchain Metrics",
+    theme = theme(plot.title = element_text(hjust = 0.5, size = 16))
+  ) &
+  theme(axis.title.x = element_blank())
+
+combined_plot
+```
+
+TODO Manually add the one below since it's failing
+
+```r
+# For more readability we are only plotting the last 24 candles
+p7 <- candles_enhanced_cleaned %>%
+  tail(24) %>%
   mutate(direction = ifelse(close >= open, "up", "down")) %>%
   ggplot(aes(x = time, y = close)) +
   # The shadows (wicks)
@@ -404,28 +428,7 @@ p7 <- candles_enhanced_cleaned %>%
     y = "Price"
   ) +
   scale_y_continuous(labels = scales::comma)
-
-# For more readability we are only plotting the last 100 candles
-p8 <- candles_enhanced_cleaned %>%
-  tail(24) %>%
-  ggplot(aes(x = time, y = volume)) +
-  geom_segment(aes(xend = time, yend = 0, color = volume)) +
-  geom_smooth(method = "loess", se = FALSE) +
-  labs(title = "BTC-USD Volume Chart (Last 24 candles)", y = "Volume", x = "") +
-  theme_tq() +
-  theme(legend.position = "none")
-
-combined_plot <- (p1 / p2 / p3 / p4 / p5 / p6 / p7 / p8) +
-  plot_layout(ncol = 2, heights = c(1, 1, 1, 1)) +
-  plot_annotation(
-    title = "Bitcoin Price and Blockchain Metrics",
-    theme = theme(plot.title = element_text(hjust = 0.5, size = 16))
-  ) &
-  theme(axis.title.x = element_blank())
-
-combined_plot
 ```
 
 TODO Add chart of TAs
 TODO When doing the real data don't forget to rm na
-
