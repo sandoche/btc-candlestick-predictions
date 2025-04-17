@@ -345,35 +345,35 @@ p1 <- candles_enhanced_cleaned %>%
   scale_y_continuous(labels = scales::comma)
 
 p2 <- candles_enhanced_cleaned %>%
-  ggplot(aes(x = timestamp, y = hash_rate)) +
+  ggplot(aes(x = time, y = hash_rate)) +
   geom_line(color = "red") +
   theme_minimal() +
   labs(title = "Hash Rate", y = "Hash Rate") +
   scale_y_continuous(labels = scales::comma)
 
 p3 <- candles_enhanced_cleaned %>%
-  ggplot(aes(x = timestamp, y = avg_block_size)) +
+  ggplot(aes(x = time, y = avg_block_size)) +
   geom_line(color = "green4") +
   theme_minimal() +
   labs(title = "Average Block Size", y = "Size") +
   scale_y_continuous(labels = scales::comma)
 
 p4 <- candles_enhanced_cleaned %>%
-  ggplot(aes(x = timestamp, y = n_transactions)) +
+  ggplot(aes(x = time, y = n_transactions)) +
   geom_line(color = "purple") +
   theme_minimal() +
   labs(title = "Number of Transactions", y = "Count") +
   scale_y_continuous(labels = scales::comma)
 
 p5 <- candles_enhanced_cleaned %>%
-  ggplot(aes(x = timestamp, y = utxo_count)) +
+  ggplot(aes(x = time, y = utxo_count)) +
   geom_line(color = "orange") +
   theme_minimal() +
   labs(title = "UTXO Count", y = "Count") +
   scale_y_continuous(labels = scales::comma)
 
 p6 <- candles_enhanced_cleaned %>%
-  ggplot(aes(x = timestamp, y = value)) +
+  ggplot(aes(x = time, y = value)) +
   geom_line() +
   theme_minimal() +
   labs(
@@ -385,7 +385,7 @@ p6 <- candles_enhanced_cleaned %>%
 
 # For more readability we are only plotting the last 100 candles
 p7 <- candles_enhanced_cleaned %>%
-  tail(100) %>%
+  tail(24) %>%
   mutate(direction = ifelse(close >= open, "up", "down")) %>%
   ggplot(aes(x = time, y = close, volume = volume)) +
   # The shadows (wicks)
@@ -396,7 +396,7 @@ p7 <- candles_enhanced_cleaned %>%
   theme_tq() +
   theme(legend.position = "none") +
   labs(
-    title = "BTC-USD Candlestick Chart (Last 100 Candles)",
+    title = "BTC-USD Candlestick Chart (Last 24 Candles)",
     x = "Time",
     y = "Price"
   ) +
@@ -404,16 +404,16 @@ p7 <- candles_enhanced_cleaned %>%
 
 # For more readability we are only plotting the last 100 candles
 p8 <- candles_enhanced_cleaned %>%
-  tail(100) %>%
+  tail(24) %>%
   ggplot(aes(x = time, y = volume)) +
   geom_segment(aes(xend = time, yend = 0, color = volume)) +
   geom_smooth(method = "loess", se = FALSE) +
-  labs(title = "BTC-USD Candlestick Chart (Last 100 candles)", y = "Volume", x = "") +
+  labs(title = "BTC-USD Volume Chart (Last 24 candles)", y = "Volume", x = "") +
   theme_tq() +
   theme(legend.position = "none")
 
 combined_plot <- (p1 / p2 / p3 / p4 / p5 / p6 / p7 / p8) +
-  plot_layout(ncol = 1, heights = c(1, 1, 1, 1, 1)) +
+  plot_layout(ncol = 2, heights = c(1, 1, 1, 1)) +
   plot_annotation(
     title = "Bitcoin Price and Blockchain Metrics",
     theme = theme(plot.title = element_text(hjust = 0.5, size = 16))
