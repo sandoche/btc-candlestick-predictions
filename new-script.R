@@ -57,3 +57,61 @@ utxo_count <- jsonlite::fromJSON("data/utxo-count.json")$`utxo-count` %>%
   filter(timestamp >= as.Date(start_date) & timestamp <= as.Date(end_date))
 
 
+### Functions to prepare the data ###
+
+enhance_dataset <- function(candles_data, fear_and_greed_index_data, hash_rate_data, average_block_size_data, n_transactions_data, utxo_count_data) {
+  candles_enhanced <- candles_data %>%
+    mutate(date_only = as.Date(time)) %>%
+    left_join(fear_and_greed_index_data, by = c("date_only" = "timestamp")) %>%
+    left_join(hash_rate_data, by = c("date_only" = "timestamp")) %>%
+    left_join(average_block_size_data, by = c("date_only" = "timestamp")) %>%
+    left_join(n_transactions_data, by = c("date_only" = "timestamp")) %>%
+    left_join(utxo_count_data, by = c("date_only" = "timestamp")) %>%
+    mutate(
+      body_size = abs(close - open),
+      upper_shadow_size = high - pmax(close, open),
+      lower_shadow_size = pmin(close, open) - low,
+      direction = ifelse(close > open, "up", "down"),
+    ) %>%
+    tq_mutate(
+      select = close,
+      mutate_fun = ROC,
+      n = 14,
+      col_rename = "roc"
+    ) %>%
+    tq_mutate( # https://www.keenbase-trading.com/find-best-macd-settings/#t-1719588154943
+      select = close,
+      mutate_fun = MACD,
+      nFast = 12,
+      nSlow = 26,
+      nSig = 9,
+      col_rename = c("macd", "signal")
+    ) %>%
+    tq_mutate(
+      select = close,
+      mutate_fun = RSI,
+      n = 14,
+      col_rename = "rsi"
+    ) %>%
+    tq_mutate(
+      select = close,
+      mutate_fun = BBands,
+      n = 20,
+      sd = 2,
+      col_rename = "bband"
+    )
+
+  candles_enhanced
+}
+
+### Clean the data ###
+
+date_na <- as.Date("2024-10-26")
+fear_and_greed_index_date_before_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-25"))
+fear_and_greed_index_date_after_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-27"))
+fear_and_greed_value_date_na <- mean(c(fear_and_greed_index_date_before_na$value, fear_and_greed_index_date_after_na$value))
+
+fear_and_greed_index_corrected <- fear_and_greed_index %>%
+  bind_rows(tibble(timestamp = date_na, value = fear_and_greed_value_date_na, value_classification = "Greed"))
+
+### Prepare the data ###
