@@ -245,6 +245,152 @@ formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_15 
 
 ### Training the models ###
 
-rf_model_OHLC_lag_3 <- train_with_cache(formula_OHLC_lag_3, train_set, "glm")
-predictions <- predict(rf_model_OHLC_lag_3, test_set)
-confusionMatrix(factor(predictions, levels = c("down", "up"), labels = c("down", "up")), factor(test_set$direction, levels = c("down", "up")))$overall["Accuracy"]
+# OHLC
+
+glm_model_OHLC_lag_3 <- train_with_cache(formula_OHLC_lag_3, train_set, "glm")
+glm_model_OHLC_lag_5 <- train_with_cache(formula_OHLC_lag_5, train_set, "glm")
+glm_model_OHLC_lag_7 <- train_with_cache(formula_OHLC_lag_7, train_set, "glm")
+glm_model_OHLC_lag_15 <- train_with_cache(formula_OHLC_lag_15, train_set, "glm")
+
+rpart_model_OHLC_lag_3 <- train_with_cache(formula_OHLC_lag_3, train_set, "rpart")
+rpart_model_OHLC_lag_5 <- train_with_cache(formula_OHLC_lag_5, train_set, "rpart")
+rpart_model_OHLC_lag_7 <- train_with_cache(formula_OHLC_lag_7, train_set, "rpart")
+rpart_model_OHLC_lag_15 <- train_with_cache(formula_OHLC_lag_15, train_set, "rpart")
+
+rf_model_OHLC_lag_3 <- train_with_cache(formula_OHLC_lag_3, train_set, "rf")
+rf_model_OHLC_lag_5 <- train_with_cache(formula_OHLC_lag_5, train_set, "rf")
+rf_model_OHLC_lag_7 <- train_with_cache(formula_OHLC_lag_7, train_set, "rf")
+rf_model_OHLC_lag_15 <- train_with_cache(formula_OHLC_lag_15, train_set, "rf")
+
+knn_model_OHLC_lag_3 <- train_with_cache(formula_OHLC_lag_3, train_set, "knn")
+knn_model_OHLC_lag_5 <- train_with_cache(formula_OHLC_lag_5, train_set, "knn")
+knn_model_OHLC_lag_7 <- train_with_cache(formula_OHLC_lag_7, train_set, "knn")
+knn_model_OHLC_lag_15 <- train_with_cache(formula_OHLC_lag_15, train_set, "knn")
+
+gbm_model_OHLC_lag_3 <- train_with_cache(formula_OHLC_lag_3, train_set, "gbm")
+gbm_model_OHLC_lag_5 <- train_with_cache(formula_OHLC_lag_5, train_set, "gbm")
+gbm_model_OHLC_lag_7 <- train_with_cache(formula_OHLC_lag_7, train_set, "gbm")
+gbm_model_OHLC_lag_15 <- train_with_cache(formula_OHLC_lag_15, train_set, "gbm")
+
+# Candles features
+
+glm_model_candles_features_lag_3 <- train_with_cache(formula_candles_features_lag_3, train_set, "glm")
+glm_model_candles_features_lag_5 <- train_with_cache(formula_candles_features_lag_5, train_set, "glm")
+glm_model_candles_features_lag_7 <- train_with_cache(formula_candles_features_lag_7, train_set, "glm")
+glm_model_candles_features_lag_15 <- train_with_cache(formula_candles_features_lag_15, train_set, "glm")
+
+rpart_model_candles_features_lag_3 <- train_with_cache(formula_candles_features_lag_3, train_set, "rpart")
+rpart_model_candles_features_lag_5 <- train_with_cache(formula_candles_features_lag_5, train_set, "rpart")
+rpart_model_candles_features_lag_7 <- train_with_cache(formula_candles_features_lag_7, train_set, "rpart")
+rpart_model_candles_features_lag_15 <- train_with_cache(formula_candles_features_lag_15, train_set, "rpart")
+
+rf_model_candles_features_lag_3 <- train_with_cache(formula_candles_features_lag_3, train_set, "rf")
+rf_model_candles_features_lag_5 <- train_with_cache(formula_candles_features_lag_5, train_set, "rf")
+rf_model_candles_features_lag_7 <- train_with_cache(formula_candles_features_lag_7, train_set, "rf")
+rf_model_candles_features_lag_15 <- train_with_cache(formula_candles_features_lag_15, train_set, "rf")
+
+knn_model_candles_features_lag_3 <- train_with_cache(formula_candles_features_lag_3, train_set, "knn")
+knn_model_candles_features_lag_5 <- train_with_cache(formula_candles_features_lag_5, train_set, "knn")
+knn_model_candles_features_lag_7 <- train_with_cache(formula_candles_features_lag_7, train_set, "knn")
+knn_model_candles_features_lag_15 <- train_with_cache(formula_candles_features_lag_15, train_set, "knn")
+
+gbm_model_candles_features_lag_3 <- train_with_cache(formula_candles_features_lag_3, train_set, "gbm")
+gbm_model_candles_features_lag_5 <- train_with_cache(formula_candles_features_lag_5, train_set, "gbm")
+gbm_model_candles_features_lag_7 <- train_with_cache(formula_candles_features_lag_7, train_set, "gbm")
+gbm_model_candles_features_lag_15 <- train_with_cache(formula_candles_features_lag_15, train_set, "gbm")
+
+# Candles features with fear and greed index
+
+glm_model_candles_features_with_fear_and_greed_index_lag_3 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_3, train_set, "glm")
+glm_model_candles_features_with_fear_and_greed_index_lag_5 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_5, train_set, "glm")
+glm_model_candles_features_with_fear_and_greed_index_lag_7 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_7, train_set, "glm")
+glm_model_candles_features_with_fear_and_greed_index_lag_15 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_15, train_set, "glm")
+
+rpart_model_candles_features_with_fear_and_greed_index_lag_3 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_3, train_set, "rpart")
+rpart_model_candles_features_with_fear_and_greed_index_lag_5 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_5, train_set, "rpart")
+rpart_model_candles_features_with_fear_and_greed_index_lag_7 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_7, train_set, "rpart")
+rpart_model_candles_features_with_fear_and_greed_index_lag_15 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_15, train_set, "rpart")
+
+rf_model_candles_features_with_fear_and_greed_index_lag_3 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_3, train_set, "rf")
+rf_model_candles_features_with_fear_and_greed_index_lag_5 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_5, train_set, "rf")
+rf_model_candles_features_with_fear_and_greed_index_lag_7 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_7, train_set, "rf")
+rf_model_candles_features_with_fear_and_greed_index_lag_15 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_15, train_set, "rf")
+
+knn_model_candles_features_with_fear_and_greed_index_lag_3 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_3, train_set, "knn")
+knn_model_candles_features_with_fear_and_greed_index_lag_5 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_5, train_set, "knn")
+knn_model_candles_features_with_fear_and_greed_index_lag_7 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_7, train_set, "knn")
+knn_model_candles_features_with_fear_and_greed_index_lag_15 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_15, train_set, "knn")
+
+gbm_model_candles_features_with_fear_and_greed_index_lag_3 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_3, train_set, "gbm")
+gbm_model_candles_features_with_fear_and_greed_index_lag_5 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_5, train_set, "gbm")
+gbm_model_candles_features_with_fear_and_greed_index_lag_7 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_7, train_set, "gbm")
+gbm_model_candles_features_with_fear_and_greed_index_lag_15 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_lag_15, train_set, "gbm")
+
+# Candles features with fear and greed index and chain data
+
+glm_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_3 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_3, train_set, "glm")
+glm_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_5 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_5, train_set, "glm")
+glm_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_7 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_7, train_set, "glm")
+glm_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_15 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_15, train_set, "glm")
+
+rpart_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_3 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_3, train_set, "rpart")
+rpart_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_5 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_5, train_set, "rpart")
+rpart_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_7 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_7, train_set, "rpart")
+rpart_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_15 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_15, train_set, "rpart")
+
+rf_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_3 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_3, train_set, "rf")
+rf_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_5 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_5, train_set, "rf")
+rf_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_7 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_7, train_set, "rf")
+rf_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_15 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_15, train_set, "rf")
+
+knn_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_3 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_3, train_set, "knn")
+knn_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_5 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_5, train_set, "knn")
+knn_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_7 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_7, train_set, "knn")
+knn_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_15 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_15, train_set, "knn")
+
+gbm_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_3 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_3, train_set, "gbm")
+gbm_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_5 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_5, train_set, "gbm")
+gbm_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_7 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_7, train_set, "gbm")
+gbm_model_candles_features_with_fear_and_greed_index_and_chain_data_lag_15 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_lag_15, train_set, "gbm")
+
+# Candles features with fear and greed index and chain data and TA
+
+glm_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_3 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_3, train_set, "glm")
+glm_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_5 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_5, train_set, "glm")
+glm_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_7 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_7, train_set, "glm")
+glm_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_15 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_15, train_set, "glm")
+
+rpart_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_3 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_3, train_set, "rpart")
+rpart_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_5 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_5, train_set, "rpart")
+rpart_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_7 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_7, train_set, "rpart")
+rpart_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_15 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_15, train_set, "rpart")
+
+rf_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_3 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_3, train_set, "rf")
+rf_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_5 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_5, train_set, "rf")
+rf_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_7 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_7, train_set, "rf")
+rf_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_15 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_15, train_set, "rf")
+
+knn_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_3 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_3, train_set, "knn")
+knn_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_5 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_5, train_set, "knn")
+knn_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_7 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_7, train_set, "knn")
+knn_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_15 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_15, train_set, "knn")
+
+gbm_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_3 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_3, train_set, "gbm")
+gbm_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_5 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_5, train_set, "gbm")
+gbm_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_7 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_7, train_set, "gbm")
+gbm_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_15 <- train_with_cache(formula_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_15, train_set, "gbm")
+
+
+## Compare results ##
+
+predictions_glm_model_OHLC_lag_3 <- predict(glm_model_OHLC_lag_3, test_set)
+accuracy_glm_model_OHLC_lag_3 <- confusionMatrix(factor(predictions_glm_model_OHLC_lag_3, levels = c("down", "up"), labels = c("down", "up")), factor(test_set$direction, levels = c("down", "up")))$overall["Accuracy"]
+
+predictions_glm_model_OHLC_lag_5 <- predict(glm_model_OHLC_lag_5, test_set)
+accuracy_glm_model_OHLC_lag_5 <- confusionMatrix(factor(predictions_glm_model_OHLC_lag_5, levels = c("down", "up"), labels = c("down", "up")), factor(test_set$direction, levels = c("down", "up")))$overall["Accuracy"]
+
+predictions_glm_model_OHLC_lag_7 <- predict(glm_model_OHLC_lag_7, test_set)
+accuracy_glm_model_OHLC_lag_7 <- confusionMatrix(factor(predictions_glm_model_OHLC_lag_7, levels = c("down", "up"), labels = c("down", "up")), factor(test_set$direction, levels = c("down", "up")))$overall["Accuracy"]
+
+predictions_glm_model_OHLC_lag_15 <- predict(glm_model_OHLC_lag_15, test_set)
+accuracy_glm_model_OHLC_lag_15 <- confusionMatrix(factor(predictions_glm_model_OHLC_lag_15, levels = c("down", "up"), labels = c("down", "up")), factor(test_set$direction, levels = c("down", "up")))$overall["Accuracy"]
