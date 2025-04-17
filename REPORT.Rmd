@@ -600,4 +600,23 @@ test_set <- project_dataset[test_index, ]
 ```
 The number of rows reduced since adding lags introduced a lot of NAs in the first rows, NAs that we removed. Also we decided not to use cross validation to reduce the time of training for the different machine learnings algorithms. Note that we initiated already the project using `set.seed(1)` part of the global variables.
 
+## Machine learning algorithms
+
+Based on some shallow research on the press, we selected the following machine learnings algorithms that seems to work better with our type of dataset:
+
+- Generalized Linear Model (GLM)
+
+- Decision Tree (DT)
+
+- Random Forest (RF)
+
+- K-nearest neighbor (KNN)
+
+- Gradient boosting (GBM)
+
+TODO add links reference
+https://www.neuroquantology.com/open-access/An+Optimized+Machine+Learning+Model+for+Candlestick+Chart+Analysis+to+Predict+Stock+Market+Trends_9861/?download=true
+https://arxiv.org/pdf/1606.00930
+
+We will also compare these algorithms with Random guess as a reference.
 
