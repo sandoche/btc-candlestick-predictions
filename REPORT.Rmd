@@ -208,8 +208,28 @@ TODO: add https://medium.com/learning-lab/become-a-better-crypto-trader-with-tec
 
 Before preparing the dataset let's see what would be the features we can extract from the OHLC candlestick data.
 
+## Features
 
+Our candlesticks dataset from coinbase gives us values that are based on the price of bitcoin, but used itself for a machine learning algorithm it will be hard to use those raw absolute values since the price always fluctuate, so we have to think about what defines the candlesticks we have seen above?
 
+If we isolate a candle we can see the following features:
+
+- Size of the body
+
+- Size of the upper shadow / wicks
+
+- Size of the lower shadow / wicks
+
+- Direction of the candle (up or down)
+
+- Closing price
+
+We are now ready to prepare the dataset for the study.
+
+## Preparation
+
+```{r dataset_preparation}
+```
 
 
 
