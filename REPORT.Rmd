@@ -427,5 +427,5 @@ combined_plot
 ```
 
 TODO Add chart of TAs
-TODO fix duplicate TIMESTAMPS
+TODO When doing the real data don't forget to rm na
 
