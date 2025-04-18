@@ -6,3 +6,5 @@
 *.rds
 REPORT_cache
 REPORT_files
+*.log
+*.tex
