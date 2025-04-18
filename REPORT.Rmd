@@ -837,7 +837,19 @@ summary_stats_OHLC <- aggregate(accuracy ~ model_type,
   data = results_OHLC,
   FUN = function(x) c(mean = mean(x), sd = sd(x), max = max(x))
 )
-knitr::kable(summary_stats_OHLC, format = "simple", caption = "Summary statistics for OHLC features")
+
+summary_stats_OHLC <- data.frame(
+  model_type = summary_stats_OHLC$model_type,
+  mean_accuracy = summary_stats_OHLC$accuracy[,"mean"],
+  sd_accuracy = summary_stats_OHLC$accuracy[,"sd"],
+  max_accuracy = summary_stats_OHLC$accuracy[,"max"]
+)
+
+knitr::kable(summary_stats_OHLC, 
+             format = "simple", 
+             caption = "Summary statistics for OHLC features",
+             digits = 4,
+             col.names = c("Model Type", "Mean Accuracy", "SD Accuracy", "Max Accuracy"))
 ```
 
 ### Candle features
@@ -888,7 +900,19 @@ summary_stats_candles <- aggregate(accuracy ~ model_type,
   data = results_candles,
   FUN = function(x) c(mean = mean(x), sd = sd(x), max = max(x))
 )
-summary_stats_candles
+
+summary_stats_candles <- data.frame(
+  model_type = summary_stats_candles$model_type,
+  mean_accuracy = summary_stats_candles$accuracy[,"mean"],
+  sd_accuracy = summary_stats_candles$accuracy[,"sd"],
+  max_accuracy = summary_stats_candles$accuracy[,"max"]
+)
+
+knitr::kable(summary_stats_cand les, 
+             format = "simple", 
+             caption = "Summary statistics for candles features",
+             digits = 4,
+             col.names = c("Model Type", "Mean Accuracy", "SD Accuracy", "Max Accuracy"))
 ```
 
 ### Candles features and fear and greed index
@@ -939,7 +963,19 @@ summary_stats_candles_fg <- aggregate(accuracy ~ model_type,
   data = results_candles_fg,
   FUN = function(x) c(mean = mean(x), sd = sd(x), max = max(x))
 )
-summary_stats_candles_fg
+
+summary_stats_candles_fg <- data.frame(
+  model_type = summary_stats_candles_fg$model_type,
+  mean_accuracy = summary_stats_candles_fg$accuracy[,"mean"],
+  sd_accuracy = summary_stats_candles_fg$accuracy[,"sd"],
+  max_accuracy = summary_stats_candles_fg$accuracy[,"max"]
+)
+
+knitr::kable(summary_stats_candles_fg, 
+             format = "simple", 
+             caption = "Summary statistics for candles features and fear and greed index",
+             digits = 4,
+             col.names = c("Model Type", "Mean Accuracy", "SD Accuracy", "Max Accuracy"))
 ```
 
 ### Candles features, fear and greed index and chain data
@@ -990,7 +1026,19 @@ summary_stats_candles_fg_chain <- aggregate(accuracy ~ model_type,
   data = results_candles_fg_chain,
   FUN = function(x) c(mean = mean(x), sd = sd(x), max = max(x))
 )
-summary_stats_candles_fg_chain
+
+summary_stats_candles_fg_chain <- data.frame(
+  model_type = summary_stats_candles_fg_chain$model_type,
+  mean_accuracy = summary_stats_candles_fg_chain$accuracy[,"mean"],
+  sd_accuracy = summary_stats_candles_fg_chain$accuracy[,"sd"],
+  max_accuracy = summary_stats_candles_fg_chain$accuracy[,"max"]
+)
+
+knitr::kable(summary_stats_candles_fg_chain, 
+             format = "simple", 
+             caption = "Summary statistics for candles features, fear and greed index and chain data",
+             digits = 4,
+             col.names = c("Model Type", "Mean Accuracy", "SD Accuracy", "Max Accuracy"))
 ```
 
 ### Candles features, fear and greed index, chain data and technical analysis indicators
@@ -1041,7 +1089,19 @@ summary_stats_candles_fg_chain_ta <- aggregate(accuracy ~ model_type,
   data = results_candles_fg_chain_ta,
   FUN = function(x) c(mean = mean(x), sd = sd(x), max = max(x))
 )
-summary_stats_candles_fg_chain_ta
+
+summary_stats_candles_fg_chain_ta <- data.frame(
+  model_type = summary_stats_candles_fg_chain_ta$model_type,
+  mean_accuracy = summary_stats_candles_fg_chain_ta$accuracy[,"mean"],
+  sd_accuracy = summary_stats_candles_fg_chain_ta$accuracy[,"sd"],
+  max_accuracy = summary_stats_candles_fg_chain_ta$accuracy[,"max"]
+)
+
+knitr::kable(summary_stats_candles_fg_chain_ta, 
+             format = "simple", 
+             caption = "Summary statistics for candles features, fear and greed index, chain data and technical analysis indicators",
+             digits = 4,
+             col.names = c("Model Type", "Mean Accuracy", "SD Accuracy", "Max Accuracy"))
 ```
 
 ## Best models
