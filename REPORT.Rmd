@@ -1020,7 +1020,7 @@ gbm_model_candles_fg_chain_lag_5 <- train_with_cache(formula_candles_fg_chain_la
 gbm_model_candles_fg_chain_lag_7 <- train_with_cache(formula_candles_fg_chain_lag_7, train_set, "gbm")
 gbm_model_candles_fg_chain_lag_15 <- train_with_cache(formula_candles_fg_chain_lag_15, train_set, "gbm")
 
-results_candles_fg_chain <- evaluate_models("candles_fg", test_set)
+results_candles_fg_chain <- evaluate_models("candles_fg_chain", test_set)
 results_candles_fg_chain
 ```
 
@@ -1083,7 +1083,7 @@ gbm_model_candles_fg_chain_ta_lag_5 <- train_with_cache(formula_candles_fg_chain
 gbm_model_candles_fg_chain_ta_lag_7 <- train_with_cache(formula_candles_fg_chain_ta_lag_7, train_set, "gbm")
 gbm_model_candles_fg_chain_ta_lag_15 <- train_with_cache(formula_candles_fg_chain_ta_lag_15, train_set, "gbm")
 
-results_candles_fg_chain_ta <- evaluate_models("candles_fg", test_set)
+results_candles_fg_chain_ta <- evaluate_models("candles_fg_chain_ta", test_set)
 results_candles_fg_chain_ta
 ```
 
@@ -1108,5 +1108,53 @@ knitr::kable(summary_stats_candles_fg_chain_ta,
 ```
 
 ## Models comparison
+
+```{r best_models, cache=TRUE}
+feature_sets <- c("OHLC", "candles", "candles_fg", "candles_fg_chain", "candles_fg_chain_ta")
+
+# Function to get top models across all feature sets
+get_top_models <- function(test_set, n = 10) {
+  all_results <- data.frame()
+
+  for (feature_set in feature_sets) {
+    results <- evaluate_models(feature_set, test_set)
+    all_results <- rbind(all_results, results)
+  }
+
+  # Sort by accuracy and get top n
+  all_results <- all_results[order(-all_results$accuracy), ]
+  head(all_results, n)
+}
+
+get_top_models(test_set)
+```
+
+```{r best_models, cache=TRUE}
+feature_set_summary <- data.frame()
+for (feature_set in feature_sets) {
+  results <- evaluate_models(feature_set, test_set)
+  avg_accuracy <- mean(results$accuracy)
+  sd_accuracy <- sd(results$accuracy)
+  feature_set_summary <- rbind(
+    feature_set_summary,
+    data.frame(
+      feature_set = feature_set,
+      avg_accuracy = avg_accuracy,
+      sd_accuracy = sd_accuracy
+    )
+  )
+}
+feature_set_summary <- feature_set_summary[order(-feature_set_summary$avg_accuracy), ]
+feature_set_summary
+```
+As expected we can see that OHLC doesn't perform well, suprisingly we can see that just the candles itself performs the best.
+
+We will use the following three models to fine tune, first the number of lags, then using the fine tuning parameters.
+
+- glm_model_candles_lag_7
+
+- gbm_model_candles_fg_lag_7
+
+- rpart_model_candles_lag_5
 
 
