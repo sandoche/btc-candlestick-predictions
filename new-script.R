@@ -298,6 +298,7 @@ opposite_direction <- function(test_set) {
 opposite_direction_accuracy <- mean(opposite_direction(test_set) == test_set$direction)
 print(paste("Opposite direction accuracy:", round(opposite_direction_accuracy, 4)))
 
+# Use candlestick patterns
 
 
 ### Creating the formulas ###
@@ -642,12 +643,12 @@ rpart_model_candles_fg_lag_15 <- train_with_cache(formula_candles_fg_lag_15, tra
 # Function to get top models across all feature sets
 get_all_models <- function(test_set, n = 100) {
   all_results <- data.frame()
-  
+
   for (feature_set in feature_sets) {
-    results <- evaluate_models(feature_set, test_set, c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15))
+    results <- evaluate_models(feature_set, test_set, c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15))
     all_results <- rbind(all_results, results)
   }
-  
+
   # Sort by accuracy and get top n
   all_results <- all_results[order(-all_results$accuracy), ]
   head(all_results, n)
@@ -655,6 +656,120 @@ get_all_models <- function(test_set, n = 100) {
 
 get_all_models(test_set)
 
-# glm_model_candles_lag_6        
+# glm_model_candles_lag_6
 # gbm_model_candles_fg_lag_7
 # rpart_model_candles_lag_5
+
+### Fine tuning GBM and RPART models ###
+
+# GBM fine tuning
+gbmGrid <- expand.grid(
+  interaction.depth = c(1, 2, 3), # Focus around the successful value of 1
+  n.trees = c(50, 100, 150), # Focus around the successful value of 100
+  shrinkage = c(0.05, 0.1, 0.15), # Focus around the successful value of 0.1
+  n.minobsinnode = c(8, 10, 12) # Focus around the successful value of 10
+)
+
+# Cache filepath for tuned GBM
+gbm_tuned_filepath <- "models/gbm_model_candles_fg_lag_7_tuned.rds"
+
+if (file.exists(gbm_tuned_filepath)) {
+  gbm_model_candles_fg_lag_7_tuned <- readRDS(gbm_tuned_filepath)
+  print(paste("Tuned GBM model loaded from cache:", gbm_tuned_filepath))
+} else {
+  start_time <- Sys.time()
+  gbm_model_candles_fg_lag_7_tuned <- train(
+    formula_candles_fg_lag_7,
+    data = train_set,
+    method = "gbm",
+    trControl = trainControl(
+      method = "boot",
+      number = 25,
+      verboseIter = TRUE
+    ),
+    tuneGrid = gbmGrid,
+    verbose = FALSE
+  )
+  end_time <- Sys.time()
+  print(paste("GBM tuning time:", format(end_time - start_time, digits = 2)))
+
+  saveRDS(gbm_model_candles_fg_lag_7_tuned, gbm_tuned_filepath)
+}
+
+print("GBM Tuning Results:")
+print(gbm_model_candles_fg_lag_7_tuned)
+
+# Plot GBM tuning results
+plot(gbm_model_candles_fg_lag_7_tuned)
+
+# RPART fine tuning
+rpartGrid <- expand.grid(
+  cp = seq(0.001, 0.01, by = 0.001)
+)
+
+# Cache filepath for tuned RPART
+rpart_tuned_filepath <- "models/rpart_model_candles_lag_5_tuned.rds"
+
+if (file.exists(rpart_tuned_filepath)) {
+  rpart_model_candles_lag_5_tuned <- readRDS(rpart_tuned_filepath)
+  print(paste("Tuned RPART model loaded from cache:", rpart_tuned_filepath))
+} else {
+  start_time <- Sys.time()
+  rpart_model_candles_lag_5_tuned <- train(
+    formula_candles_lag_5,
+    data = train_set,
+    method = "rpart",
+    trControl = trainControl(
+      method = "boot",
+      number = 25,
+      verboseIter = TRUE
+    ),
+    tuneGrid = rpartGrid
+  )
+  end_time <- Sys.time()
+  print(paste("RPART tuning time:", format(end_time - start_time, digits = 2)))
+
+  saveRDS(rpart_model_candles_lag_5_tuned, rpart_tuned_filepath)
+}
+
+print("\nRPART Tuning Results:")
+print(rpart_model_candles_lag_5_tuned)
+
+# Plot RPART tuning results
+plot(rpart_model_candles_lag_5_tuned)
+
+# Compare original vs tuned models on test set
+results_comparison <- data.frame(
+  model = character(),
+  accuracy = numeric(),
+  stringsAsFactors = FALSE
+)
+
+# Original GBM
+gbm_orig_pred <- predict(gbm_model_candles_fg_lag_7, test_set)
+gbm_orig_acc <- mean(gbm_orig_pred == test_set$direction)
+
+# Tuned GBM
+gbm_tuned_pred <- predict(gbm_model_candles_fg_lag_7_tuned, test_set)
+gbm_tuned_acc <- mean(gbm_tuned_pred == test_set$direction)
+
+# Original RPART
+rpart_orig_pred <- predict(rpart_model_candles_lag_5, test_set)
+rpart_orig_acc <- mean(rpart_orig_pred == test_set$direction)
+
+# Tuned RPART
+rpart_tuned_pred <- predict(rpart_model_candles_lag_5_tuned, test_set)
+rpart_tuned_acc <- mean(rpart_tuned_pred == test_set$direction)
+
+results_comparison <- rbind(
+  results_comparison,
+  data.frame(
+    model = c("GBM Original", "GBM Tuned", "RPART Original", "RPART Tuned"),
+    accuracy = c(gbm_orig_acc, gbm_tuned_acc, rpart_orig_acc, rpart_tuned_acc)
+  )
+)
+
+print("\nModel Comparison Results:")
+print(results_comparison)
+
+# Tune model not as good: probably because it's tuned with the train_set
