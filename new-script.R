@@ -244,6 +244,8 @@ formula_candles_fg_chain_ta_lag_7 <- create_feature_formula(c("body_size", "uppe
 formula_candles_fg_chain_ta_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB"), 15)
 
 
+
+
 ### Training the models ###
 
 # OHLC
@@ -272,6 +274,8 @@ gbm_model_OHLC_lag_3 <- train_with_cache(formula_OHLC_lag_3, train_set, "gbm")
 gbm_model_OHLC_lag_5 <- train_with_cache(formula_OHLC_lag_5, train_set, "gbm")
 gbm_model_OHLC_lag_7 <- train_with_cache(formula_OHLC_lag_7, train_set, "gbm")
 gbm_model_OHLC_lag_15 <- train_with_cache(formula_OHLC_lag_15, train_set, "gbm")
+
+
 
 # Candles features
 
@@ -383,3 +387,107 @@ gbm_model_candles_fg_chain_ta_lag_15 <- train_with_cache(formula_candles_fg_chai
 
 
 ## Compare results ##
+
+evaluate_models <- function(feature_set, test_set, lags = c(3, 5, 7, 15)) {
+  # Define model types
+  model_types <- c("glm", "rf", "rpart", "knn", "gbm")
+
+  # Create a data frame to store results
+  results <- data.frame(
+    model = character(),
+    model_type = character(),
+    lag = numeric(),
+    accuracy = numeric(),
+    stringsAsFactors = FALSE
+  )
+
+  # Evaluate each model type and lag combination
+  for (model_type in model_types) {
+    for (lag in lags) {
+      model_name <- paste0(model_type, "_model_", feature_set, "_lag_", lag)
+
+      if (exists(model_name)) {
+        # Get the model object
+        model <- get(model_name)
+
+        # Make predictions
+        predictions <- predict(model, test_set)
+
+        # Calculate accuracy
+        accuracy <- mean(predictions == test_set$direction)
+
+        # Add to results
+        results <- rbind(results, data.frame(
+          model = model_name,
+          model_type = model_type,
+          lag = lag,
+          accuracy = accuracy,
+          stringsAsFactors = FALSE
+        ))
+      }
+    }
+  }
+
+  # Sort by accuracy in descending order
+  results <- results[order(-results$accuracy), ]
+
+  # Add rank column
+  results$rank <- 1:nrow(results)
+
+  results
+}
+
+# Compare results for each feature set
+feature_sets <- c("OHLC", "candles", "candles_fg", "candles_fg_chain", "candles_fg_chain_ta")
+
+for (feature_set in feature_sets) {
+  cat("\nResults for", feature_set, "features:\n")
+  results <- evaluate_models(feature_set, test_set)
+  print(results)
+
+  # Print summary statistics
+  cat("\nSummary statistics for", feature_set, "features:\n")
+  summary_stats <- aggregate(accuracy ~ model_type,
+    data = results,
+    FUN = function(x) c(mean = mean(x), sd = sd(x), max = max(x))
+  )
+  print(summary_stats)
+  cat("\n-------------------\n")
+}
+
+# Function to get top models across all feature sets
+get_top_models <- function(test_set, n = 10) {
+  all_results <- data.frame()
+
+  for (feature_set in feature_sets) {
+    results <- evaluate_models(feature_set, test_set)
+    all_results <- rbind(all_results, results)
+  }
+
+  # Sort by accuracy and get top n
+  all_results <- all_results[order(-all_results$accuracy), ]
+  head(all_results, n)
+}
+
+# Get top 10 models overall
+print("\nTop 10 Models Overall:")
+print(get_top_models(test_set))
+
+# Compare average performance across feature sets
+print("\nAverage Performance by Feature Set:")
+feature_set_summary <- data.frame()
+for (feature_set in feature_sets) {
+  results <- evaluate_models(feature_set, test_set)
+  avg_accuracy <- mean(results$accuracy)
+  sd_accuracy <- sd(results$accuracy)
+  feature_set_summary <- rbind(
+    feature_set_summary,
+    data.frame(
+      feature_set = feature_set,
+      avg_accuracy = avg_accuracy,
+      sd_accuracy = sd_accuracy
+    )
+  )
+}
+feature_set_summary <- feature_set_summary[order(-feature_set_summary$avg_accuracy), ]
+print(feature_set_summary)
