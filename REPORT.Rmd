@@ -1044,4 +1044,4 @@ summary_stats_candles_fg_chain_ta <- aggregate(accuracy ~ model_type,
 summary_stats_candles_fg_chain_ta
 ```
 
-
+## 
