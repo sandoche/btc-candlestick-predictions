@@ -908,7 +908,7 @@ summary_stats_candles <- data.frame(
   max_accuracy = summary_stats_candles$accuracy[,"max"]
 )
 
-knitr::kable(summary_stats_cand les, 
+knitr::kable(summary_stats_candles, 
              format = "simple", 
              caption = "Summary statistics for candles features",
              digits = 4,
