@@ -230,13 +230,19 @@ previous_direction <- function(test_set) {
 previous_direction_accuracy <- mean(previous_direction(test_set) == test_set$direction)
 print(paste("Previous direction accuracy:", round(previous_direction_accuracy, 4)))
 
+# Return the opposite of the previous direction
+opposite_direction <- function(test_set) {
+  ifelse(test_set$direction_lag_1 == "up", "down", "up")
+}
+opposite_direction_accuracy <- mean(opposite_direction(test_set) == test_set$direction)
+print(paste("Opposite direction accuracy:", round(opposite_direction_accuracy, 4)))
+
 # Return always "up"
 always_up <- function(test_set) {
   replicate(nrow(test_set), "up")
 }
 always_up_accuracy <- mean(always_up(test_set) == test_set$direction)
 print(paste("Always up accuracy:", round(always_up_accuracy, 4)))
-
 
 
 ### Creating the formulas ###
