@@ -216,6 +216,29 @@ train_with_cache <- function(formula, train_set, method) {
   model
 }
 
+### Evaluate random guess ###
+
+# Randomly return "up" or "down"
+estimated_direction <- replicate(nrow(test_set), sample(c("up", "down"), 1))
+random_guess_accuracy <- mean(estimated_direction == test_set$direction)
+print(paste("Random guess accuracy:", round(random_guess_accuracy, 4)))
+
+# Return the previous direction
+previous_direction <- function(test_set) {
+  test_set$direction_lag_1
+}
+previous_direction_accuracy <- mean(previous_direction(test_set) == test_set$direction)
+print(paste("Previous direction accuracy:", round(previous_direction_accuracy, 4)))
+
+# Return always "up"
+always_up <- function(test_set) {
+  replicate(nrow(test_set), "up")
+}
+always_up_accuracy <- mean(always_up(test_set) == test_set$direction)
+print(paste("Always up accuracy:", round(always_up_accuracy, 4)))
+
+
+
 ### Creating the formulas ###
 
 formula_OHLC_lag_3 <- create_feature_formula(c("open", "high", "low", "close"), 3)
@@ -242,8 +265,6 @@ formula_candles_fg_chain_ta_lag_3 <- create_feature_formula(c("body_size", "uppe
 formula_candles_fg_chain_ta_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB"), 5)
 formula_candles_fg_chain_ta_lag_7 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB"), 7)
 formula_candles_fg_chain_ta_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB"), 15)
-
-
 
 
 ### Training the models ###
@@ -274,8 +295,6 @@ gbm_model_OHLC_lag_3 <- train_with_cache(formula_OHLC_lag_3, train_set, "gbm")
 gbm_model_OHLC_lag_5 <- train_with_cache(formula_OHLC_lag_5, train_set, "gbm")
 gbm_model_OHLC_lag_7 <- train_with_cache(formula_OHLC_lag_7, train_set, "gbm")
 gbm_model_OHLC_lag_15 <- train_with_cache(formula_OHLC_lag_15, train_set, "gbm")
-
-
 
 # Candles features
 
