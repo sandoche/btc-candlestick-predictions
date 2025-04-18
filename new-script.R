@@ -383,16 +383,5 @@ gbm_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_1
 
 ## Compare results ##
 
-predictions_glm_model_OHLC_lag_3 <- predict(glm_model_OHLC_lag_3, test_set)
-accuracy_glm_model_OHLC_lag_3 <- confusionMatrix(factor(predictions_glm_model_OHLC_lag_3, levels = c("down", "up"), labels = c("down", "up")), factor(test_set$direction, levels = c("down", "up")))$overall["Accuracy"]
 
-predictions_glm_model_OHLC_lag_5 <- predict(glm_model_OHLC_lag_5, test_set)
-accuracy_glm_model_OHLC_lag_5 <- confusionMatrix(factor(predictions_glm_model_OHLC_lag_5, levels = c("down", "up"), labels = c("down", "up")), factor(test_set$direction, levels = c("down", "up")))$overall["Accuracy"]
 
-predictions_glm_model_OHLC_lag_7 <- predict(glm_model_OHLC_lag_7, test_set)
-accuracy_glm_model_OHLC_lag_7 <- confusionMatrix(factor(predictions_glm_model_OHLC_lag_7, levels = c("down", "up"), labels = c("down", "up")), factor(test_set$direction, levels = c("down", "up")))$overall["Accuracy"]
-
-predictions_glm_model_OHLC_lag_15 <- predict(glm_model_OHLC_lag_15, test_set)
-accuracy_glm_model_OHLC_lag_15 <- confusionMatrix(factor(predictions_glm_model_OHLC_lag_15, levels = c("down", "up"), labels = c("down", "up")), factor(test_set$direction, levels = c("down", "up")))$overall["Accuracy"]
-
-# TODO MAKE A FUNCTION TO DISPLAY ALL THE RESULTS IN TABLES
