@@ -217,11 +217,10 @@ train_with_cache <- function(formula, train_set, method) {
 
 ### Creating the formulas ###
 
-OHLC_features <- c("open", "high", "low", "close")
-formula_OHLC_lag_3 <- create_feature_formula(OHLC_features, 3)
-formula_OHLC_lag_5 <- create_feature_formula(OHLC_features, 5)
-formula_OHLC_lag_7 <- create_feature_formula(OHLC_features, 7)
-formula_OHLC_lag_15 <- create_feature_formula(OHLC_features, 15)
+formula_OHLC_lag_3 <- create_feature_formula(c("open", "high", "low", "close"), 3)
+formula_OHLC_lag_5 <- create_feature_formula(c("open", "high", "low", "close"), 5)
+formula_OHLC_lag_7 <- create_feature_formula(c("open", "high", "low", "close"), 7)
+formula_OHLC_lag_15 <- create_feature_formula(c("open", "high", "low", "close"), 15)
 
 formula_candles_features_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close"), 3)
 formula_candles_features_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close"), 5)
