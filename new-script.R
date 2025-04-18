@@ -217,11 +217,15 @@ train_with_cache <- function(formula, train_set, method) {
 }
 
 ### Evaluate random guess ###
+random_guess_simulations <- replicate(1000, {
+  estimated_direction <- replicate(nrow(test_set), sample(c("up", "down"), 1))
+  mean(estimated_direction == test_set$direction)
+})
 
-# Randomly return "up" or "down"
-estimated_direction <- replicate(nrow(test_set), sample(c("up", "down"), 1))
-random_guess_accuracy <- mean(estimated_direction == test_set$direction)
-print(paste("Random guess accuracy:", round(random_guess_accuracy, 4)))
+mean_accuracy <- mean(random_guess_simulations)
+print(paste("Random guess simulation results (1000 runs):"))
+print(paste("Mean accuracy:", round(mean_accuracy, 4)))
+
 
 # Return the previous direction
 previous_direction <- function(test_set) {
