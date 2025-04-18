@@ -661,10 +661,10 @@ get_all_models(test_set)
 
 # GBM fine tuning
 gbmGrid <- expand.grid(
-  interaction.depth = c(1, 2, 3), # Focus around the successful value of 1
-  n.trees = c(50, 100, 150), # Focus around the successful value of 100
-  shrinkage = c(0.05, 0.1, 0.15), # Focus around the successful value of 0.1
-  n.minobsinnode = c(8, 10, 12) # Focus around the successful value of 10
+  interaction.depth = c(1, 2, 3),
+  n.trees = c(50, 100, 150),
+  shrinkage = c(0.05, 0.1, 0.15),
+  n.minobsinnode = c(8, 10, 12)
 )
 
 # Cache filepath for tuned GBM
