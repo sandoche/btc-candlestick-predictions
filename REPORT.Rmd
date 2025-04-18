@@ -432,8 +432,9 @@ p7 <- candles_enhanced_cleaned_no_na %>%
 
 And the plot of the different TA.
 
+TODO fix the following for rendering on pdf
 
-```{r visual_ta, cache=TRUE}
+```r 
 plot_data_ta <- candles_enhanced_cleaned_no_na %>% tail(100)
 
 # ROC Plot
@@ -854,7 +855,7 @@ knitr::kable(summary_stats_OHLC,
 
 ### Candle features
 
-```{r ohlc_features, cache=TRUE}
+```{r candles_features, cache=TRUE}
 formula_candles_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close"), 1)
 formula_candles_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close"), 3)
 formula_candles_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close"), 5)
@@ -895,7 +896,7 @@ results_candles <- evaluate_models("candles", test_set)
 results_candles
 ```
 
-```{r ohlc_stats, cache=TRUE}
+```{r candles_stats, cache=TRUE}
 summary_stats_candles <- aggregate(accuracy ~ model_type,
   data = results_candles,
   FUN = function(x) c(mean = mean(x), sd = sd(x), max = max(x))
