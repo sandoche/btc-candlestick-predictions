@@ -339,7 +339,9 @@ sum(is.na(candles_enhanced_cleaned_no_na))
 
 First of all let's plot the data to visually verify the data.
 
-```{r visual_analysis, cache=TRUE}
+TODO Fix rendering of this data (it was fixed previously, could be just a cache issue)
+
+```r
 p1 <- candles_enhanced_cleaned_no_na %>%
   ggplot(aes(x = time, y = close)) +
   geom_line(color = "blue") +
@@ -1105,4 +1107,6 @@ knitr::kable(summary_stats_candles_fg_chain_ta,
              col.names = c("Model Type", "Mean Accuracy", "SD Accuracy", "Max Accuracy"))
 ```
 
-## Best models
+## Models comparison
+
+
