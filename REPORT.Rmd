@@ -1129,7 +1129,7 @@ get_top_models <- function(test_set, n = 10) {
 get_top_models(test_set)
 ```
 
-```{r best_models, cache=TRUE}
+```{r best_features, cache=TRUE}
 feature_set_summary <- data.frame()
 for (feature_set in feature_sets) {
   results <- evaluate_models(feature_set, test_set)
