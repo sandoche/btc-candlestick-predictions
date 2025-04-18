@@ -581,6 +581,7 @@ Using the function `prepare_dataset` and the we can have directly the final data
 We put together the code to fix the fear_and_greed_index and to prepare the datasets and split them in train and test sets.
 
 ```{r project_datasets, cache=TRUE}
+date_na <- as.Date("2024-10-26")
 fear_and_greed_index_date_before_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-25"))
 fear_and_greed_index_date_after_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-27"))
 fear_and_greed_value_date_na <- mean(c(fear_and_greed_index_date_before_na$value, fear_and_greed_index_date_after_na$value))

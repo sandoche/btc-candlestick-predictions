@@ -147,7 +147,7 @@ prepare_dataset <- function(candles_data, fear_and_greed_index_data, hash_rate_d
 }
 
 ### Prepare the data ###
-
+date_na <- as.Date("2024-10-26")
 fear_and_greed_index_date_before_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-25"))
 fear_and_greed_index_date_after_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-27"))
 fear_and_greed_value_date_na <- mean(c(fear_and_greed_index_date_before_na$value, fear_and_greed_index_date_after_na$value))
@@ -217,10 +217,11 @@ train_with_cache <- function(formula, train_set, method) {
 
 ### Creating the formulas ###
 
-formula_OHLC_lag_3 <- create_feature_formula(c("open", "high", "low", "close"), 3)
-formula_OHLC_lag_5 <- create_feature_formula(c("open", "high", "low", "close"), 5)
-formula_OHLC_lag_7 <- create_feature_formula(c("open", "high", "low", "close"), 7)
-formula_OHLC_lag_15 <- create_feature_formula(c("open", "high", "low", "close"), 15)
+OHLC_features <- c("open", "high", "low", "close")
+formula_OHLC_lag_3 <- create_feature_formula(OHLC_features, 3)
+formula_OHLC_lag_5 <- create_feature_formula(OHLC_features, 5)
+formula_OHLC_lag_7 <- create_feature_formula(OHLC_features, 7)
+formula_OHLC_lag_15 <- create_feature_formula(OHLC_features, 15)
 
 formula_candles_features_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close"), 3)
 formula_candles_features_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close"), 5)
@@ -382,6 +383,3 @@ gbm_model_candles_features_with_fear_and_greed_index_and_chain_data_and_ta_lag_1
 
 
 ## Compare results ##
-
-
-
