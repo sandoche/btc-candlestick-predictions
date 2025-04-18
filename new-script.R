@@ -298,9 +298,6 @@ opposite_direction <- function(test_set) {
 opposite_direction_accuracy <- mean(opposite_direction(test_set) == test_set$direction)
 print(paste("Opposite direction accuracy:", round(opposite_direction_accuracy, 4)))
 
-# Use candlestick patterns
-
-
 ### Creating the formulas ###
 
 formula_OHLC_lag_1 <- create_feature_formula(c("open", "high", "low", "close"), 1)
