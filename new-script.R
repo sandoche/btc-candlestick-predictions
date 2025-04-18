@@ -559,8 +559,6 @@ feature_set_summary
 
 ### Fine tuning ###
 
-lags <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
-
 formula_candles_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close"), 1)
 formula_candles_lag_2 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close"), 2)
 formula_candles_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close"), 3)
@@ -641,4 +639,22 @@ rpart_model_candles_fg_lag_13 <- train_with_cache(formula_candles_fg_lag_13, tra
 rpart_model_candles_fg_lag_14 <- train_with_cache(formula_candles_fg_lag_14, train_set, "rpart")
 rpart_model_candles_fg_lag_15 <- train_with_cache(formula_candles_fg_lag_15, train_set, "rpart")
 
-get_top_models(test_set)
+# Function to get top models across all feature sets
+get_all_models <- function(test_set, n = 100) {
+  all_results <- data.frame()
+  
+  for (feature_set in feature_sets) {
+    results <- evaluate_models(feature_set, test_set, c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15))
+    all_results <- rbind(all_results, results)
+  }
+  
+  # Sort by accuracy and get top n
+  all_results <- all_results[order(-all_results$accuracy), ]
+  head(all_results, n)
+}
+
+get_all_models(test_set)
+
+# glm_model_candles_lag_6        
+# gbm_model_candles_fg_lag_7
+# rpart_model_candles_lag_5
