@@ -829,7 +829,7 @@ gbm_model_OHLC_lag_7 <- train_with_cache(formula_OHLC_lag_7, train_set, "gbm")
 gbm_model_OHLC_lag_15 <- train_with_cache(formula_OHLC_lag_15, train_set, "gbm")
 
 results_OHLC <- evaluate_models("OHLC", test_set)
-results_OHLC
+knitr::kable(results_OHLC, format = "simple", caption = "Model comparison for OHLC features")
 ```
 
 ```{r ohlc_stats, cache=TRUE}
@@ -837,7 +837,7 @@ summary_stats_OHLC <- aggregate(accuracy ~ model_type,
   data = results_OHLC,
   FUN = function(x) c(mean = mean(x), sd = sd(x), max = max(x))
 )
-summary_stats_OHLC
+knitr::kable(summary_stats_OHLC, format = "simple", caption = "Summary statistics for OHLC features")
 ```
 
 ### Candle features
@@ -1044,4 +1044,4 @@ summary_stats_candles_fg_chain_ta <- aggregate(accuracy ~ model_type,
 summary_stats_candles_fg_chain_ta
 ```
 
-## 
+## Best models
