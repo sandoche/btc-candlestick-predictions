@@ -23,6 +23,7 @@ if (!require(tidyquant)) install.packages("tidyquant", repos = "http://cran.us.r
 if (!require(patchwork)) install.packages("patchwork", repos = "http://cran.us.r-project.org")
 if (!require(randomForest)) install.packages("randomForest", repos = "http://cran.us.r-project.org")
 if (!require(TTR)) install.packages("TTR", repos = "http://cran.us.r-project.org")
+if (!require(gbm)) install.packages("gbm", repos = "http://cran.us.r-project.org")
 
 library(lubridate)
 library(formatR)
@@ -34,6 +35,7 @@ library(tidyquant)
 library(patchwork)
 library(randomForest)
 library(TTR)
+library(gbm)
 ```
 
 \newpage
@@ -1390,14 +1392,55 @@ knitr::kable(all_best_models,
              col.names = c("Model", "Features", "Model Type", "Lag", "Accuracy"))
 ```
 
+While our best model has an accuracy of `0.5499`, we would still consider the fine tuned algorithm more robust with an accuracy of `0.5457`.
 
+## Most relevant features
 
+Now let's see what are the most important features of the algorithm.
 
+```{r feature_importance}
+variable_importance <- varImp(gbm_model_candles_fg_chain_ta_lag_1_tuned)
+ggplot(variable_importance, aes(x = reorder(feature, Overall), y = Overall)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Variable Importance", x = "Feature", y = "Importance")
+```
+Interestingly the features with an importance higher than 25 are related to TA, Chain Data and Candles data.
 
+## Confusion matrix
 
+```{r confusion_matrix}
+predicted_values <- predict(gbm_model_candles_fg_chain_ta_lag_1_tuned, test_set)
+confusion_matrix <- confusionMatrix(factor(predicted_values, levels = c("up", "down")), 
+                                   factor(test_set$direction, levels = c("up", "down")))
+confusion_matrix
+```
+We can notice that the model is slightly better at predicting `down` than `up` at least with the `test_set`.
+Which means that in in future trading it would potentially get a better success rate at shorting rather than longing.
 
+# Conclusion
 
+We have learned in this study that predictions using a trained model are better than luck.
 
+With an accuracy of `0.5457` it would be important for a trader to use the predictions along with a well defined target for take-profit and stop-loss where the profit targeted should be higher than the stop-loss targeted.
+
+Let's see what are the limitations of this study and what could be done next.
+
+## Limitations
+
+As mentioned in the report, most of the training have been done without cross-validation, in order to save computation time, therefore some other algorithm may have performed better than the current one.
+
+## Potential improvements
+
+A deeper study of the existing research could be used as a base to improve this algorithm, also there may be some other algorithms working even better than GBM that may be worth be trained.
+
+Also, some other Technical Analysis indicator could be used to have better predictions maybe by coupling our hourly candles to a smaller time frame of candles.
+
+Last but not least, using different algorithm depending on the type of market could also be a good solution. By comparing how algorithms performs in a different type of market, bearish, bullish or sideway and switching to the right model depending on the type of market could also improve the accuracy.
+
+## Trading application
+
+In order to be closer to the trading reality and test the ability of the model to make profit, I would recommend to start with backtesting to see how it performs setting good stop loss / take profit targets. Then after tuning the trading algorithm it would be worth doing some paper trading before doing actual real trading.
 
 
 
