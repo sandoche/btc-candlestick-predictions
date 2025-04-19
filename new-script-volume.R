@@ -677,10 +677,26 @@ accuracy_rf_model_candles_lag_1_tuned <- mean(predict(rf_model_candles_lag_1_tun
 accuracy_rf_model_candles_fg_chain_lag_1_tuned <- mean(predict(rf_model_candles_fg_chain_lag_1_tuned, test_set) == test_set$direction)
 accuracy_rf_model_candles_fg_chain_ta_lag_1_tuned <- mean(predict(rf_model_candles_fg_chain_ta_lag_1_tuned, test_set) == test_set$direction)
 
-accuracy_rf_model_OHLC_lag_1_tuned
-accuracy_rf_model_candles_fg_lag_1_tuned
-accuracy_rf_model_candles_lag_1_tuned
-accuracy_rf_model_candles_fg_chain_lag_1_tuned
-accuracy_rf_model_candles_fg_chain_ta_lag_1_tuned
+# Create a table of tuned model results
+tuned_model_results <- data.frame(
+  Model = c(
+    "RF OHLC lag 1",
+    "RF Candles lag 1",
+    "RF Candles+FG lag 1",
+    "RF Candles+FG+Chain lag 1",
+    "RF Candles+FG+Chain+TA lag 1"
+  ),
+  Accuracy = c(
+    accuracy_rf_model_OHLC_lag_1_tuned,
+    accuracy_rf_model_candles_lag_1_tuned,
+    accuracy_rf_model_candles_fg_lag_1_tuned,
+    accuracy_rf_model_candles_fg_chain_lag_1_tuned,
+    accuracy_rf_model_candles_fg_chain_ta_lag_1_tuned
+  )
+)
+
+# Sort by accuracy in descending order
+tuned_model_results <- tuned_model_results[order(-tuned_model_results$Accuracy), ]
+tuned_model_results
 
 # results far below the original models, so we will not use the tuned models
