@@ -1158,3 +1158,4 @@ We will use the following three models to fine tune, first the number of lags, t
 - rpart_model_candles_lag_5
 
 
+TODO redo everything with volume features

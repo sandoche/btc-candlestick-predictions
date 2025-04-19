@@ -1,0 +1,772 @@
+### Dependencies ###
+
+if (!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+if (!require(caret)) install.packages("caret", repos = "http://cran.us.r-project.org")
+if (!require(httr)) install.packages("httr", repos = "http://cran.us.r-project.org")
+if (!require(jsonlite)) install.packages("jsonlite", repos = "http://cran.us.r-project.org")
+if (!require(tidyquant)) install.packages("tidyquant", repos = "http://cran.us.r-project.org")
+if (!require(patchwork)) install.packages("patchwork", repos = "http://cran.us.r-project.org")
+if (!require(randomForest)) install.packages("randomForest", repos = "http://cran.us.r-project.org")
+if (!require(TTR)) install.packages("TTR", repos = "http://cran.us.r-project.org")
+
+### Global Variables ###
+
+library(tidyverse)
+library(caret)
+library(httr)
+library(jsonlite)
+library(tidyquant)
+library(patchwork)
+library(randomForest)
+library(TTR)
+
+trading_pair <- "BTC-USD"
+start_date <- "2024-01-01"
+end_date <- "2025-03-29"
+candlestick_period <- 3600
+set.seed(1)
+
+### Loading the datasets ###
+
+candles <- read_csv(paste0("data/", trading_pair, "_candles_", start_date, "_", end_date, "_", candlestick_period, ".csv"), show_col_types = FALSE)
+
+fear_and_greed_index <- read_csv(paste0("data/", trading_pair, "_fear_and_greed_index_", start_date, "_", end_date, ".csv"))
+fear_and_greed_index <- fear_and_greed_index %>% mutate(value = as.numeric(value))
+
+hash_rate <- jsonlite::fromJSON("data/hash-rate.json")$`hash-rate` %>%
+  rename(timestamp = x, hash_rate = y) %>%
+  mutate(timestamp = as.POSIXct(timestamp / 1000, origin = "1970-01-01", tz = "UTC")) %>%
+  filter(timestamp >= as.POSIXct(start_date, origin = "1970-01-01", tz = "UTC") & timestamp <= as.POSIXct(end_date, origin = "1970-01-01", tz = "UTC"))
+
+average_block_size <- jsonlite::fromJSON("data/avg-block-size.json")$`avg-block-size` %>%
+  rename(timestamp = x, avg_block_size = y) %>%
+  mutate(timestamp = as.POSIXct(timestamp / 1000, origin = "1970-01-01", tz = "UTC")) %>%
+  filter(timestamp >= as.POSIXct(start_date, origin = "1970-01-01", tz = "UTC") & timestamp <= as.POSIXct(end_date, origin = "1970-01-01", tz = "UTC"))
+
+n_transactions <- jsonlite::fromJSON("data/n-transactions.json")$`n-transactions` %>%
+  rename(timestamp = x, n_transactions = y) %>%
+  mutate(timestamp = as.POSIXct(timestamp / 1000, origin = "1970-01-01", tz = "UTC")) %>%
+  filter(timestamp >= as.POSIXct(start_date, origin = "1970-01-01", tz = "UTC") & timestamp <= as.POSIXct(end_date, origin = "1970-01-01", tz = "UTC"))
+
+utxo_count <- jsonlite::fromJSON("data/utxo-count.json")$`utxo-count` %>%
+  rename(timestamp = x, utxo_count = y) %>%
+  mutate(
+    timestamp = as.POSIXct(timestamp / 1000, origin = "1970-01-01", tz = "UTC"),
+    timestamp = as.Date(timestamp)
+  ) %>%
+  filter(timestamp >= as.Date(start_date) & timestamp <= as.Date(end_date)) %>%
+  group_by(timestamp) %>%
+  summarise(utxo_count = mean(utxo_count)) # Take average for each date
+knitr::kable(head(utxo_count), format = "simple", caption = "Overview of the BTC UTXO count dataset")
+
+
+### Functions to prepare the data ###
+
+enhance_dataset <- function(candles_data, fear_and_greed_index_data, hash_rate_data, average_block_size_data, n_transactions_data, utxo_count_data) {
+  candles_enhanced <- candles_data %>%
+    mutate(date_only = as.Date(time)) %>%
+    left_join(fear_and_greed_index_data, by = c("date_only" = "timestamp")) %>%
+    left_join(hash_rate_data, by = c("date_only" = "timestamp")) %>%
+    left_join(average_block_size_data, by = c("date_only" = "timestamp")) %>%
+    left_join(n_transactions_data, by = c("date_only" = "timestamp")) %>%
+    left_join(utxo_count_data, by = c("date_only" = "timestamp")) %>%
+    mutate(
+      body_size = abs(close - open),
+      upper_shadow_size = high - pmax(close, open),
+      lower_shadow_size = pmin(close, open) - low,
+      direction = ifelse(close > open, "up", "down"),
+    ) %>%
+    tq_mutate(
+      select = close,
+      mutate_fun = ROC,
+      n = 14,
+      col_rename = "roc"
+    ) %>%
+    tq_mutate( # https://www.keenbase-trading.com/find-best-macd-settings/#t-1719588154943
+      select = close,
+      mutate_fun = MACD,
+      nFast = 12,
+      nSlow = 26,
+      nSig = 9,
+      col_rename = c("macd", "signal")
+    ) %>%
+    tq_mutate(
+      select = close,
+      mutate_fun = RSI,
+      n = 14,
+      col_rename = "rsi"
+    ) %>%
+    tq_mutate(
+      select = close,
+      mutate_fun = BBands,
+      n = 20,
+      sd = 2,
+      col_rename = "bband"
+    )
+
+  candles_enhanced
+}
+
+add_lagged_candles <- function(enhanced_clean_dataset, n_lag) {
+  dataset_with_lagged_candles <- enhanced_clean_dataset
+
+  for (i in 1:n_lag) {
+    dataset_with_lagged_candles[[paste0("body_size_lag_", i)]] <- lag(dataset_with_lagged_candles$body_size, i)
+    dataset_with_lagged_candles[[paste0("upper_shadow_size_lag_", i)]] <- lag(dataset_with_lagged_candles$upper_shadow_size, i)
+    dataset_with_lagged_candles[[paste0("lower_shadow_size_lag_", i)]] <- lag(dataset_with_lagged_candles$lower_shadow_size, i)
+    dataset_with_lagged_candles[[paste0("direction_lag_", i)]] <- lag(dataset_with_lagged_candles$direction, i)
+    dataset_with_lagged_candles[[paste0("volume_lag_", i)]] <- lag(dataset_with_lagged_candles$volume, i)
+    dataset_with_lagged_candles[[paste0("value_lag_", i)]] <- lag(dataset_with_lagged_candles$value, i)
+    dataset_with_lagged_candles[[paste0("close_lag_", i)]] <- lag(dataset_with_lagged_candles$close, i)
+    dataset_with_lagged_candles[[paste0("hash_rate_lag_", i)]] <- lag(dataset_with_lagged_candles$hash_rate, i)
+    dataset_with_lagged_candles[[paste0("avg_block_size_lag_", i)]] <- lag(dataset_with_lagged_candles$avg_block_size, i)
+    dataset_with_lagged_candles[[paste0("n_transactions_lag_", i)]] <- lag(dataset_with_lagged_candles$n_transactions, i)
+    dataset_with_lagged_candles[[paste0("utxo_count_lag_", i)]] <- lag(dataset_with_lagged_candles$utxo_count, i)
+    dataset_with_lagged_candles[[paste0("open_lag_", i)]] <- lag(dataset_with_lagged_candles$open, i)
+    dataset_with_lagged_candles[[paste0("high_lag_", i)]] <- lag(dataset_with_lagged_candles$high, i)
+    dataset_with_lagged_candles[[paste0("low_lag_", i)]] <- lag(dataset_with_lagged_candles$low, i)
+    dataset_with_lagged_candles[[paste0("roc_lag_", i)]] <- lag(dataset_with_lagged_candles$roc, i)
+    dataset_with_lagged_candles[[paste0("macd_lag_", i)]] <- lag(dataset_with_lagged_candles$macd, i)
+    dataset_with_lagged_candles[[paste0("signal_lag_", i)]] <- lag(dataset_with_lagged_candles$signal, i)
+    dataset_with_lagged_candles[[paste0("rsi_lag_", i)]] <- lag(dataset_with_lagged_candles$rsi, i)
+    dataset_with_lagged_candles[[paste0("up_bband_lag_", i)]] <- lag(dataset_with_lagged_candles$up, i)
+    dataset_with_lagged_candles[[paste0("mavg_lag_", i)]] <- lag(dataset_with_lagged_candles$mavg, i)
+    dataset_with_lagged_candles[[paste0("dn_bband_lag_", i)]] <- lag(dataset_with_lagged_candles$dn, i)
+    dataset_with_lagged_candles[[paste0("pctB_lag_", i)]] <- lag(dataset_with_lagged_candles$pctB, i)
+  }
+
+  dataset_with_lagged_candles
+}
+
+prepare_dataset <- function(candles_data, fear_and_greed_index_data, hash_rate_data, average_block_size_data, n_transactions_data, utxo_count_data) {
+  enhanced_clean_dataset <- enhance_dataset(candles_data, fear_and_greed_index_data, hash_rate_data, average_block_size_data, n_transactions_data, utxo_count_data)
+  enhanced_clean_dataset_without_na <- enhanced_clean_dataset %>% drop_na()
+  dataset_with_lagged_candles <- add_lagged_candles(enhanced_clean_dataset_without_na, 15)
+  dataset_with_lagged_candles_without_na <- dataset_with_lagged_candles %>% drop_na()
+  dataset_with_lagged_candles_without_na
+}
+
+### Prepare the data ###
+date_na <- as.Date("2024-10-26")
+fear_and_greed_index_date_before_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-25"))
+fear_and_greed_index_date_after_na <- fear_and_greed_index %>% filter(timestamp == as.Date("2024-10-27"))
+fear_and_greed_value_date_na <- mean(c(fear_and_greed_index_date_before_na$value, fear_and_greed_index_date_after_na$value))
+
+fear_and_greed_index_corrected <- fear_and_greed_index %>%
+  bind_rows(tibble(timestamp = date_na, value = fear_and_greed_value_date_na, value_classification = "Greed"))
+
+project_dataset <- prepare_dataset(candles, fear_and_greed_index_corrected, hash_rate, average_block_size, n_transactions, utxo_count)
+
+sum(is.na(project_dataset))
+nrow(project_dataset)
+nrow(candles)
+
+test_index <- createDataPartition(y = project_dataset$direction, times = 1, p = 0.2, list = FALSE)
+train_set <- project_dataset[-test_index, ]
+test_set <- project_dataset[test_index, ]
+
+
+### Utility functions ###
+
+create_feature_formula <- function(feature_names, n_lags) {
+  features <- c()
+
+  for (feature_name in feature_names) {
+    for (i in 1:n_lags) {
+      features <- c(
+        features,
+        paste0(feature_name, "_lag_", i)
+      )
+    }
+  }
+
+  formula_str <- paste("direction ~", paste(features, collapse = " + "))
+
+  as.formula(formula_str)
+}
+
+
+train_with_cache <- function(formula, train_set, method) {
+  formula_hash <- digest::digest(formula)
+  filepath <- paste0("models/", method, "_", formula_hash, ".rds")
+  if (file.exists(filepath)) {
+    model <- readRDS(filepath)
+    print(paste("Model loaded from cache:", filepath))
+  } else {
+    start_time <- Sys.time()
+    if (method == "rf") {
+      model <- train(formula, data = train_set, method = "rf", ntree = 100)
+    } else if (method == "glm") {
+      model <- train(formula, data = train_set, method = "glm", family = "binomial")
+    } else if (method == "rpart") {
+      model <- train(formula, data = train_set, method = "rpart")
+    } else if (method == "knn") {
+      model <- train(formula, data = train_set, method = "knn", preProcess = c("center", "scale"), tuneGrid = data.frame(k = seq(3, 15, 2)))
+    } else if (method == "gbm") {
+      model <- train(formula, data = train_set, method = "gbm")
+    } else {
+      stop("Invalid method")
+    }
+    end_time <- Sys.time()
+    print(paste("Training time:", format(end_time - start_time, digits = 2)))
+
+    saveRDS(model, filepath)
+  }
+
+  model
+}
+
+evaluate_models <- function(feature_set, test_set, lags = c(1, 3, 5, 7, 15)) {
+  # Define model types
+  model_types <- c("glm", "rf", "rpart", "knn", "gbm")
+
+  # Create a data frame to store results
+  results <- data.frame(
+    model = character(),
+    model_type = character(),
+    lag = numeric(),
+    accuracy = numeric(),
+    stringsAsFactors = FALSE
+  )
+
+  # Evaluate each model type and lag combination
+  for (model_type in model_types) {
+    for (lag in lags) {
+      model_name <- paste0(model_type, "_model_", feature_set, "_lag_", lag)
+
+      if (exists(model_name)) {
+        # Get the model object
+        model <- get(model_name)
+
+        # Make predictions
+        predictions <- predict(model, test_set)
+
+        # Calculate accuracy
+        accuracy <- mean(predictions == test_set$direction)
+
+        # Add to results
+        results <- rbind(results, data.frame(
+          model = model_name,
+          model_type = model_type,
+          lag = lag,
+          accuracy = accuracy,
+          stringsAsFactors = FALSE
+        ))
+      }
+    }
+  }
+
+  # Sort by accuracy in descending order
+  results <- results[order(-results$accuracy), ]
+
+  # Add rank column
+  results$rank <- 1:nrow(results)
+
+  results
+}
+
+
+### Evaluate random guess ###
+
+random_guess_simulations <- replicate(10000, {
+  estimated_direction <- replicate(nrow(test_set), sample(c("up", "down"), 1))
+  mean(estimated_direction == test_set$direction)
+})
+
+mean_accuracy <- mean(random_guess_simulations)
+print(paste("Random guess simulation results (10000 runs):"))
+print(paste("Mean accuracy:", round(mean_accuracy, 4)))
+
+# Return always "up"
+always_up <- function(test_set) {
+  replicate(nrow(test_set), "up")
+}
+always_up_accuracy <- mean(always_up(test_set) == test_set$direction)
+print(paste("Always up accuracy:", round(always_up_accuracy, 4)))
+
+# Return the previous direction
+previous_direction <- function(test_set) {
+  test_set$direction_lag_1
+}
+previous_direction_accuracy <- mean(previous_direction(test_set) == test_set$direction)
+print(paste("Previous direction accuracy:", round(previous_direction_accuracy, 4)))
+
+# Return the opposite of the previous direction
+opposite_direction <- function(test_set) {
+  ifelse(test_set$direction_lag_1 == "up", "down", "up")
+}
+opposite_direction_accuracy <- mean(opposite_direction(test_set) == test_set$direction)
+print(paste("Opposite direction accuracy:", round(opposite_direction_accuracy, 4)))
+
+### Creating the formulas ###
+
+formula_OHLC_lag_1 <- create_feature_formula(c("open", "high", "low", "close", "volume"), 1)
+formula_OHLC_lag_3 <- create_feature_formula(c("open", "high", "low", "close", "volume"), 3)
+formula_OHLC_lag_5 <- create_feature_formula(c("open", "high", "low", "close", "volume"), 5)
+formula_OHLC_lag_7 <- create_feature_formula(c("open", "high", "low", "close", "volume"), 7)
+formula_OHLC_lag_15 <- create_feature_formula(c("open", "high", "low", "close", "volume"), 15)
+
+formula_candles_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 1)
+formula_candles_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 3)
+formula_candles_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 5)
+formula_candles_lag_7 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 7)
+formula_candles_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 15)
+
+formula_candles_fg_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 1)
+formula_candles_fg_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 3)
+formula_candles_fg_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 5)
+formula_candles_fg_lag_7 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 7)
+formula_candles_fg_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 15)
+
+formula_candles_fg_chain_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "volume"), 1)
+formula_candles_fg_chain_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "volume"), 3)
+formula_candles_fg_chain_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "volume"), 5)
+formula_candles_fg_chain_lag_7 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "volume"), 7)
+formula_candles_fg_chain_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "volume"), 15)
+
+formula_candles_fg_chain_ta_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 1)
+formula_candles_fg_chain_ta_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 3)
+formula_candles_fg_chain_ta_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 5)
+formula_candles_fg_chain_ta_lag_7 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 7)
+formula_candles_fg_chain_ta_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 15)
+
+
+### Training the models ###
+
+# OHLC
+
+glm_model_OHLC_lag_1 <- train_with_cache(formula_OHLC_lag_1, train_set, "glm")
+glm_model_OHLC_lag_3 <- train_with_cache(formula_OHLC_lag_3, train_set, "glm")
+glm_model_OHLC_lag_5 <- train_with_cache(formula_OHLC_lag_5, train_set, "glm")
+glm_model_OHLC_lag_7 <- train_with_cache(formula_OHLC_lag_7, train_set, "glm")
+glm_model_OHLC_lag_15 <- train_with_cache(formula_OHLC_lag_15, train_set, "glm")
+
+rpart_model_OHLC_lag_1 <- train_with_cache(formula_OHLC_lag_1, train_set, "rpart")
+rpart_model_OHLC_lag_3 <- train_with_cache(formula_OHLC_lag_3, train_set, "rpart")
+rpart_model_OHLC_lag_5 <- train_with_cache(formula_OHLC_lag_5, train_set, "rpart")
+rpart_model_OHLC_lag_7 <- train_with_cache(formula_OHLC_lag_7, train_set, "rpart")
+rpart_model_OHLC_lag_15 <- train_with_cache(formula_OHLC_lag_15, train_set, "rpart")
+
+rf_model_OHLC_lag_1 <- train_with_cache(formula_OHLC_lag_1, train_set, "rf")
+rf_model_OHLC_lag_3 <- train_with_cache(formula_OHLC_lag_3, train_set, "rf")
+rf_model_OHLC_lag_5 <- train_with_cache(formula_OHLC_lag_5, train_set, "rf")
+rf_model_OHLC_lag_7 <- train_with_cache(formula_OHLC_lag_7, train_set, "rf")
+rf_model_OHLC_lag_15 <- train_with_cache(formula_OHLC_lag_15, train_set, "rf")
+
+knn_model_OHLC_lag_1 <- train_with_cache(formula_OHLC_lag_1, train_set, "knn")
+knn_model_OHLC_lag_3 <- train_with_cache(formula_OHLC_lag_3, train_set, "knn")
+knn_model_OHLC_lag_5 <- train_with_cache(formula_OHLC_lag_5, train_set, "knn")
+knn_model_OHLC_lag_7 <- train_with_cache(formula_OHLC_lag_7, train_set, "knn")
+knn_model_OHLC_lag_15 <- train_with_cache(formula_OHLC_lag_15, train_set, "knn")
+
+gbm_model_OHLC_lag_1 <- train_with_cache(formula_OHLC_lag_1, train_set, "gbm")
+gbm_model_OHLC_lag_3 <- train_with_cache(formula_OHLC_lag_3, train_set, "gbm")
+gbm_model_OHLC_lag_5 <- train_with_cache(formula_OHLC_lag_5, train_set, "gbm")
+gbm_model_OHLC_lag_7 <- train_with_cache(formula_OHLC_lag_7, train_set, "gbm")
+gbm_model_OHLC_lag_15 <- train_with_cache(formula_OHLC_lag_15, train_set, "gbm")
+
+
+# Candles features
+
+glm_model_candles_lag_1 <- train_with_cache(formula_candles_lag_1, train_set, "glm")
+glm_model_candles_lag_3 <- train_with_cache(formula_candles_lag_3, train_set, "glm")
+glm_model_candles_lag_5 <- train_with_cache(formula_candles_lag_5, train_set, "glm")
+glm_model_candles_lag_7 <- train_with_cache(formula_candles_lag_7, train_set, "glm")
+glm_model_candles_lag_15 <- train_with_cache(formula_candles_lag_15, train_set, "glm")
+
+rpart_model_candles_lag_1 <- train_with_cache(formula_candles_lag_1, train_set, "rpart")
+rpart_model_candles_lag_3 <- train_with_cache(formula_candles_lag_3, train_set, "rpart")
+rpart_model_candles_lag_5 <- train_with_cache(formula_candles_lag_5, train_set, "rpart")
+rpart_model_candles_lag_7 <- train_with_cache(formula_candles_lag_7, train_set, "rpart")
+rpart_model_candles_lag_15 <- train_with_cache(formula_candles_lag_15, train_set, "rpart")
+
+rf_model_candles_lag_1 <- train_with_cache(formula_candles_lag_1, train_set, "rf")
+rf_model_candles_lag_3 <- train_with_cache(formula_candles_lag_3, train_set, "rf")
+rf_model_candles_lag_5 <- train_with_cache(formula_candles_lag_5, train_set, "rf")
+rf_model_candles_lag_7 <- train_with_cache(formula_candles_lag_7, train_set, "rf")
+rf_model_candles_lag_15 <- train_with_cache(formula_candles_lag_15, train_set, "rf")
+
+knn_model_candles_lag_1 <- train_with_cache(formula_candles_lag_1, train_set, "knn")
+knn_model_candles_lag_3 <- train_with_cache(formula_candles_lag_3, train_set, "knn")
+knn_model_candles_lag_5 <- train_with_cache(formula_candles_lag_5, train_set, "knn")
+knn_model_candles_lag_7 <- train_with_cache(formula_candles_lag_7, train_set, "knn")
+knn_model_candles_lag_15 <- train_with_cache(formula_candles_lag_15, train_set, "knn")
+
+gbm_model_candles_lag_1 <- train_with_cache(formula_candles_lag_1, train_set, "gbm")
+gbm_model_candles_lag_3 <- train_with_cache(formula_candles_lag_3, train_set, "gbm")
+gbm_model_candles_lag_5 <- train_with_cache(formula_candles_lag_5, train_set, "gbm")
+gbm_model_candles_lag_7 <- train_with_cache(formula_candles_lag_7, train_set, "gbm")
+gbm_model_candles_lag_15 <- train_with_cache(formula_candles_lag_15, train_set, "gbm")
+
+
+# Candles features with fear and greed index
+
+glm_model_candles_fg_lag_1 <- train_with_cache(formula_candles_fg_lag_1, train_set, "glm")
+glm_model_candles_fg_lag_3 <- train_with_cache(formula_candles_fg_lag_3, train_set, "glm")
+glm_model_candles_fg_lag_5 <- train_with_cache(formula_candles_fg_lag_5, train_set, "glm")
+glm_model_candles_fg_lag_7 <- train_with_cache(formula_candles_fg_lag_7, train_set, "glm")
+glm_model_candles_fg_lag_15 <- train_with_cache(formula_candles_fg_lag_15, train_set, "glm")
+
+rpart_model_candles_fg_lag_1 <- train_with_cache(formula_candles_fg_lag_1, train_set, "rpart")
+rpart_model_candles_fg_lag_3 <- train_with_cache(formula_candles_fg_lag_3, train_set, "rpart")
+rpart_model_candles_fg_lag_5 <- train_with_cache(formula_candles_fg_lag_5, train_set, "rpart")
+rpart_model_candles_fg_lag_7 <- train_with_cache(formula_candles_fg_lag_7, train_set, "rpart")
+rpart_model_candles_fg_lag_15 <- train_with_cache(formula_candles_fg_lag_15, train_set, "rpart")
+
+rf_model_candles_fg_lag_1 <- train_with_cache(formula_candles_fg_lag_1, train_set, "rf")
+rf_model_candles_fg_lag_3 <- train_with_cache(formula_candles_fg_lag_3, train_set, "rf")
+rf_model_candles_fg_lag_5 <- train_with_cache(formula_candles_fg_lag_5, train_set, "rf")
+rf_model_candles_fg_lag_7 <- train_with_cache(formula_candles_fg_lag_7, train_set, "rf")
+rf_model_candles_fg_lag_15 <- train_with_cache(formula_candles_fg_lag_15, train_set, "rf")
+
+knn_model_candles_fg_lag_1 <- train_with_cache(formula_candles_fg_lag_1, train_set, "knn")
+knn_model_candles_fg_lag_3 <- train_with_cache(formula_candles_fg_lag_3, train_set, "knn")
+knn_model_candles_fg_lag_5 <- train_with_cache(formula_candles_fg_lag_5, train_set, "knn")
+knn_model_candles_fg_lag_7 <- train_with_cache(formula_candles_fg_lag_7, train_set, "knn")
+knn_model_candles_fg_lag_15 <- train_with_cache(formula_candles_fg_lag_15, train_set, "knn")
+
+gbm_model_candles_fg_lag_1 <- train_with_cache(formula_candles_fg_lag_1, train_set, "gbm")
+gbm_model_candles_fg_lag_3 <- train_with_cache(formula_candles_fg_lag_3, train_set, "gbm")
+gbm_model_candles_fg_lag_5 <- train_with_cache(formula_candles_fg_lag_5, train_set, "gbm")
+gbm_model_candles_fg_lag_7 <- train_with_cache(formula_candles_fg_lag_7, train_set, "gbm")
+gbm_model_candles_fg_lag_15 <- train_with_cache(formula_candles_fg_lag_15, train_set, "gbm")
+
+
+# Candles features with fear and greed index and chain data
+
+glm_model_candles_fg_chain_lag_1 <- train_with_cache(formula_candles_fg_chain_lag_1, train_set, "glm")
+glm_model_candles_fg_chain_lag_3 <- train_with_cache(formula_candles_fg_chain_lag_3, train_set, "glm")
+glm_model_candles_fg_chain_lag_5 <- train_with_cache(formula_candles_fg_chain_lag_5, train_set, "glm")
+glm_model_candles_fg_chain_lag_7 <- train_with_cache(formula_candles_fg_chain_lag_7, train_set, "glm")
+glm_model_candles_fg_chain_lag_15 <- train_with_cache(formula_candles_fg_chain_lag_15, train_set, "glm")
+
+rpart_model_candles_fg_chain_lag_1 <- train_with_cache(formula_candles_fg_chain_lag_1, train_set, "rpart")
+rpart_model_candles_fg_chain_lag_3 <- train_with_cache(formula_candles_fg_chain_lag_3, train_set, "rpart")
+rpart_model_candles_fg_chain_lag_5 <- train_with_cache(formula_candles_fg_chain_lag_5, train_set, "rpart")
+rpart_model_candles_fg_chain_lag_7 <- train_with_cache(formula_candles_fg_chain_lag_7, train_set, "rpart")
+rpart_model_candles_fg_chain_lag_15 <- train_with_cache(formula_candles_fg_chain_lag_15, train_set, "rpart")
+
+rf_model_candles_fg_chain_lag_1 <- train_with_cache(formula_candles_fg_chain_lag_1, train_set, "rf")
+rf_model_candles_fg_chain_lag_3 <- train_with_cache(formula_candles_fg_chain_lag_3, train_set, "rf")
+rf_model_candles_fg_chain_lag_5 <- train_with_cache(formula_candles_fg_chain_lag_5, train_set, "rf")
+rf_model_candles_fg_chain_lag_7 <- train_with_cache(formula_candles_fg_chain_lag_7, train_set, "rf")
+rf_model_candles_fg_chain_lag_15 <- train_with_cache(formula_candles_fg_chain_lag_15, train_set, "rf")
+
+knn_model_candles_fg_chain_lag_1 <- train_with_cache(formula_candles_fg_chain_lag_1, train_set, "knn")
+knn_model_candles_fg_chain_lag_3 <- train_with_cache(formula_candles_fg_chain_lag_3, train_set, "knn")
+knn_model_candles_fg_chain_lag_5 <- train_with_cache(formula_candles_fg_chain_lag_5, train_set, "knn")
+knn_model_candles_fg_chain_lag_7 <- train_with_cache(formula_candles_fg_chain_lag_7, train_set, "knn")
+knn_model_candles_fg_chain_lag_15 <- train_with_cache(formula_candles_fg_chain_lag_15, train_set, "knn")
+
+gbm_model_candles_fg_chain_lag_1 <- train_with_cache(formula_candles_fg_chain_lag_1, train_set, "gbm")
+gbm_model_candles_fg_chain_lag_3 <- train_with_cache(formula_candles_fg_chain_lag_3, train_set, "gbm")
+gbm_model_candles_fg_chain_lag_5 <- train_with_cache(formula_candles_fg_chain_lag_5, train_set, "gbm")
+gbm_model_candles_fg_chain_lag_7 <- train_with_cache(formula_candles_fg_chain_lag_7, train_set, "gbm")
+gbm_model_candles_fg_chain_lag_15 <- train_with_cache(formula_candles_fg_chain_lag_15, train_set, "gbm")
+
+# Candles features with fear and greed index and chain data and TA
+
+glm_model_candles_fg_chain_ta_lag_1 <- train_with_cache(formula_candles_fg_chain_ta_lag_1, train_set, "glm")
+glm_model_candles_fg_chain_ta_lag_3 <- train_with_cache(formula_candles_fg_chain_ta_lag_3, train_set, "glm")
+glm_model_candles_fg_chain_ta_lag_5 <- train_with_cache(formula_candles_fg_chain_ta_lag_5, train_set, "glm")
+glm_model_candles_fg_chain_ta_lag_7 <- train_with_cache(formula_candles_fg_chain_ta_lag_7, train_set, "glm")
+glm_model_candles_fg_chain_ta_lag_15 <- train_with_cache(formula_candles_fg_chain_ta_lag_15, train_set, "glm")
+
+rpart_model_candles_fg_chain_ta_lag_1 <- train_with_cache(formula_candles_fg_chain_ta_lag_1, train_set, "rpart")
+rpart_model_candles_fg_chain_ta_lag_3 <- train_with_cache(formula_candles_fg_chain_ta_lag_3, train_set, "rpart")
+rpart_model_candles_fg_chain_ta_lag_5 <- train_with_cache(formula_candles_fg_chain_ta_lag_5, train_set, "rpart")
+rpart_model_candles_fg_chain_ta_lag_7 <- train_with_cache(formula_candles_fg_chain_ta_lag_7, train_set, "rpart")
+rpart_model_candles_fg_chain_ta_lag_15 <- train_with_cache(formula_candles_fg_chain_ta_lag_15, train_set, "rpart")
+
+rf_model_candles_fg_chain_ta_lag_1 <- train_with_cache(formula_candles_fg_chain_ta_lag_1, train_set, "rf")
+rf_model_candles_fg_chain_ta_lag_3 <- train_with_cache(formula_candles_fg_chain_ta_lag_3, train_set, "rf")
+rf_model_candles_fg_chain_ta_lag_5 <- train_with_cache(formula_candles_fg_chain_ta_lag_5, train_set, "rf")
+rf_model_candles_fg_chain_ta_lag_7 <- train_with_cache(formula_candles_fg_chain_ta_lag_7, train_set, "rf")
+rf_model_candles_fg_chain_ta_lag_15 <- train_with_cache(formula_candles_fg_chain_ta_lag_15, train_set, "rf")
+
+knn_model_candles_fg_chain_ta_lag_1 <- train_with_cache(formula_candles_fg_chain_ta_lag_1, train_set, "knn")
+knn_model_candles_fg_chain_ta_lag_3 <- train_with_cache(formula_candles_fg_chain_ta_lag_3, train_set, "knn")
+knn_model_candles_fg_chain_ta_lag_5 <- train_with_cache(formula_candles_fg_chain_ta_lag_5, train_set, "knn")
+knn_model_candles_fg_chain_ta_lag_7 <- train_with_cache(formula_candles_fg_chain_ta_lag_7, train_set, "knn")
+knn_model_candles_fg_chain_ta_lag_15 <- train_with_cache(formula_candles_fg_chain_ta_lag_15, train_set, "knn")
+
+gbm_model_candles_fg_chain_ta_lag_1 <- train_with_cache(formula_candles_fg_chain_ta_lag_1, train_set, "gbm")
+gbm_model_candles_fg_chain_ta_lag_3 <- train_with_cache(formula_candles_fg_chain_ta_lag_3, train_set, "gbm")
+gbm_model_candles_fg_chain_ta_lag_5 <- train_with_cache(formula_candles_fg_chain_ta_lag_5, train_set, "gbm")
+gbm_model_candles_fg_chain_ta_lag_7 <- train_with_cache(formula_candles_fg_chain_ta_lag_7, train_set, "gbm")
+gbm_model_candles_fg_chain_ta_lag_15 <- train_with_cache(formula_candles_fg_chain_ta_lag_15, train_set, "gbm")
+
+
+## Compare results ##
+
+# Compare results for each feature set
+feature_sets <- c("OHLC", "candles", "candles_fg", "candles_fg_chain", "candles_fg_chain_ta")
+
+for (feature_set in feature_sets) {
+  cat("\nResults for", feature_set, "features:\n")
+  results <- evaluate_models(feature_set, test_set)
+  print(results)
+
+  # Print summary statistics
+  cat("\nSummary statistics for", feature_set, "features:\n")
+  summary_stats <- aggregate(accuracy ~ model_type,
+    data = results,
+    FUN = function(x) c(mean = mean(x), sd = sd(x), max = max(x))
+  )
+  print(summary_stats)
+  cat("\n-------------------\n")
+}
+
+# Function to get top models across all feature sets
+get_top_models <- function(test_set, n = 10) {
+  all_results <- data.frame()
+
+  for (feature_set in feature_sets) {
+    results <- evaluate_models(feature_set, test_set)
+    all_results <- rbind(all_results, results)
+  }
+
+  # Sort by accuracy and get top n
+  all_results <- all_results[order(-all_results$accuracy), ]
+  head(all_results, n)
+}
+
+# Get top 10 models overall
+print("\nTop 10 Models Overall:")
+get_top_models(test_set)
+
+# Compare average performance across feature sets
+print("\nAverage Performance by Feature Set:")
+feature_set_summary <- data.frame()
+for (feature_set in feature_sets) {
+  results <- evaluate_models(feature_set, test_set)
+  avg_accuracy <- mean(results$accuracy)
+  sd_accuracy <- sd(results$accuracy)
+  feature_set_summary <- rbind(
+    feature_set_summary,
+    data.frame(
+      feature_set = feature_set,
+      avg_accuracy = avg_accuracy,
+      sd_accuracy = sd_accuracy
+    )
+  )
+}
+feature_set_summary <- feature_set_summary[order(-feature_set_summary$avg_accuracy), ]
+feature_set_summary
+
+
+### Fine tuning ###
+
+formula_candles_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 1)
+formula_candles_lag_2 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 2)
+formula_candles_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 3)
+formula_candles_lag_4 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 4)
+formula_candles_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 5)
+formula_candles_lag_6 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 6)
+formula_candles_lag_7 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 7)
+formula_candles_lag_8 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 8)
+formula_candles_lag_9 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 9)
+formula_candles_lag_10 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 10)
+formula_candles_lag_11 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 11)
+formula_candles_lag_12 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 12)
+formula_candles_lag_13 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 13)
+formula_candles_lag_14 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 14)
+formula_candles_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 15)
+
+formula_candles_fg_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 1)
+formula_candles_fg_lag_2 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 2)
+formula_candles_fg_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 3)
+formula_candles_fg_lag_4 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 4)
+formula_candles_fg_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 5)
+formula_candles_fg_lag_6 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 6)
+formula_candles_fg_lag_7 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 7)
+formula_candles_fg_lag_8 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 8)
+formula_candles_fg_lag_9 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 9)
+formula_candles_fg_lag_10 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 10)
+formula_candles_fg_lag_11 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 11)
+formula_candles_fg_lag_12 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 12)
+formula_candles_fg_lag_13 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 13)
+formula_candles_fg_lag_14 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 14)
+formula_candles_fg_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 15)
+
+glm_model_candles_lag_1 <- train_with_cache(formula_candles_lag_1, train_set, "glm")
+glm_model_candles_lag_2 <- train_with_cache(formula_candles_lag_2, train_set, "glm")
+glm_model_candles_lag_3 <- train_with_cache(formula_candles_lag_3, train_set, "glm")
+glm_model_candles_lag_4 <- train_with_cache(formula_candles_lag_4, train_set, "glm")
+glm_model_candles_lag_5 <- train_with_cache(formula_candles_lag_5, train_set, "glm")
+glm_model_candles_lag_6 <- train_with_cache(formula_candles_lag_6, train_set, "glm")
+glm_model_candles_lag_7 <- train_with_cache(formula_candles_lag_7, train_set, "glm")
+glm_model_candles_lag_8 <- train_with_cache(formula_candles_lag_8, train_set, "glm")
+glm_model_candles_lag_9 <- train_with_cache(formula_candles_lag_9, train_set, "glm")
+glm_model_candles_lag_10 <- train_with_cache(formula_candles_lag_10, train_set, "glm")
+glm_model_candles_lag_11 <- train_with_cache(formula_candles_lag_11, train_set, "glm")
+glm_model_candles_lag_12 <- train_with_cache(formula_candles_lag_12, train_set, "glm")
+glm_model_candles_lag_13 <- train_with_cache(formula_candles_lag_13, train_set, "glm")
+glm_model_candles_lag_14 <- train_with_cache(formula_candles_lag_14, train_set, "glm")
+glm_model_candles_lag_15 <- train_with_cache(formula_candles_lag_15, train_set, "glm")
+
+gbm_model_candles_fg_lag_1 <- train_with_cache(formula_candles_fg_lag_1, train_set, "gbm")
+gbm_model_candles_fg_lag_2 <- train_with_cache(formula_candles_fg_lag_2, train_set, "gbm")
+gbm_model_candles_fg_lag_3 <- train_with_cache(formula_candles_fg_lag_3, train_set, "gbm")
+gbm_model_candles_fg_lag_4 <- train_with_cache(formula_candles_fg_lag_4, train_set, "gbm")
+gbm_model_candles_fg_lag_5 <- train_with_cache(formula_candles_fg_lag_5, train_set, "gbm")
+gbm_model_candles_fg_lag_6 <- train_with_cache(formula_candles_fg_lag_6, train_set, "gbm")
+gbm_model_candles_fg_lag_7 <- train_with_cache(formula_candles_fg_lag_7, train_set, "gbm")
+gbm_model_candles_fg_lag_8 <- train_with_cache(formula_candles_fg_lag_8, train_set, "gbm")
+gbm_model_candles_fg_lag_9 <- train_with_cache(formula_candles_fg_lag_9, train_set, "gbm")
+gbm_model_candles_fg_lag_10 <- train_with_cache(formula_candles_fg_lag_10, train_set, "gbm")
+gbm_model_candles_fg_lag_11 <- train_with_cache(formula_candles_fg_lag_11, train_set, "gbm")
+gbm_model_candles_fg_lag_12 <- train_with_cache(formula_candles_fg_lag_12, train_set, "gbm")
+gbm_model_candles_fg_lag_13 <- train_with_cache(formula_candles_fg_lag_13, train_set, "gbm")
+gbm_model_candles_fg_lag_14 <- train_with_cache(formula_candles_fg_lag_14, train_set, "gbm")
+gbm_model_candles_fg_lag_15 <- train_with_cache(formula_candles_fg_lag_15, train_set, "gbm")
+
+rpart_model_candles_fg_lag_1 <- train_with_cache(formula_candles_fg_lag_1, train_set, "rpart")
+rpart_model_candles_fg_lag_2 <- train_with_cache(formula_candles_fg_lag_2, train_set, "rpart")
+rpart_model_candles_fg_lag_3 <- train_with_cache(formula_candles_fg_lag_3, train_set, "rpart")
+rpart_model_candles_fg_lag_4 <- train_with_cache(formula_candles_fg_lag_4, train_set, "rpart")
+rpart_model_candles_fg_lag_5 <- train_with_cache(formula_candles_fg_lag_5, train_set, "rpart")
+rpart_model_candles_fg_lag_6 <- train_with_cache(formula_candles_fg_lag_6, train_set, "rpart")
+rpart_model_candles_fg_lag_7 <- train_with_cache(formula_candles_fg_lag_7, train_set, "rpart")
+rpart_model_candles_fg_lag_8 <- train_with_cache(formula_candles_fg_lag_8, train_set, "rpart")
+rpart_model_candles_fg_lag_9 <- train_with_cache(formula_candles_fg_lag_9, train_set, "rpart")
+rpart_model_candles_fg_lag_10 <- train_with_cache(formula_candles_fg_lag_10, train_set, "rpart")
+rpart_model_candles_fg_lag_11 <- train_with_cache(formula_candles_fg_lag_11, train_set, "rpart")
+rpart_model_candles_fg_lag_12 <- train_with_cache(formula_candles_fg_lag_12, train_set, "rpart")
+rpart_model_candles_fg_lag_13 <- train_with_cache(formula_candles_fg_lag_13, train_set, "rpart")
+rpart_model_candles_fg_lag_14 <- train_with_cache(formula_candles_fg_lag_14, train_set, "rpart")
+rpart_model_candles_fg_lag_15 <- train_with_cache(formula_candles_fg_lag_15, train_set, "rpart")
+
+# Function to get top models across all feature sets
+get_all_models <- function(test_set, n = 100) {
+  all_results <- data.frame()
+
+  for (feature_set in feature_sets) {
+    results <- evaluate_models(feature_set, test_set, c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15))
+    all_results <- rbind(all_results, results)
+  }
+
+  # Sort by accuracy and get top n
+  all_results <- all_results[order(-all_results$accuracy), ]
+  head(all_results, n)
+}
+
+get_all_models(test_set)
+
+# glm_model_candles_lag_6
+# gbm_model_candles_fg_lag_7
+# rpart_model_candles_lag_5
+
+### Fine tuning GBM and RPART models ###
+
+# GBM fine tuning
+gbmGrid <- expand.grid(
+  interaction.depth = c(1, 2, 3),
+  n.trees = c(50, 100, 150),
+  shrinkage = c(0.05, 0.1, 0.15),
+  n.minobsinnode = c(8, 10, 12)
+)
+
+# Cache filepath for tuned GBM
+gbm_tuned_filepath <- "models/gbm_model_candles_fg_lag_7_tuned.rds"
+
+if (file.exists(gbm_tuned_filepath)) {
+  gbm_model_candles_fg_lag_7_tuned <- readRDS(gbm_tuned_filepath)
+  print(paste("Tuned GBM model loaded from cache:", gbm_tuned_filepath))
+} else {
+  start_time <- Sys.time()
+  gbm_model_candles_fg_lag_7_tuned <- train(
+    formula_candles_fg_lag_7,
+    data = train_set,
+    method = "gbm",
+    trControl = trainControl(
+      method = "boot",
+      number = 25,
+      verboseIter = TRUE
+    ),
+    tuneGrid = gbmGrid,
+    verbose = FALSE
+  )
+  end_time <- Sys.time()
+  print(paste("GBM tuning time:", format(end_time - start_time, digits = 2)))
+
+  saveRDS(gbm_model_candles_fg_lag_7_tuned, gbm_tuned_filepath)
+}
+
+print("GBM Tuning Results:")
+print(gbm_model_candles_fg_lag_7_tuned)
+
+# Plot GBM tuning results
+plot(gbm_model_candles_fg_lag_7_tuned)
+
+# RPART fine tuning
+rpartGrid <- expand.grid(
+  cp = seq(0.001, 0.01, by = 0.001)
+)
+
+# Cache filepath for tuned RPART
+rpart_tuned_filepath <- "models/rpart_model_candles_lag_5_tuned.rds"
+
+if (file.exists(rpart_tuned_filepath)) {
+  rpart_model_candles_lag_5_tuned <- readRDS(rpart_tuned_filepath)
+  print(paste("Tuned RPART model loaded from cache:", rpart_tuned_filepath))
+} else {
+  start_time <- Sys.time()
+  rpart_model_candles_lag_5_tuned <- train(
+    formula_candles_lag_5,
+    data = train_set,
+    method = "rpart",
+    trControl = trainControl(
+      method = "boot",
+      number = 25,
+      verboseIter = TRUE
+    ),
+    tuneGrid = rpartGrid
+  )
+  end_time <- Sys.time()
+  print(paste("RPART tuning time:", format(end_time - start_time, digits = 2)))
+
+  saveRDS(rpart_model_candles_lag_5_tuned, rpart_tuned_filepath)
+}
+
+print("\nRPART Tuning Results:")
+print(rpart_model_candles_lag_5_tuned)
+
+# Plot RPART tuning results
+plot(rpart_model_candles_lag_5_tuned)
+
+# Compare original vs tuned models on test set
+results_comparison <- data.frame(
+  model = character(),
+  accuracy = numeric(),
+  stringsAsFactors = FALSE
+)
+
+# Original GBM
+gbm_orig_pred <- predict(gbm_model_candles_fg_lag_7, test_set)
+gbm_orig_acc <- mean(gbm_orig_pred == test_set$direction)
+
+# Tuned GBM
+gbm_tuned_pred <- predict(gbm_model_candles_fg_lag_7_tuned, test_set)
+gbm_tuned_acc <- mean(gbm_tuned_pred == test_set$direction)
+
+# Original RPART
+rpart_orig_pred <- predict(rpart_model_candles_lag_5, test_set)
+rpart_orig_acc <- mean(rpart_orig_pred == test_set$direction)
+
+# Tuned RPART
+rpart_tuned_pred <- predict(rpart_model_candles_lag_5_tuned, test_set)
+rpart_tuned_acc <- mean(rpart_tuned_pred == test_set$direction)
+
+results_comparison <- rbind(
+  results_comparison,
+  data.frame(
+    model = c("GBM Original", "GBM Tuned", "RPART Original", "RPART Tuned"),
+    accuracy = c(gbm_orig_acc, gbm_tuned_acc, rpart_orig_acc, rpart_tuned_acc)
+  )
+)
+
+print("\nModel Comparison Results:")
+print(results_comparison)
+
+# Tune model not as good: probably because it's tuned with the train_set
