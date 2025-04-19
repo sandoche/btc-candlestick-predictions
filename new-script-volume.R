@@ -616,9 +616,6 @@ if (!file.exists("gbm_model_candles_fg_chain_ta_lag_1_tuned.rds")) {
 accuracy_gbm_model_candles_fg_chain_ta_lag_1_tuned <- mean(predict(gbm_model_candles_fg_chain_ta_lag_1_tuned, test_set) == test_set$direction)
 print(paste("Fine-tuned model accuracy:", accuracy_gbm_model_candles_fg_chain_ta_lag_1_tuned))
 
-# Compare with the original model
-print(paste("Original model accuracy:", accuracy_gbm_model_candles_fg_chain_ta_lag_1))
-
 # Print model details
-print(gbm_model_candles_fg_chain_ta_lag_1_tuned)
+print(gbm_model_candles_fg_chain_ta_lag_1_tuned$bestTune)
 print(gbm_model_candles_fg_chain_ta_lag_1_tuned$finalModel)
