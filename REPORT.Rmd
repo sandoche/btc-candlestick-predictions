@@ -1327,7 +1327,7 @@ if (!file.exists("gbm_model_candles_fg_chain_ta_lag_1_tuned.rds")) {
 accuracy_gbm_model_candles_fg_chain_ta_lag_1_tuned <- mean(predict(gbm_model_candles_fg_chain_ta_lag_1_tuned, test_set) == test_set$direction)
 print(paste("Fine-tuned model accuracy:", accuracy_gbm_model_candles_fg_chain_ta_lag_1_tuned))
 ```
-As we can see the result the model is performing slightly less good than the one without fine tuning, but it's still better than the second best model.
+As we can see the result the model is performing slightly less good than the one without fine tuning, but it's still better than the third best model.
 
 We can see below the values of the different parameters:
 ```{r gbm_model_candles_fg_chain_ta_lag_1_tuned_best_tune, cache=TRUE}
@@ -1340,8 +1340,54 @@ Now let's compare the results and analyse what we have got.
 
 We will compare the best model for each feature set.
 
-```{r results_comparison}
+```{r results_comparison, cache=TRUE}
+# Get the best model from each feature set
+best_OHLC <- results_OHLC[which.max(results_OHLC$accuracy), ] %>% select(-rank) %>% mutate(features = "OHLC")
+best_candles <- results_candles[which.max(results_candles$accuracy), ] %>% select(-rank) %>% mutate(features = "Candles")
+best_candles_fg <- results_candles_fg[which.max(results_candles_fg$accuracy), ] %>% select(-rank) %>% mutate(features = "Candles, F&G")
+best_candles_fg_chain <- results_candles_fg_chain[which.max(results_candles_fg_chain$accuracy), ] %>% select(-rank) %>% mutate(features = "Candles, F&G, Chain")
+best_candles_fg_chain_ta <- results_candles_fg_chain_ta[which.max(results_candles_fg_chain_ta$accuracy), ] %>% select(-rank) %>% mutate(features = "Candles, F&G, Chain, TA")
 
+# Create a data frame for the tuned model
+tuned_model <- data.frame(
+  model = "gbm_model_candles_fg_chain_ta_lag_1_tuned",
+  features = "Candles, F&G, Chain, TA",
+  model_type = "gbm",
+  lag = 1,
+  accuracy = accuracy_gbm_model_candles_fg_chain_ta_lag_1_tuned,
+  stringsAsFactors = FALSE
+)
+
+# Create a data frame for the baseline methods
+simple_models <- data.frame(
+  model = c("random_guess", "always_up", "previous_direction", "opposite_direction"),
+  features = c("simple", "simple", "simple", "simple"),
+  model_type = c("simple", "simple", "simple", "simple"),
+  lag = c(NA, NA, 1, 1),
+  accuracy = c(mean_accuracy, always_up_accuracy, previous_direction_accuracy, opposite_direction_accuracy),
+  stringsAsFactors = FALSE
+)
+
+# Combine all results
+all_best_models <- rbind(
+  simple_models,
+  best_OHLC,
+  best_candles,
+  best_candles_fg,
+  best_candles_fg_chain,
+  best_candles_fg_chain_ta,
+  tuned_model
+)
+
+# Sort by accuracy (descending)
+all_best_models <- all_best_models[order(-all_best_models$accuracy), ]
+
+# Display the table
+knitr::kable(all_best_models, 
+             format = "simple", 
+             caption = "Comparison of best models from each feature set and baseline methods",
+             digits = 4,
+             col.names = c("Model", "Features", "Model Type", "Lag", "Accuracy"))
 ```
 
 
