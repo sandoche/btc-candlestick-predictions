@@ -593,6 +593,94 @@ get_all_models <- function(test_set, n = 100) {
 
 get_all_models(test_set)
 
-# Best models:
+## Fine tuning rf models ##
 
-### Fine tuning rf models ###
+rf_grid <- expand.grid(
+  mtry = c(2, 3, 6, 8, 10, 19, 25, 50, 100, 200, 300)
+)
+
+control <- trainControl(
+  method = "cv",
+  number = 5
+)
+
+# Function to fine-tune RF models with file caching
+fine_tune_rf_model <- function(formula, model_name, file_path, train_data, control, rf_grid) {
+  if (file.exists(file_path)) {
+    cat("File", file_path, "already exists. Skipping training.\n")
+    return(readRDS(file_path))
+  }
+
+  cat("Training model:", model_name, "\n")
+  model_tuned <- train(
+    formula,
+    data = train_data,
+    method = "rf",
+    trControl = control,
+    tuneGrid = rf_grid,
+    trees = 100
+  )
+
+  saveRDS(model_tuned, file_path)
+  return(model_tuned)
+}
+
+# Fine-tune RF models
+rf_model_OHLC_lag_1_tuned <- fine_tune_rf_model(
+  formula_OHLC_lag_1,
+  "rf_model_OHLC_lag_1",
+  "models/rf_model_OHLC_lag_1_tuned.rds",
+  train_set,
+  control,
+  rf_grid
+)
+
+rf_model_candles_fg_lag_1_tuned <- fine_tune_rf_model(
+  formula_candles_fg_lag_1,
+  "rf_model_candles_fg_lag_1",
+  "models/rf_model_candles_fg_lag_1_tuned.rds",
+  train_set,
+  control,
+  rf_grid
+)
+
+rf_model_candles_lag_1_tuned <- fine_tune_rf_model(
+  formula_candles_lag_1,
+  "rf_model_candles_lag_1",
+  "models/rf_model_candles_lag_1_tuned.rds",
+  train_set,
+  control,
+  rf_grid
+)
+
+rf_model_candles_fg_chain_lag_1_tuned <- fine_tune_rf_model(
+  formula_candles_fg_chain_lag_1,
+  "rf_model_candles_fg_chain_lag_1",
+  "models/rf_model_candles_fg_chain_lag_1_tuned.rds",
+  train_set,
+  control,
+  rf_grid
+)
+
+rf_model_candles_fg_chain_ta_lag_1_tuned <- fine_tune_rf_model(
+  formula_candles_fg_chain_ta_lag_1,
+  "rf_model_candles_fg_chain_ta_lag_1",
+  "models/rf_model_candles_fg_chain_ta_lag_1_tuned.rds",
+  train_set,
+  control,
+  rf_grid
+)
+
+accuracy_rf_model_OHLC_lag_1_tuned <- mean(predict(rf_model_OHLC_lag_1_tuned, test_set) == test_set$direction)
+accuracy_rf_model_candles_fg_lag_1_tuned <- mean(predict(rf_model_candles_fg_lag_1_tuned, test_set) == test_set$direction)
+accuracy_rf_model_candles_lag_1_tuned <- mean(predict(rf_model_candles_lag_1_tuned, test_set) == test_set$direction)
+accuracy_rf_model_candles_fg_chain_lag_1_tuned <- mean(predict(rf_model_candles_fg_chain_lag_1_tuned, test_set) == test_set$direction)
+accuracy_rf_model_candles_fg_chain_ta_lag_1_tuned <- mean(predict(rf_model_candles_fg_chain_ta_lag_1_tuned, test_set) == test_set$direction)
+
+accuracy_rf_model_OHLC_lag_1_tuned
+accuracy_rf_model_candles_fg_lag_1_tuned
+accuracy_rf_model_candles_lag_1_tuned
+accuracy_rf_model_candles_fg_chain_lag_1_tuned
+accuracy_rf_model_candles_fg_chain_ta_lag_1_tuned
+
+# results far below the original models, so we will not use the tuned models
