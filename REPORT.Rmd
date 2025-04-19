@@ -737,10 +737,10 @@ Before starting with those algorithms we will start with very simple ones to hav
 
 ### Random guess
 
-We will run a montecarlo simulation of `10000` random guesses of direction and compare it with the test set.
+We will run a montecarlo simulation of `1000` random guesses of direction and compare it with the test set.
 
 ```{r random_guess, cache=TRUE}
-random_guess_simulations <- replicate(10000, {
+random_guess_simulations <- replicate(1000, {
   estimated_direction <- replicate(nrow(test_set), sample(c("up", "down"), 1))
   mean(estimated_direction == test_set$direction)
 })
@@ -1260,19 +1260,105 @@ feature_set_summary <- feature_set_summary[order(-feature_set_summary$avg_accura
 feature_set_summary
 ```
 
-As we can see the best models are the ones using random forest with 1 lag followed by the ones using 3 lags features.
+As we can see the best models are the ones using `Gradient boosting`  and the `candles` feature set seems to perform better overall.
 
-We will use the following three models to fine tune, first trying to find the best number of lags, then using the fine tuning parameters.
+Also as expected the OHLC didn't perform well since it just uses raw data that are hard to use to train a machine learning algorithm.
 
-- rf_model_OHLC_lag_1
+But in order to proceed to the fine tuning we will use `gbm_model_candles_fg_chain_ta_lag_1` since it's outperforming the other models with an accuracy of `0.5498615`.
 
-- rf_model_candles_lag_1
+# Fine tuning
 
-- rf_model_candles_fg_lag_1
+Before proceeding to the fine tuning it's worth checking if the GBM model is not performing better with the same features and 2 lags instead of one.
 
-- rf_model_candles_fg_chain_lag_1
+```{r gbm_model_candles_fg_chain_ta_lag_2, cache=TRUE}
+formula_candles_fg_chain_ta_lag_2 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 2)
+gbm_model_candles_fg_chain_ta_lag_2 <- train_with_cache(formula_candles_fg_chain_ta_lag_2, train_set, "gbm")
 
-- rf_model_candles_fg_chain_ta_lag_1
+accuracy_gbm_model_candles_fg_chain_ta_lag_2 <- mean(predict(gbm_model_candles_fg_chain_ta_lag_2, test_set) == test_set$direction)
+accuracy_gbm_model_candles_fg_chain_ta_lag_2
+```
+As we can see the GBM model with `candles_fg_chain_ta` feature set and 1 lag `gbm_model_candles_fg_chain_ta_lag_1` is still performing better.
 
-Also it looks like the models with less features perform better.
+Let's use its tuning values and let's fine tune it.
+
+```{r gbm_model_candles_fg_chain_ta_lag_1_bestTune, cache=TRUE}
+gbm_model_candles_fg_chain_ta_lag_1$bestTune
+```
+
+We will use values around those values to fine tune this algorithm. Also unlike all the others algorithms we will use cross-validation for avoiding overfitting and having a more robust prediction algorithm, that would perform better with any dataset than only the `test_set`.
+
+```{r gbm_model_candles_fg_chain_ta_lag_1_tuned, cache=TRUE}
+# Define the tuning grid with the best values
+gbm_grid <- expand.grid(
+  n.trees = c(45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55),
+  interaction.depth = c(1, 2),
+  shrinkage = c(0.05, 0.1, 0.15),
+  n.minobsinnode = c(8, 9, 10, 11, 12)
+)
+
+# Set up cross-validation
+train_control <- trainControl(
+  method = "cv",
+  number = 5, # 5-fold cross-validation
+  verboseIter = TRUE,
+  classProbs = TRUE,
+  summaryFunction = twoClassSummary
+)
+
+# Train the fine-tuned model with cross-validation
+formula_candles_fg_chain_ta_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 1)
+
+
+if (!file.exists("gbm_model_candles_fg_chain_ta_lag_1_tuned.rds")) {
+  gbm_model_candles_fg_chain_ta_lag_1_tuned <- train(
+    formula_candles_fg_chain_ta_lag_1,
+    data = train_set,
+    method = "gbm",
+    trControl = train_control,
+    tuneGrid = gbm_grid,
+    metric = "ROC"
+  )
+  saveRDS(gbm_model_candles_fg_chain_ta_lag_1_tuned, "gbm_model_candles_fg_chain_ta_lag_1_tuned.rds")
+} else {
+  gbm_model_candles_fg_chain_ta_lag_1_tuned <- readRDS("gbm_model_candles_fg_chain_ta_lag_1_tuned.rds")
+}
+
+# Evaluate the fine-tuned model on the test set
+accuracy_gbm_model_candles_fg_chain_ta_lag_1_tuned <- mean(predict(gbm_model_candles_fg_chain_ta_lag_1_tuned, test_set) == test_set$direction)
+print(paste("Fine-tuned model accuracy:", accuracy_gbm_model_candles_fg_chain_ta_lag_1_tuned))
+```
+As we can see the result the model is performing slightly less good than the one without fine tuning, but it's still better than the second best model.
+
+We can see below the values of the different parameters:
+```{r gbm_model_candles_fg_chain_ta_lag_1_tuned_best_tune, cache=TRUE}
+gbm_model_candles_fg_chain_ta_lag_1_tuned$bestTune
+```
+Now let's compare the results and analyse what we have got.
+
+
+# Results
+
+We will compare the best model for each feature set.
+
+```{r results_comparison}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
