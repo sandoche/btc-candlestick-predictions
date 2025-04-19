@@ -1301,7 +1301,7 @@ gbm_grid <- expand.grid(
 # Set up cross-validation
 train_control <- trainControl(
   method = "cv",
-  number = 5, # 5-fold cross-validation
+  number = 5,
   verboseIter = TRUE,
   classProbs = TRUE,
   summaryFunction = twoClassSummary
