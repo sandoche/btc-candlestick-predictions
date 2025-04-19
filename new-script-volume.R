@@ -268,13 +268,13 @@ evaluate_models <- function(feature_set, test_set, lags = c(1, 3, 5, 7, 15)) {
 
 ### Evaluate random guess ###
 
-random_guess_simulations <- replicate(10000, {
+random_guess_simulations <- replicate(1000, {
   estimated_direction <- replicate(nrow(test_set), sample(c("up", "down"), 1))
   mean(estimated_direction == test_set$direction)
 })
 
 mean_accuracy <- mean(random_guess_simulations)
-print(paste("Random guess simulation results (10000 runs):"))
+print(paste("Random guess simulation results (1000 runs):"))
 print(paste("Mean accuracy:", round(mean_accuracy, 4)))
 
 # Return always "up"
@@ -554,149 +554,71 @@ for (feature_set in feature_sets) {
 feature_set_summary <- feature_set_summary[order(-feature_set_summary$avg_accuracy), ]
 feature_set_summary
 
-# 6                 rf_model_OHLC_lag_1         rf   1 0.7510103    1
-# 62          rf_model_candles_fg_lag_1         rf   1 0.7479018    1
-# 61             rf_model_candles_lag_1         rf   1 0.7432390    1
-# 63    rf_model_candles_fg_chain_lag_1         rf   1 0.7382655    1
-# 64 rf_model_candles_fg_chain_ta_lag_1         rf   1 0.6922599    1
+
+# Best result:
+# 214 gbm_model_candles_fg_chain_ta_lag_1        gbm   1 0.5498615    1
 
 
 
 ### Fine tuning ###
 
-formula_OHLC_lag_2 <- create_feature_formula(c("open", "high", "low", "close", "volume"), 2)
-formula_candles_lag_2 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 2)
-formula_candles_fg_lag_2 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 2)
-formula_candles_fg_chain_lag_2 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "volume"), 2)
+# First let's see if lag 2 is better than lag 1 for "candles_fg_chain_ta" and gbm model
+
 formula_candles_fg_chain_ta_lag_2 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 2)
+gbm_model_candles_fg_chain_ta_lag_2 <- train_with_cache(formula_candles_fg_chain_ta_lag_2, train_set, "gbm")
 
-rf_model_OHLC_lag_2 <- train_with_cache(formula_OHLC_lag_2, train_set, "rf")
-rf_model_candles_lag_2 <- train_with_cache(formula_candles_lag_2, train_set, "rf")
-rf_model_candles_fg_lag_2 <- train_with_cache(formula_candles_fg_lag_2, train_set, "rf")
-rf_model_candles_fg_chain_lag_2 <- train_with_cache(formula_candles_fg_chain_lag_2, train_set, "rf")
-rf_model_candles_fg_chain_ta_lag_2 <- train_with_cache(formula_candles_fg_chain_ta_lag_2, train_set, "rf")
+accuracy_gbm_model_candles_fg_chain_ta_lag_2 <- mean(predict(gbm_model_candles_fg_chain_ta_lag_2, test_set) == test_set$direction)
+accuracy_gbm_model_candles_fg_chain_ta_lag_2
+
+# We can see that the best model is still gbm_model_candles_fg_chain_ta_lag_1
+# Now let's get the best tune for this model and fine tune it
 
 
-# Function to get top models across all feature sets
-get_all_models <- function(test_set, n = 100) {
-  all_results <- data.frame()
+# Fine tune the best model (gbm_model_candles_fg_chain_ta_lag_1) using cross-validation
+print("\nFine-tuning the best model (gbm_model_candles_fg_chain_ta_lag_1):")
 
-  for (feature_set in feature_sets) {
-    results <- evaluate_models(feature_set, test_set, c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15))
-    all_results <- rbind(all_results, results)
-  }
-
-  # Sort by accuracy and get top n
-  all_results <- all_results[order(-all_results$accuracy), ]
-  head(all_results, n)
-}
-
-get_all_models(test_set)
-
-## Fine tuning rf models ##
-
-rf_grid <- expand.grid(
-  mtry = c(2, 3, 6, 8, 10, 19, 25, 50, 100, 200, 300)
+# Define the tuning grid with the best values
+gbm_grid <- expand.grid(
+  n.trees = c(45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55),
+  interaction.depth = c(1, 2),
+  shrinkage = c(0.05, 0.1, 0.15),
+  n.minobsinnode = c(8, 9, 10, 11, 12)
 )
 
-control <- trainControl(
+# Set up cross-validation
+train_control <- trainControl(
   method = "cv",
-  number = 5
+  number = 5, # 5-fold cross-validation
+  verboseIter = TRUE,
+  classProbs = TRUE,
+  summaryFunction = twoClassSummary
 )
 
-# Function to fine-tune RF models with file caching
-fine_tune_rf_model <- function(formula, model_name, file_path, train_data, control, rf_grid) {
-  if (file.exists(file_path)) {
-    cat("File", file_path, "already exists. Skipping training.\n")
-    return(readRDS(file_path))
-  }
+# Train the fine-tuned model with cross-validation
+formula_candles_fg_chain_ta_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 1)
 
-  cat("Training model:", model_name, "\n")
-  model_tuned <- train(
-    formula,
-    data = train_data,
-    method = "rf",
-    trControl = control,
-    tuneGrid = rf_grid,
-    trees = 100
+
+if (!file.exists("gbm_model_candles_fg_chain_ta_lag_1_tuned.rds")) {
+  gbm_model_candles_fg_chain_ta_lag_1_tuned <- train(
+    formula_candles_fg_chain_ta_lag_1,
+    data = train_set,
+    method = "gbm",
+    trControl = train_control,
+    tuneGrid = gbm_grid,
+    metric = "ROC"
   )
-
-  saveRDS(model_tuned, file_path)
-  return(model_tuned)
+  saveRDS(gbm_model_candles_fg_chain_ta_lag_1_tuned, "gbm_model_candles_fg_chain_ta_lag_1_tuned.rds")
+} else {
+  gbm_model_candles_fg_chain_ta_lag_1_tuned <- readRDS("gbm_model_candles_fg_chain_ta_lag_1_tuned.rds")
 }
 
-# Fine-tune RF models
-rf_model_OHLC_lag_1_tuned <- fine_tune_rf_model(
-  formula_OHLC_lag_1,
-  "rf_model_OHLC_lag_1",
-  "models/rf_model_OHLC_lag_1_tuned.rds",
-  train_set,
-  control,
-  rf_grid
-)
+# Evaluate the fine-tuned model on the test set
+accuracy_gbm_model_candles_fg_chain_ta_lag_1_tuned <- mean(predict(gbm_model_candles_fg_chain_ta_lag_1_tuned, test_set) == test_set$direction)
+print(paste("Fine-tuned model accuracy:", accuracy_gbm_model_candles_fg_chain_ta_lag_1_tuned))
 
-rf_model_candles_fg_lag_1_tuned <- fine_tune_rf_model(
-  formula_candles_fg_lag_1,
-  "rf_model_candles_fg_lag_1",
-  "models/rf_model_candles_fg_lag_1_tuned.rds",
-  train_set,
-  control,
-  rf_grid
-)
+# Compare with the original model
+print(paste("Original model accuracy:", accuracy_gbm_model_candles_fg_chain_ta_lag_1))
 
-rf_model_candles_lag_1_tuned <- fine_tune_rf_model(
-  formula_candles_lag_1,
-  "rf_model_candles_lag_1",
-  "models/rf_model_candles_lag_1_tuned.rds",
-  train_set,
-  control,
-  rf_grid
-)
-
-rf_model_candles_fg_chain_lag_1_tuned <- fine_tune_rf_model(
-  formula_candles_fg_chain_lag_1,
-  "rf_model_candles_fg_chain_lag_1",
-  "models/rf_model_candles_fg_chain_lag_1_tuned.rds",
-  train_set,
-  control,
-  rf_grid
-)
-
-rf_model_candles_fg_chain_ta_lag_1_tuned <- fine_tune_rf_model(
-  formula_candles_fg_chain_ta_lag_1,
-  "rf_model_candles_fg_chain_ta_lag_1",
-  "models/rf_model_candles_fg_chain_ta_lag_1_tuned.rds",
-  train_set,
-  control,
-  rf_grid
-)
-
-accuracy_rf_model_OHLC_lag_1_tuned <- mean(predict(rf_model_OHLC_lag_1_tuned, test_set) == test_set$direction)
-accuracy_rf_model_candles_fg_lag_1_tuned <- mean(predict(rf_model_candles_fg_lag_1_tuned, test_set) == test_set$direction)
-accuracy_rf_model_candles_lag_1_tuned <- mean(predict(rf_model_candles_lag_1_tuned, test_set) == test_set$direction)
-accuracy_rf_model_candles_fg_chain_lag_1_tuned <- mean(predict(rf_model_candles_fg_chain_lag_1_tuned, test_set) == test_set$direction)
-accuracy_rf_model_candles_fg_chain_ta_lag_1_tuned <- mean(predict(rf_model_candles_fg_chain_ta_lag_1_tuned, test_set) == test_set$direction)
-
-# Create a table of tuned model results
-tuned_model_results <- data.frame(
-  Model = c(
-    "RF OHLC lag 1",
-    "RF Candles lag 1",
-    "RF Candles+FG lag 1",
-    "RF Candles+FG+Chain lag 1",
-    "RF Candles+FG+Chain+TA lag 1"
-  ),
-  Accuracy = c(
-    accuracy_rf_model_OHLC_lag_1_tuned,
-    accuracy_rf_model_candles_lag_1_tuned,
-    accuracy_rf_model_candles_fg_lag_1_tuned,
-    accuracy_rf_model_candles_fg_chain_lag_1_tuned,
-    accuracy_rf_model_candles_fg_chain_ta_lag_1_tuned
-  )
-)
-
-# Sort by accuracy in descending order
-tuned_model_results <- tuned_model_results[order(-tuned_model_results$Accuracy), ]
-tuned_model_results
-
-# results far below the original models, so we will not use the tuned models
+# Print model details
+print(gbm_model_candles_fg_chain_ta_lag_1_tuned)
+print(gbm_model_candles_fg_chain_ta_lag_1_tuned$finalModel)
