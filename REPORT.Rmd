@@ -792,14 +792,28 @@ We will later fine tune that number of lagged candles to see what works the best
 
 ### OHLC features
 
-We will first try to use the OHLC features got directly from the coinbase dataset.
+We will first try to use the lagged OHLC features got directly from the coinbase dataset:
+
+- open
+
+- high
+
+- low
+
+- close
+
+- volume
+
+
+
+
 
 ```{r ohlc_features, cache=TRUE}
-formula_OHLC_lag_1 <- create_feature_formula(c("open", "high", "low", "close"), 1)
-formula_OHLC_lag_3 <- create_feature_formula(c("open", "high", "low", "close"), 3)
-formula_OHLC_lag_5 <- create_feature_formula(c("open", "high", "low", "close"), 5)
-formula_OHLC_lag_7 <- create_feature_formula(c("open", "high", "low", "close"), 7)
-formula_OHLC_lag_15 <- create_feature_formula(c("open", "high", "low", "close"), 15)
+formula_OHLC_lag_1 <- create_feature_formula(c("open", "high", "low", "close", "volume"), 1)
+formula_OHLC_lag_3 <- create_feature_formula(c("open", "high", "low", "close", "volume"), 3)
+formula_OHLC_lag_5 <- create_feature_formula(c("open", "high", "low", "close", "volume"), 5)
+formula_OHLC_lag_7 <- create_feature_formula(c("open", "high", "low", "close", "volume"), 7)
+formula_OHLC_lag_15 <- create_feature_formula(c("open", "high", "low", "close", "volume"), 15)
 
 glm_model_OHLC_lag_1 <- train_with_cache(formula_OHLC_lag_1, train_set, "glm")
 glm_model_OHLC_lag_3 <- train_with_cache(formula_OHLC_lag_3, train_set, "glm")
@@ -857,12 +871,28 @@ knitr::kable(summary_stats_OHLC,
 
 ### Candle features
 
+Now let's try to use the lagged candle features:
+
+- body_size
+
+- upper_shadow_size
+
+- lower_shadow_size
+
+- direction
+
+- close
+
+- volume
+
+
+
 ```{r candles_features, cache=TRUE}
-formula_candles_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close"), 1)
-formula_candles_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close"), 3)
-formula_candles_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close"), 5)
-formula_candles_lag_7 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close"), 7)
-formula_candles_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close"), 15)
+formula_candles_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 1)
+formula_candles_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 3)
+formula_candles_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 5)
+formula_candles_lag_7 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 7)
+formula_candles_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 15)
 
 glm_model_candles_lag_1 <- train_with_cache(formula_candles_lag_1, train_set, "glm")
 glm_model_candles_lag_3 <- train_with_cache(formula_candles_lag_3, train_set, "glm")
@@ -920,12 +950,28 @@ knitr::kable(summary_stats_candles,
 
 ### Candles features and fear and greed index
 
+Now let's try to use the lagged candles features and the fear and greed index:
+
+- body_size
+
+- upper_shadow_size
+
+- lower_shadow_size
+
+- direction
+
+- close
+
+- value
+
+- volume
+
 ```{r candles_fg_features, cache=TRUE}
-formula_candles_fg_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value"), 1)
-formula_candles_fg_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value"), 3)
-formula_candles_fg_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value"), 5)
-formula_candles_fg_lag_7 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value"), 7)
-formula_candles_fg_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value"), 15)
+formula_candles_fg_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 1)
+formula_candles_fg_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 3)
+formula_candles_fg_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 5)
+formula_candles_fg_lag_7 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 7)
+formula_candles_fg_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 15)
 
 glm_model_candles_fg_lag_1 <- train_with_cache(formula_candles_fg_lag_1, train_set, "glm")
 glm_model_candles_fg_lag_3 <- train_with_cache(formula_candles_fg_lag_3, train_set, "glm")
@@ -983,12 +1029,38 @@ knitr::kable(summary_stats_candles_fg,
 
 ### Candles features, fear and greed index and chain data
 
+We will try to use the lagged candles features, the fear and greed index and the chain data:
+
+- body_size
+
+- upper_shadow_size
+
+- lower_shadow_size
+
+- direction
+
+- close
+
+- value
+
+- hash_rate
+
+- avg_block_size
+
+- n_transactions
+
+- utxo_count
+
+- volume
+
+
+
 ```{r candles_fg_chain_features, cache=TRUE}
-formula_candles_fg_chain_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count"), 1)
-formula_candles_fg_chain_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count"), 3)
-formula_candles_fg_chain_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count"), 5)
-formula_candles_fg_chain_lag_7 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count"), 7)
-formula_candles_fg_chain_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count"), 15)
+formula_candles_fg_chain_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "volume"), 1)
+formula_candles_fg_chain_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "volume"), 3)
+formula_candles_fg_chain_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "volume"), 5)
+formula_candles_fg_chain_lag_7 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "volume"), 7)
+formula_candles_fg_chain_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "volume"), 15)
 
 glm_model_candles_fg_chain_lag_1 <- train_with_cache(formula_candles_fg_chain_lag_1, train_set, "glm")
 glm_model_candles_fg_chain_lag_3 <- train_with_cache(formula_candles_fg_chain_lag_3, train_set, "glm")
@@ -1046,12 +1118,52 @@ knitr::kable(summary_stats_candles_fg_chain,
 
 ### Candles features, fear and greed index, chain data and technical analysis indicators
 
+Finally let's add the technical analysis indicators to the model, so we will use the following lagged features:
+
+- body_size
+
+- upper_shadow_size
+
+- lower_shadow_size
+
+- direction
+
+- close
+
+- value
+
+- hash_rate
+
+- avg_block_size
+
+- n_transactions
+
+- utxo_count
+
+- volume
+
+- roc
+
+- macd
+
+- signal
+
+- rsi
+
+- up_bband
+
+- mavg
+
+- dn_bband
+
+- pctB
+
 ```{r candles_fg_chain_ta_features, cache=TRUE}
-formula_candles_fg_chain_ta_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB"), 1)
-formula_candles_fg_chain_ta_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB"), 3)
-formula_candles_fg_chain_ta_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB"), 5)
-formula_candles_fg_chain_ta_lag_7 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB"), 7)
-formula_candles_fg_chain_ta_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB"), 15)
+formula_candles_fg_chain_ta_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 1)
+formula_candles_fg_chain_ta_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 3)
+formula_candles_fg_chain_ta_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 5)
+formula_candles_fg_chain_ta_lag_7 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 7)
+formula_candles_fg_chain_ta_lag_15 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 15)
 
 glm_model_candles_fg_chain_ta_lag_1 <- train_with_cache(formula_candles_fg_chain_ta_lag_1, train_set, "glm")
 glm_model_candles_fg_chain_ta_lag_3 <- train_with_cache(formula_candles_fg_chain_ta_lag_3, train_set, "glm")
@@ -1147,15 +1259,20 @@ for (feature_set in feature_sets) {
 feature_set_summary <- feature_set_summary[order(-feature_set_summary$avg_accuracy), ]
 feature_set_summary
 ```
-As expected we can see that OHLC doesn't perform well, suprisingly we can see that just the candles itself performs the best.
 
-We will use the following three models to fine tune, first the number of lags, then using the fine tuning parameters.
+As we can see the best models are the ones using random forest with 1 lag followed by the ones using 3 lags features.
 
-- glm_model_candles_lag_7
+We will use the following three models to fine tune, first trying to find the best number of lags, then using the fine tuning parameters.
 
-- gbm_model_candles_fg_lag_7
+- rf_model_OHLC_lag_1
 
-- rpart_model_candles_lag_5
+- rf_model_candles_lag_1
 
+- rf_model_candles_fg_lag_1
 
-TODO redo everything with volume features
+- rf_model_candles_fg_chain_lag_1
+
+- rf_model_candles_fg_chain_ta_lag_1
+
+Also it looks like the models with less features perform better.
+
