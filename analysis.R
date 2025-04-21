@@ -600,7 +600,7 @@ train_control <- trainControl(
 formula_candles_fg_chain_ta_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 1)
 
 
-if (!file.exists("gbm_model_candles_fg_chain_ta_lag_1_tuned.rds")) {
+if (!file.exists("models/gbm_model_candles_fg_chain_ta_lag_1_tuned.rds")) {
   gbm_model_candles_fg_chain_ta_lag_1_tuned <- train(
     formula_candles_fg_chain_ta_lag_1,
     data = train_set,
@@ -609,9 +609,9 @@ if (!file.exists("gbm_model_candles_fg_chain_ta_lag_1_tuned.rds")) {
     tuneGrid = gbm_grid,
     metric = "ROC"
   )
-  saveRDS(gbm_model_candles_fg_chain_ta_lag_1_tuned, "gbm_model_candles_fg_chain_ta_lag_1_tuned.rds")
+  saveRDS(gbm_model_candles_fg_chain_ta_lag_1_tuned, "models/gbm_model_candles_fg_chain_ta_lag_1_tuned.rds")
 } else {
-  gbm_model_candles_fg_chain_ta_lag_1_tuned <- readRDS("gbm_model_candles_fg_chain_ta_lag_1_tuned.rds")
+  gbm_model_candles_fg_chain_ta_lag_1_tuned <- readRDS("models/gbm_model_candles_fg_chain_ta_lag_1_tuned.rds")
 }
 
 # Evaluate the fine-tuned model on the test set
