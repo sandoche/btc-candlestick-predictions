@@ -8,6 +8,7 @@ if (!require(tidyquant)) install.packages("tidyquant", repos = "http://cran.us.r
 if (!require(patchwork)) install.packages("patchwork", repos = "http://cran.us.r-project.org")
 if (!require(randomForest)) install.packages("randomForest", repos = "http://cran.us.r-project.org")
 if (!require(TTR)) install.packages("TTR", repos = "http://cran.us.r-project.org")
+if (!require(gbm)) install.packages("gbm", repos = "http://cran.us.r-project.org")
 
 ### Global Variables ###
 
@@ -19,6 +20,7 @@ library(tidyquant)
 library(patchwork)
 library(randomForest)
 library(TTR)
+library(gbm)
 
 trading_pair <- "BTC-USD"
 start_date <- "2024-01-01"

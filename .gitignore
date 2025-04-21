@@ -8,3 +8,4 @@ REPORT_cache
 REPORT_files
 *.log
 *.tex
+.DS_Store
