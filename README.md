@@ -33,8 +33,6 @@ coming soon
   author = {Sandoche Adittane},
   title = {Bitcoin candlestick predictions using lagged features and machine learning algorithm in R},
   year = {2025},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  howpublished = {\url{https://github.com/sandoche/btc-candlestick-predictions}},
+  url = {\url{https://github.com/sandoche/btc-candlestick-predictions}},
 }
 ```
