@@ -68,7 +68,13 @@ The candle stick chart is defined as a time serie of candles, each candle is def
 
 ## Candlesticks pattern
 
-TODO Talk about chartists and common patterns
+Some of the technical analyist study candlestick pattern to try to predict the direction of the market, this field is known as candlestick pattern. It consist at knowing a set of patterns and the outcome of them.
+
+![Common candlestick patterns guide [@tradingsim2022candlestick]](https://www.tradingsim.com/hubfs/Imported_Blog_Media/CANDLESTICKQUICKGUIDE-Mar-18-2022-09-42-46-01-AM.png)
+
+Traders look for specific patterns like "Doji", "Hammer", "Engulfing patterns", and many others to make trading decisions. Each pattern has a specific interpretation based on market psychology and historical tendencies [@tradingsim2022candlestick].
+
+If they really exist we believe that machine learning algorithms would be able to detect them.
 
 ## Goal of the study
 
