@@ -91,7 +91,6 @@ In this section we will see what are the are the different datasets available. W
 ## Data sets
 
 In order to conduct this study we used as a the main data set the historic rates for the trading pair BTC-USD using Coinbase API.
-TODO: add reference https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductcandles
 
 We used the following global variables for the full project:
 ```{r global_variables}
@@ -102,9 +101,9 @@ candlestick_period <- 3600
 set.seed(1)
 ```
 
-The timeframe is the entire year 2024 and the start of the year 2025 until the day we started the study. Note that since January 2024, Bitcoin ETF has officially been approved. The period `candlestick_period <- 3600` is the time of a candle, the candle closes 1h after it starts. Which means we have 24 candles per day.
+The timeframe is the entire year 2024 and the start of the year 2025 until the day we started the study. Note that since January 2024, Bitcoin ETF has officially been approved. The period `candlestick_period <- 3600` is the time of a candle, the candle closes 1h after it starts. Which means we have 24 candles per day [@coinbase2024api].
 
-I choose this settings to have a dataset of around 10000 candles but also since Bitcoin ETF has been approved the market may have taken a different dynamic than the previous years.
+I choose this settings to have a dataset of around `r format(10000, big.mark = ",")` candles but also since Bitcoin ETF has been approved the market may have taken a different dynamic than the previous years.
 
 Let's see how the dataset looks like.
 
@@ -136,9 +135,7 @@ Keeping this in mind, I tried to find other dataset that could represent each of
 
 - Number of unspent transaction outputs (UTXO) — defines how many addresses contains bitcoin, and reflects the network activity (users)
 
- 
-https://www.blockchain.com/explorer/charts/total-bitcoins
-https://alternative.me/crypto/fear-and-greed-index/
+
 
 ```{r fear_and_greed_index, cache=TRUE}
 fear_and_greed_index <- read_csv(paste0("data/", trading_pair, "_fear_and_greed_index_", start_date, "_", end_date, ".csv"))
@@ -148,6 +145,8 @@ knitr::kable(head(fear_and_greed_index), format = "simple", caption = "Overview 
 
 This dataset is a time serie of the daily fear and greed index, it is a value between 0 and 100, 0 being the most fearful and 100 being the most greedy.
 The data set contains `r nrow(fear_and_greed_index)` entries.
+
+The blockchain data (hash rate, average block size, number of transactions, and UTXO count) was sourced from Blockchain.com Explorer [@blockchain2024data], while the fear and greed index was obtained from Alternative.me [@alternative2024feargreed].
 
 ```{r hash_rate, cache=TRUE}
 hash_rate <- jsonlite::fromJSON("data/hash-rate.json")$`hash-rate` %>%
