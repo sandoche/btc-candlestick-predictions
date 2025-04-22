@@ -82,13 +82,11 @@ The goal of the study is to find a model able to predict the direction of a cand
 
 ## Applications
 
-Why is the direction of a candlestick matter? Because being able to predict the direction of the next candle could enable trader to buy and sell on spot market when the predicted candle is green. Also perpetual futures trader can go both way, they can long when the prediction says "up" and "short" when the predictions says "down".
-
-TODO: Give some resource to learn about spot vs future.
+Why does the direction of a candlestick matter? Because being able to predict the direction of the next candle could enable traders to buy and sell on spot market when the predicted candle is green. Also perpetual futures trader can go both ways, they can long when the prediction says "up" and "short" when the predictions says "down".
 
 # Exploratory data analysis
 
-In this section we will see what are the are the different dataset available, see what features are available to train the different models, prepare the data, verify it, and choose different machine learning algorithms we will use and compare.
+In this section we will see what are the are the different datasets available. We will see what features are available to train the different models. Then we will prepare the data, verify it, and choose which machine learning algorithms we are going to train.
 
 ## Data sets
 
