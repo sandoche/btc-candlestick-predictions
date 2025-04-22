@@ -62,7 +62,7 @@ Bitcoin is defined by its source code, and that's quite facinating. Its ledger i
 
 Let's talk about the candlestick. The price of assets such as Bitcoin is described by a timeserie of candle stick defined by, an opening price, a close price a high and a low also called OHLC. A candlestick can be "up" (often green and also called bullish) or "down" (often red and also called bearish). You can see this visually with the following figure.
 
-![Candlestick components [@techqualitypedia2024candlestick]](https://i0.wp.com/techqualitypedia.com/wp-content/uploads/2024/09/candlestick-components.jpg)
+![Candlestick components [@techqualitypedia2024candlestick]](figures/candlestick-components.jpg)
 
 The candle stick chart is defined as a time serie of candles, each candle is defined at a defined time and have a time duration. We will explain more in detail in the exploratory analysis.
 
@@ -70,7 +70,7 @@ The candle stick chart is defined as a time serie of candles, each candle is def
 
 Some of the technical analyist study candlestick pattern to try to predict the direction of the market, this field is known as candlestick pattern. It consist at knowing a set of patterns and the outcome of them.
 
-![Common candlestick patterns guide [@tradingsim2022candlestick]](https://www.tradingsim.com/hubfs/Imported_Blog_Media/CANDLESTICKQUICKGUIDE-Mar-18-2022-09-42-46-01-AM.png)
+![Common candlestick patterns guide [@tradingsim2022candlestick]](figures/CANDLESTICKQUICKGUIDE-Mar-18-2022-09-42-46-01-AM.png)
 
 Traders look for specific patterns like "Doji", "Hammer", "Engulfing patterns", and many others to make trading decisions. Each pattern has a specific interpretation based on market psychology and historical tendencies [@tradingsim2022candlestick].
 
@@ -107,7 +107,7 @@ I choose this settings to have a dataset of around `r format(10000, big.mark = "
 
 Let's see how the dataset looks like.
 
-```{r btc_coinbase_candlestick_chart, cache=TRUE, echo=FALSE}
+```{r btc_coinbase_candlestick_chart, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 candles <- read_csv(paste0("data/", trading_pair, "_candles_", start_date, "_", end_date, "_", candlestick_period, ".csv"), show_col_types = FALSE)
 knitr::kable(head(candles), format = "simple", caption = "Overview of the BTC-USD candlestick dataset")
 ```
@@ -137,7 +137,7 @@ Keeping this in mind, I tried to find other dataset that could represent each of
 
 
 
-```{r fear_and_greed_index, cache=TRUE}
+```{r fear_and_greed_index, cache=TRUE, echo=FALSE}
 fear_and_greed_index <- read_csv(paste0("data/", trading_pair, "_fear_and_greed_index_", start_date, "_", end_date, ".csv"))
 fear_and_greed_index <- fear_and_greed_index %>% mutate(value = as.numeric(value))
 knitr::kable(head(fear_and_greed_index), format = "simple", caption = "Overview of the BTC fear and greed index dataset")
