@@ -344,7 +344,7 @@ First of all let's plot the data to visually verify the data.
 
 TODO Fix rendering of this data (it was fixed previously, could be just a cache issue)
 
-```{r visual_analysis, cache=TRUE}
+```{r visual_analysis}
 p1 <- candles_enhanced_cleaned_no_na %>%
   ggplot(aes(x = time, y = close)) +
   geom_line(color = "blue") +
@@ -414,9 +414,9 @@ combined_plot
 
 Find below the candletick chart of BTC-USD.
 
-```{r visual_analysis_candlestick_chart, cache=TRUE}
+```{r visual_analysis_candlestick_chart, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 # For more readability we are only plotting the last 24 candles
-p7 <- candles_enhanced_cleaned_no_na %>%
+p8 <- candles_enhanced_cleaned_no_na %>%
   tail(24) %>%
   mutate(direction = ifelse(close >= open, "up", "down")) %>%
   ggplot(aes(x = time, y = close)) +
@@ -433,13 +433,17 @@ p7 <- candles_enhanced_cleaned_no_na %>%
     y = "Price"
   ) +
   scale_y_continuous(labels = scales::comma)
+
+p8
 ```
+![BTC-USD Candlestick Chart (Last 24 Candles)](figures/visual_analysis_candlestick_chart)
+
 
 And the plot of the different TA.
 
 TODO fix the following for rendering on pdf
 
-```{r visual_analysis_ta, cache=TRUE}
+```{r visual_analysis_ta, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Technical analysis indicators of BTC-USD"}
 plot_data_ta <- candles_enhanced_cleaned_no_na %>% tail(100)
 
 # ROC Plot
