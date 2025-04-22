@@ -804,7 +804,7 @@ We will first try to use the lagged OHLC features got directly from the coinbase
 
 
 
-```{r ohlc_features, cache=TRUE}
+```{r ohlc_features, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 formula_OHLC_lag_1 <- create_feature_formula(c("open", "high", "low", "close", "volume"), 1)
 formula_OHLC_lag_3 <- create_feature_formula(c("open", "high", "low", "close", "volume"), 3)
 formula_OHLC_lag_5 <- create_feature_formula(c("open", "high", "low", "close", "volume"), 5)
@@ -845,7 +845,7 @@ results_OHLC <- evaluate_models("OHLC", test_set)
 knitr::kable(results_OHLC, format = "simple", caption = "Model comparison for OHLC features")
 ```
 
-```{r ohlc_stats, cache=TRUE}
+```{r ohlc_stats, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 summary_stats_OHLC <- aggregate(accuracy ~ model_type,
   data = results_OHLC,
   FUN = function(x) c(mean = mean(x), sd = sd(x), max = max(x))
@@ -883,7 +883,7 @@ Now let's try to use the lagged candle features:
 
 
 
-```{r candles_features, cache=TRUE}
+```{r candles_features, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 formula_candles_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 1)
 formula_candles_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 3)
 formula_candles_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 5)
@@ -924,7 +924,7 @@ results_candles <- evaluate_models("candles", test_set)
 results_candles
 ```
 
-```{r candles_stats, cache=TRUE}
+```{r candles_stats, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 summary_stats_candles <- aggregate(accuracy ~ model_type,
   data = results_candles,
   FUN = function(x) c(mean = mean(x), sd = sd(x), max = max(x))
@@ -962,7 +962,7 @@ Now let's try to use the lagged candles features and the fear and greed index:
 
 - volume
 
-```{r candles_fg_features, cache=TRUE}
+```{r candles_fg_features, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 formula_candles_fg_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 1)
 formula_candles_fg_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 3)
 formula_candles_fg_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 5)
@@ -1003,7 +1003,7 @@ results_candles_fg <- evaluate_models("candles_fg", test_set)
 results_candles_fg
 ```
 
-```{r candles_fg_stats, cache=TRUE}
+```{r candles_fg_stats, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 summary_stats_candles_fg <- aggregate(accuracy ~ model_type,
   data = results_candles_fg,
   FUN = function(x) c(mean = mean(x), sd = sd(x), max = max(x))
@@ -1051,7 +1051,7 @@ We will try to use the lagged candles features, the fear and greed index and the
 
 
 
-```{r candles_fg_chain_features, cache=TRUE}
+```{r candles_fg_chain_features, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 formula_candles_fg_chain_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "volume"), 1)
 formula_candles_fg_chain_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "volume"), 3)
 formula_candles_fg_chain_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "volume"), 5)
@@ -1092,7 +1092,7 @@ results_candles_fg_chain <- evaluate_models("candles_fg_chain", test_set)
 results_candles_fg_chain
 ```
 
-```{r candles_fg_chain_stats, cache=TRUE}
+```{r candles_fg_chain_stats, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 summary_stats_candles_fg_chain <- aggregate(accuracy ~ model_type,
   data = results_candles_fg_chain,
   FUN = function(x) c(mean = mean(x), sd = sd(x), max = max(x))
@@ -1154,7 +1154,7 @@ Finally let's add the technical analysis indicators to the model, so we will use
 
 - pctB
 
-```{r candles_fg_chain_ta_features, cache=TRUE}
+```{r candles_fg_chain_ta_features, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 formula_candles_fg_chain_ta_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 1)
 formula_candles_fg_chain_ta_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 3)
 formula_candles_fg_chain_ta_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 5)
@@ -1195,7 +1195,7 @@ results_candles_fg_chain_ta <- evaluate_models("candles_fg_chain_ta", test_set)
 results_candles_fg_chain_ta
 ```
 
-```{r candles_fg_chain_ta_stats, cache=TRUE}
+```{r candles_fg_chain_ta_stats, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 summary_stats_candles_fg_chain_ta <- aggregate(accuracy ~ model_type,
   data = results_candles_fg_chain_ta,
   FUN = function(x) c(mean = mean(x), sd = sd(x), max = max(x))
@@ -1217,7 +1217,7 @@ knitr::kable(summary_stats_candles_fg_chain_ta,
 
 ## Models comparison
 
-```{r best_models, cache=TRUE}
+```{r best_models, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 feature_sets <- c("OHLC", "candles", "candles_fg", "candles_fg_chain", "candles_fg_chain_ta")
 
 # Function to get top models across all feature sets
@@ -1237,7 +1237,7 @@ get_top_models <- function(test_set, n = 10) {
 get_top_models(test_set)
 ```
 
-```{r best_features, cache=TRUE}
+```{r best_features, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 feature_set_summary <- data.frame()
 for (feature_set in feature_sets) {
   results <- evaluate_models(feature_set, test_set)
@@ -1266,7 +1266,7 @@ But in order to proceed to the fine tuning we will use `gbm_model_candles_fg_cha
 
 Before proceeding to the fine tuning it's worth checking if the GBM model is not performing better with the same features and 2 lags instead of one.
 
-```{r gbm_model_candles_fg_chain_ta_lag_2, cache=TRUE}
+```{r gbm_model_candles_fg_chain_ta_lag_2, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 formula_candles_fg_chain_ta_lag_2 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 2)
 gbm_model_candles_fg_chain_ta_lag_2 <- train_with_cache(formula_candles_fg_chain_ta_lag_2, train_set, "gbm")
 
@@ -1277,7 +1277,7 @@ As we can see the GBM model with `candles_fg_chain_ta` feature set and 1 lag `gb
 
 Let's use its tuning values and let's fine tune it.
 
-```{r gbm_model_candles_fg_chain_ta_lag_1_bestTune, cache=TRUE}
+```{r gbm_model_candles_fg_chain_ta_lag_1_bestTune, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 gbm_model_candles_fg_chain_ta_lag_1$bestTune
 ```
 
@@ -1326,7 +1326,7 @@ print(paste("Fine-tuned model accuracy:", accuracy_gbm_model_candles_fg_chain_ta
 As we can see the result the model is performing slightly less good than the one without fine tuning, but it's still better than the third best model.
 
 We can see below the values of the different parameters:
-```{r gbm_model_candles_fg_chain_ta_lag_1_tuned_best_tune, cache=TRUE}
+```{r gbm_model_candles_fg_chain_ta_lag_1_tuned_best_tune, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 gbm_model_candles_fg_chain_ta_lag_1_tuned$bestTune
 ```
 Now let's compare the results and analyse what we have got.
@@ -1336,7 +1336,7 @@ Now let's compare the results and analyse what we have got.
 
 We will compare the best model for each feature set.
 
-```{r results_comparison, cache=TRUE}
+```{r results_comparison, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 # Get the best model from each feature set
 best_OHLC <- results_OHLC[which.max(results_OHLC$accuracy), ] %>% select(-rank) %>% mutate(features = "OHLC")
 best_candles <- results_candles[which.max(results_candles$accuracy), ] %>% select(-rank) %>% mutate(features = "Candles")
@@ -1392,7 +1392,7 @@ While our best model has an accuracy of `0.5499`, we would still consider the fi
 
 Now let's see what are the most important features of the algorithm.
 
-```{r feature_importance}
+```{r feature_importance, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Feature importance of the best model"}
 variable_importance <- varImp(gbm_model_candles_fg_chain_ta_lag_1_tuned)
 ggplot(variable_importance, aes(x = reorder(feature, Overall), y = Overall)) +
   geom_bar(stat = "identity") +
@@ -1403,7 +1403,7 @@ Interestingly the features with an importance higher than 25 are related to TA, 
 
 ## Confusion matrix
 
-```{r confusion_matrix}
+```{r confusion_matrix, echo=FALSE, message=FALSE, warning=FALSE}
 predicted_values <- predict(gbm_model_candles_fg_chain_ta_lag_1_tuned, test_set)
 confusion_matrix <- confusionMatrix(factor(predicted_values, levels = c("up", "down")), 
                                    factor(test_set$direction, levels = c("up", "down")))
