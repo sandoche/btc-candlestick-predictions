@@ -62,7 +62,7 @@ Bitcoin is defined by its source code, and that's quite facinating. Its ledger i
 
 Let's talk about the candlestick. The price of assets such as Bitcoin is described by a timeserie of candle stick defined by, an opening price, a close price a high and a low also called OHLC. A candlestick can be "up" (often green and also called bullish) or "down" (often red and also called bearish). You can see this visually with the following figure.
 
-![Candlestick components [@techqualitypedia2024candlestick]](https://i0.wp.com/techqualitypedia.com/wp-content/uploads/2024/09/candlestick-components.jpg?w=1491&ssl=1)
+![Candlestick components [@techqualitypedia2024candlestick]](https://i0.wp.com/techqualitypedia.com/wp-content/uploads/2024/09/candlestick-components.jpg)
 
 The candle stick chart is defined as a time serie of candles, each candle is defined at a defined time and have a time duration. We will explain more in detail in the exploratory analysis.
 
