@@ -1,7 +1,7 @@
 ---
 title: "Bitcoin candlestick predictions using lagged features and machine learning algorithm in R"
 subtitle: "Training various machine learning algorithms to predict the next candlestick of the bitcoin price using various lagged features"
-abstract: "This report explores how to get the best accuracy on predicting the next candlestick of the bitcoin chart using the previous ones. It compares different algorithms: Generalized Linear Model, Decision Tree, Random Forest, KNN and Gradient boosting and different number of lagged features. This project is part of the 'Data Science: Capstone' module of HarvardX PH125.9x from the edx platform."
+abstract: "This report explores how to achieve the best accuracy in predicting the next candlestick of the bitcoin chart using the previous ones. It compares different algorithms: Generalized Linear Model, Decision Tree, Random Forest, KNN, and Gradient Boosting, considering different numbers of lagged features. This project is part of the 'Data Science: Capstone' module of HarvardX PH125.9x on the edx platform."
 author: "Sandoche Adittane"
 date: "`r Sys.Date()`"
 bibliography: references.bib
@@ -55,49 +55,49 @@ library(gbm)
 
 # Overview
 
-In this study we will try to predict the direction of the next candlestick of the bitcoin chart. Before starting, it's important to understand: what are Bitcoin and candlesticks and the goal of this study.
+In this study we will try to predict the direction of the next candlestick of the bitcoin chart. Before starting, it's important to understand: what are Bitcoin and candlesticks, and the goal of this study.
 
 ## Introduction to Bitcoin
 
-This last years Bitcoin (BTC) has been gaining attention not only by retail investors but also by institutional investor. In 2024 we've seen the emergence of spot Bitcoin exchange-traded funds (ETF) from institutions such as BlackRock, VanEck, Grayscale [@usnews2024bitcoin]. With a market capitalization of about 1.68 billion in dollars at the time of writing, Bitcoin started as a peer-to-peer currency, a free alernative to centralized currencies controlled by central banks. Now it is often used as an investment, a store of value and even considered as a strategic reserve assets by some countries [@reuters2025trump; @reuters2025elsalvador].
+In recent years, Bitcoin (BTC) has been gaining attention not only from retail investors but also from institutional investors. In 2024 we've seen the emergence of spot Bitcoin exchange-traded funds (ETF) from institutions such as BlackRock, VanEck, Grayscale [@usnews2024bitcoin]. With a market capitalization of about 1.68 billion in dollars at the time of writing, Bitcoin started as a peer-to-peer currency, a free alternative to centralized currencies controlled by central banks. Now it is often used as an investment, a store of value and even considered strategic reserve assets by some countries [@reuters2025trump; @reuters2025elsalvador].
 
-Bitcoin ows its decentralization to its data structure, the blockchain — a chain of block that contains transactions, and to its consensus, the proof of work. Without going too much into details, it makes Bitcoin a currency that does not rely on a centralized server. Proof of work is a cryptographic algorithm, that enables a competition between bitcoin servers (called nodes) to decide which transactions will be part of the next block added to the blockchain. They go through a process called mining where nodes have to use their computing power to find a number called nonce. This computing power is called the hashrate. The node who succeed at "mining" successfully gets rewarded for that [@adittane2018cryptoguide].
+Bitcoin owes its decentralization to its data structure, the blockchain — a chain of blocks that contains transactions, and to its consensus, the proof of work. Without going too much into details, it makes Bitcoin a currency that does not rely on a centralized server. Proof of work is a cryptographic algorithm that enables a competition between bitcoin servers (called nodes) to decide which transactions will be part of the next block added to the blockchain. They go through a process called mining where nodes have to use their computing power to find a number called nonce. This computing power is called the hashrate. The node that succeeds at "mining" successfully gets rewarded for that [@adittane2018cryptoguide].
 
-Bitcoin is defined by its source code, and that's quite facinating. Its ledger is visible and publicly available, which gives a lot of data available to analyze. Moreover unlike stocks BTC can be traded any time, there is no opening or closing hours, the bitcoin market never stops and it is very easy for anyone to buy and sell bitcoin. Those are two reasons worth studying bitcoin's candlestick charts instead of other asset.
+Bitcoin is defined by its source code, and that's quite fascinating. Its ledger is visible and publicly available, which gives a lot of data available to analyze. Moreover, unlike stocks, BTC can be traded any time; there are no opening or closing hours, the bitcoin market never stops and it is very easy for anyone to buy and sell bitcoin. Those are two reasons worth studying Bitcoin's candlestick charts instead of other assets.
 
 ## What are candlesticks?
 
-Let's talk about the candlestick. The price of assets such as Bitcoin is described by a timeserie of candle stick defined by, an opening price, a close price a high and a low also called OHLC. A candlestick can be "up" (often green and also called bullish) or "down" (often red and also called bearish). You can see this visually with the following figure.
+Let's talk about the candlestick. The price of assets such as Bitcoin is described by a time series of candlesticks, each defined by an opening price, a close price, a high, and a low, also called OHLC. A candlestick can be "up" (often green and also called bullish) or "down" (often red and also called bearish). You can see this visually with the following figure.
 
 ![Candlestick components [@techqualitypedia2024candlestick]](figures/candlestick-components.jpg)
 
-The candle stick chart is defined as a time serie of candles, each candle is defined at a defined time and have a time duration. We will explain more in detail in the exploratory analysis.
+The candlestick chart is defined as a time series of candles; each candle is defined at a specific time and has a specific time duration. We will explain this in more detail in the exploratory analysis section.
 
 ## Candlesticks pattern
 
-Some of the technical analyist study candlestick pattern to try to predict the direction of the market, this field is known as candlestick pattern. It consist at knowing a set of patterns and the outcome of them.
+Some technical analysts study candlestick patterns to try to predict the direction of the market; this field is known as candlestick pattern analysis. It consists of knowing a set of patterns and their likely outcomes.
 
 ![Common candlestick patterns guide [@tradingsim2022candlestick]](figures/CANDLESTICKQUICKGUIDE-Mar-18-2022-09-42-46-01-AM.png)
 
 Traders look for specific patterns like "Doji", "Hammer", "Engulfing patterns", and many others to make trading decisions. Each pattern has a specific interpretation based on market psychology and historical tendencies [@tradingsim2022candlestick].
 
-If they really exist we believe that machine learning algorithms would be able to detect them.
+If such patterns really exist, we believe that machine learning algorithms should be able to detect them.
 
 ## Goal of the study
 
-The goal of the study is to find a model able to predict the direction of a candlestick using N previous candles. This number N will be also part of the research. We will have to not only find N but also find what are the best features to achieve the best accuracy.
+The goal of the study is to find a model able to predict the direction of a candlestick using N previous candles. This number N will also be part of the research. We will have to not only find N but also find the best features to achieve the best accuracy.
 
 ## Applications
 
-Why does the direction of a candlestick matter? Because being able to predict the direction of the next candle could enable traders to buy and sell on spot market when the predicted candle is green. Also perpetual futures trader can go both ways, they can long when the prediction says "up" and "short" when the predictions says "down".
+Why does the direction of a candlestick matter? Because being able to predict the direction of the next candle could enable traders to buy and sell on the spot market when the predicted candle is green. Also, perpetual futures traders can go both ways; they can long when the prediction says "up" and "short" when the predictions says "down".
 
 # Exploratory data analysis
 
-In this section we will see what are the are the different datasets available. We will see what features are available to train the different models. Then we will prepare the data, verify it, and choose which machine learning algorithms we are going to train.
+In this section, we will see what are the different datasets available. We will see what features are available to train the different models. Then we will prepare the data, verify it, and choose which machine learning algorithms we are going to train.
 
 ## Data sets
 
-In order to conduct this study we used as a the main data set the historic rates for the trading pair BTC-USD using Coinbase API.
+In order to conduct this study, we used the historical rates for the trading pair BTC-USD using the Coinbase API as the main dataset.
 
 We used the following global variables for the full project:
 ```{r global_variables}
@@ -108,9 +108,9 @@ candlestick_period <- 3600
 set.seed(1)
 ```
 
-The timeframe is the entire year 2024 and the start of the year 2025 until the day we started the study. Note that since January 2024, Bitcoin ETF has officially been approved. The period `candlestick_period <- 3600` is the time of a candle, the candle closes 1h after it starts. Which means we have 24 candles per day [@coinbase2024api].
+The timeframe covers the entire year 2024 and the beginning of 2025, up until the day this study commenced. Note that since January 2024, Bitcoin ETF has officially been approved. The period `candlestick_period <- 3600` is the time of a candle; the candle closes 1h after it starts. Which means we have 24 candles per day [@coinbase2024api].
 
-I choose this settings to have a dataset of around `r format(10000, big.mark = ",")` candles but also since Bitcoin ETF has been approved the market may have taken a different dynamic than the previous years.
+I chose these settings to have a dataset of around `r format(10000, big.mark = ",")` candles. Also, since the Bitcoin ETF has been approved, the market may have taken on a different dynamic than in previous years.
 
 Let's see how the dataset looks like.
 
@@ -119,7 +119,7 @@ candles <- read_csv(paste0("data/", trading_pair, "_candles_", start_date, "_", 
 knitr::kable(head(candles), format = "simple", caption = "Overview of the BTC-USD candlestick dataset")
 ```
 
-We have `r format(nrow(candles), big.mark=",")` entries in our candle stick dataset. As described in the overview it contains the OCLH data, timestamp and the volume of each candles.
+We have `r format(nrow(candles), big.mark=",")` entries in our candlestick dataset. As described in the overview, it contains the OHLC data, timestamp, and the volume of each candle.
 
 Bitcoin is used by 3 types of users: 
 
@@ -127,20 +127,20 @@ Bitcoin is used by 3 types of users:
 
 - Users — using the currency to do payments or to transfer money around the world
 
-- Miners — they mine bitcoin to sell it, their interest is that the price of bitcoin is higher than the cost of mining bitcoin
+- Miners — they mine bitcoin to sell it; their interest is that the price of bitcoin is higher than the cost of mining bitcoin
 
 
-Keeping this in mind, I tried to find other dataset that could represent each of the type of users that could eventually help in our predictions and I picked the following:
+Keeping this in mind, I tried to find other datasets that could represent each type of user that could eventually help in our predictions, and I picked the following:
 
 - Fear and greed index — represents the overall mood of the market (traders)
 
 - Hash-rate — defines the overall mining power (miners)
 
-- Average block size — the higher it is the more transactions are happening (users)
+- Average block size — the higher it is, the more transactions are happening (users)
 
 - Number of transactions — defines the activity of the network (users)
 
-- Number of unspent transaction outputs (UTXO) — defines how many addresses contains bitcoin, and reflects the network activity (users)
+- Number of unspent transaction outputs (UTXO) — defines how many addresses contain Bitcoin, and reflects the network activity (users)
 
 
 
@@ -150,8 +150,8 @@ fear_and_greed_index <- fear_and_greed_index %>% mutate(value = as.numeric(value
 knitr::kable(head(fear_and_greed_index), format = "simple", caption = "Overview of the BTC fear and greed index dataset")
 ```
 
-This dataset is a time serie of the daily fear and greed index, it is a value between 0 and 100, 0 being the most fearful and 100 being the most greedy.
-The data set contains `r nrow(fear_and_greed_index)` entries.
+This dataset is a time series of the daily fear and greed index; it is a value between 0 and 100, 0 being the most fearful and 100 being the most greedy.
+The dataset contains `r nrow(fear_and_greed_index)` entries.
 
 The blockchain data (hash rate, average block size, number of transactions, and UTXO count) was sourced from Blockchain.com Explorer [@blockchain2024data], while the fear and greed index was obtained from Alternative.me [@alternative2024feargreed].
 
@@ -163,8 +163,8 @@ hash_rate <- jsonlite::fromJSON("data/hash-rate.json")$`hash-rate` %>%
 knitr::kable(head(hash_rate), format = "simple", caption = "Overview of the BTC hash rate dataset")
 ```
 
-This dataset is a time serie of the daily hash rate, it is a value in TH/s.
-The data set contains `r nrow(hash_rate)` entries.
+This dataset is a time series of the daily hash rate; it is a value in TH/s.
+The dataset contains `r nrow(hash_rate)` entries.
 
 ```{r average_block_size, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 average_block_size <- jsonlite::fromJSON("data/avg-block-size.json")$`avg-block-size` %>%
@@ -174,8 +174,8 @@ average_block_size <- jsonlite::fromJSON("data/avg-block-size.json")$`avg-block-
 knitr::kable(head(average_block_size), format = "simple", caption = "Overview of the BTC average block size dataset")
 ```
 
-This dataset is a time serie of the daily average block size, it is a value in bytes.
-The data set contains `r nrow(average_block_size)` entries.
+This dataset is a time series of the daily average block size; it is a value in bytes.
+The dataset contains `r nrow(average_block_size)` entries.
 
 ```{r n_transactions, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 n_transactions <- jsonlite::fromJSON("data/n-transactions.json")$`n-transactions` %>%
@@ -185,8 +185,8 @@ n_transactions <- jsonlite::fromJSON("data/n-transactions.json")$`n-transactions
 knitr::kable(head(n_transactions), format = "simple", caption = "Overview of the BTC number of transactions dataset")
 ```
 
-This dataset is a time serie of the daily number of transactions, it is a value in transactions.
-The data set contains `r nrow(n_transactions)` entries.
+This dataset is a time series of the daily number of transactions; it is a value in transactions.
+The dataset contains `r nrow(n_transactions)` entries.
 
 
 ```{r utxo_count, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
@@ -202,12 +202,12 @@ utxo_count <- jsonlite::fromJSON("data/utxo-count.json")$`utxo-count` %>%
 knitr::kable(head(utxo_count), format = "simple", caption = "Overview of the BTC UTXO count dataset")
 ```
 
-This dataset is a time serie of the daily number of UTXO, it is the count of UTXO in the network.
-The data set contains `r nrow(utxo_count)` entries. We had to group by timestamp since some dates had more than 1 value.
+This dataset is a time series of the daily number of UTXOs; it is the count of UTXOs in the network.
+The dataset contains `r nrow(utxo_count)` entries. We had to group by timestamp because some dates had more than one value.
 
-As we can see `fear_and_greed_index` seems to miss one data point. We will see fix that in the next sections.
+As we can see, `fear_and_greed_index` seems to be missing one data point. We will fix this in the following sections.
 
-We have different dataset that we will use for the predictions but we are still missing one important data used by traders, technical analysis indicator.
+We have different datasets that we will use for the predictions, but we are still missing one important piece of data used by traders: technical analysis indicators.
 
 Based on a previous research and blog post I wrote [@adittane2018chartanalysis], I decided to include a few indicators that are very common in trading :
 
@@ -219,13 +219,13 @@ Based on a previous research and blog post I wrote [@adittane2018chartanalysis],
 
 - Relative Strenght Index (RSI)
 
-Before preparing the dataset let's see what would be the features we can extract from the OHLC candlestick data.
+Before preparing the dataset, let's see what features we can extract from the OHLC candlestick data.
 
 ## Features
 
-Our candlesticks dataset from coinbase gives us values that are based on the price of bitcoin, but used itself for a machine learning algorithm it will be hard to use those raw absolute values since the price always fluctuate, so we have to think about what defines the candlesticks we have seen above?
+Our candlesticks dataset from Coinbase gives us values that are based on the price of bitcoin, but using these raw absolute values directly in a machine learning algorithm will be difficult since the price always fluctuates. Therefore, we have to think about what defines the candlesticks we have seen above?
 
-If we isolate a candle we can see the following features:
+If we isolate a candle, we can see the following features:
 
 - Size of the body
 
