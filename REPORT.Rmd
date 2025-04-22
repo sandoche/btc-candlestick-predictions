@@ -342,7 +342,7 @@ sum(is.na(candles_enhanced_cleaned_no_na))
 
 First of all let's plot the data to visually verify the data.
 
-```{r visual_analysis, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Visualis analysis of BTC-USD data"}
+```{r visual_analysis, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Visual analysis of BTC-USD data", fig.height=20}
 p1 <- candles_enhanced_cleaned_no_na %>%
   ggplot(aes(x = time, y = close)) +
   geom_line(color = "blue") +
@@ -419,7 +419,7 @@ p8 <- candles_enhanced_cleaned_no_na %>%
   scale_y_continuous(labels = scales::comma)
 
 combined_plot <- (p1 / p2 / p3 / p4 / p5 / p6 / p7 / p8) +
-  plot_layout(ncol = 2, heights = c(1, 1, 1, 1)) +
+  plot_layout(ncol = 2, heights = c(2, 2, 2, 2)) +
   plot_annotation(
     title = "Bitcoin Price and Blockchain Metrics",
     theme = theme(plot.title = element_text(hjust = 0.5, size = 16))
