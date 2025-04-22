@@ -243,7 +243,7 @@ We are now ready to prepare the dataset for the study.
 
 ## Preparation
 
-Preparation of the dataset is done in the following function:
+The preparation of the dataset is performed by the following function:
 ```{r dataset_preparation, cache=TRUE, message=FALSE, warning=FALSE}
 
 enhance_dataset <- function(candles_data, fear_and_greed_index_data, hash_rate_data, average_block_size_data, n_transactions_data, utxo_count_data) {
@@ -295,9 +295,9 @@ candles_enhanced <- enhance_dataset(candles, fear_and_greed_index, hash_rate, av
 names(candles_enhanced)
 ```
 
-We have now a table with all the features discussed above. Before adding the lagged features let's explore our set.
+We now have a table containing all the features discussed above. Before adding the lagged features, let's explore our dataset.
 
-First let's see if we have NAs.
+First, let's check for NAs.
 
 ```{r dataset_preparation_find_na, cache=TRUE}
 na_indexes <- which(apply(candles_enhanced, 1, function(x) any(is.na(x))))
@@ -307,15 +307,15 @@ knitr::kable(tail(candles_enhanced[na_indexes, ] %>% select(direction, roc, macd
 
 We can see in the table above that there are 2 types of NAs:
 
-1. Technical analisis indicators
+1. Technical analysis indicators
 
 2. Fear and greed index
 
-The technical analysis indicators are located at the start of the table which is normal since to calculate these indicators you need to have a certain number of previous values. Clearing those NAs will be enough.
+The technical analysis indicators are located at the beginning of the table. This is expected, as calculating these indicators requires a certain number of previous values. Removing rows with these NAs will be sufficient.
 
-As concern the fear and greed index missing value we can notice that we are missing the values of the day `2024-10-26` so we will add the values of the average between the day before and after manually.
+As for the missing fear and greed index value, we can notice that we are missing the values for the day `2024-10-26`, so we will manually add the average of the values from the day before and the day after.
 
-It's important to do so to have coherant lagged values.
+It's important to do this to ensure coherent lagged values.
 
 ```{r fear_and_greed_index_corrected, cache=TRUE}
 date_na <- as.Date("2024-10-26")
@@ -338,7 +338,7 @@ na_indexes <- which(apply(candles_enhanced_cleaned, 1, function(x) any(is.na(x))
 knitr::kable(tail(candles_enhanced_cleaned[na_indexes, ] %>% select(direction, roc, macd, signal, rsi, mavg, pctB, value)), format = "simple", caption = "NAs of the dataset cleaned")
 ```
 
-We can see now the only NAs are the missing TA values that we can clean with a simple line of code.
+We can now see that the only remaining NAs are the missing TA values at the beginning, which can be removed easily.
 
 ```{r candles_enhanced_cleaned_no_na, cache=TRUE}
 candles_enhanced_cleaned_no_na <- candles_enhanced_cleaned %>% drop_na()
@@ -348,7 +348,7 @@ sum(is.na(candles_enhanced_cleaned_no_na))
 
 ## Visual analysis
 
-First of all let's plot the data to visually verify the data.
+First, let's plot the data for visual verification.
 
 ```{r visual_analysis, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Visual analysis of BTC-USD data", fig.height=20, fig.width=15}
 p1 <- candles_enhanced_cleaned_no_na %>%
@@ -437,7 +437,7 @@ combined_plot <- (p1 / p2 / p3 / p4 / p5 / p6 / p7 / p8) +
 combined_plot
 ```
 
-Find below the plot of the different TA.
+Below are the plots for the different Technical Analysis indicators.
 
 ```{r visual_analysis_ta, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Technical analysis indicators of BTC-USD"}
 plot_data_ta <- candles_enhanced_cleaned_no_na %>% tail(100)
@@ -491,9 +491,9 @@ combined_ta_plot + plot_annotation(
 
 ```
 
-Comparing with the data from TradingView it seems that all the charts are correct.
+Comparing these charts with data from TradingView confirms their correctness.
 
-Let's now see how is the distribution of "up" and "down" candles.
+Let's now examine the distribution of "up" and "down" candles.
 
 ```{r visual_repartion, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Distribution of up and down candles in the dataset"}
 candles_enhanced_cleaned_no_na %>%
@@ -532,13 +532,13 @@ distribution_data <- candles_enhanced_cleaned_no_na %>%
 knitr::kable(distribution_data, format = "simple", caption = "Distribution of up and down candles")
 ```
 
-We can notice that the distribution is not exacly 50%.
+We can notice that the distribution is not exactly 50%.
 
 ## Adding lagged candles
 
-Our study aim at predicting the direction of a candle using the previous candle's data and other features.
+Our study aims at predicting the direction of a candle using the previous candle's data and other features.
 
-So we need to create a function to create a dataset containing lagged candles. We also created another function to directly prepare the right data.
+Therefore, we need to create a function that generates a dataset containing lagged candle data. We also created another function to directly prepare the right data.
 
 ```{r lagged_candles, cache=TRUE}
 add_lagged_candles <- function(enhanced_clean_dataset, n_lag) {
@@ -581,11 +581,11 @@ prepare_dataset <- function(candles_data, fear_and_greed_index_data, hash_rate_d
 }
 ```
 
-Using the function `prepare_dataset` and the we can have directly the final dataset with lagged data.
+Using the `prepare_dataset` function allows us to directly obtain the final dataset with lagged data.
 
 ## Test and training datasets
 
-We put together the code to fix the fear_and_greed_index and to prepare the datasets and split them in train and test sets.
+We put together the code to fix the fear_and_greed_index, prepare the datasets, and split them into train and test sets.
 
 ```{r project_datasets, cache=TRUE, warning=FALSE}
 date_na <- as.Date("2024-10-26")
@@ -606,11 +606,11 @@ test_index <- createDataPartition(y = project_dataset$direction, times = 1, p = 
 train_set <- project_dataset[-test_index, ]
 test_set <- project_dataset[test_index, ]
 ```
-The number of rows reduced since adding lags introduced a lot of NAs in the first rows, NAs that we removed. Also we decided not to use cross validation to reduce the time of training for the different machine learnings algorithms. Note that we initiated already the project using `set.seed(1)` part of the global variables.
+The number of rows was reduced because adding lags introduced NAs in the initial rows, which we subsequently removed. Also, we decided not to use cross-validation to reduce the training time for the different machine learning algorithms. Note that we already initiated the project using `set.seed(1)` as part of the global variables.
 
 ## Machine learning algorithms
 
-Based on some shallow research on the press, we selected the following machine learnings algorithms that seems to work better with our type of dataset [@neuroquantology2023candlestick; @nakano2016stock]:
+Based on preliminary research, we selected the following machine learning algorithms that seem to work well with our type of dataset [@neuroquantology2023candlestick; @nakano2016stock]:
 
 - Generalized Linear Model (GLM)
 
@@ -622,11 +622,11 @@ Based on some shallow research on the press, we selected the following machine l
 
 - Gradient boosting (GBM)
 
-We will also compare these algorithms with Random guess as a reference.
+We will also compare these algorithms with a random guess baseline as a reference.
 
 ## Utility functions
 
-Since we want to compare each algorithms for a different set of features we need a function to create the formula that we will pass to the machine learning function.
+Since we want to compare each algorithm for a different set of features, we need a function to create the formula that will be passed to the machine learning training function.
 
 ```{r utility_functions, cache=TRUE}
 create_feature_formula <- function(feature_names, n_lags) {
@@ -727,11 +727,11 @@ evaluate_models <- function(feature_set, test_set, lags = c(1, 3, 5, 7, 15)) {
 }
 ```
 
-# Training machine learnings algorithms
+# Training Machine Learning Algorithms
 
-We are now going to train and compare various machine learning algorithms with different set of selected features and different number of lag.
+We are now going to train and compare various machine learning algorithms with different sets of selected features and different numbers of lags.
 
-Before starting with those algorithms we will start with very simple ones to have a reference to compare.
+Before starting with those algorithms, we will start with very simple ones to have a reference for comparison.
 
 ## Simple algorithms
 
@@ -765,7 +765,7 @@ print(paste("Always up accuracy:", round(always_up_accuracy, 4)))
 
 ### Previous direction
 
-Now let's see how it compares with returning the same direction as the previous (lag_1):
+Now, let's see how this compares to simply predicting the same direction as the previous candle (lag 1):
 ```{r previous_direction, cache=TRUE}
 previous_direction <- function(test_set) {
   test_set$direction_lag_1
@@ -783,16 +783,16 @@ opposite_direction_accuracy <- mean(opposite_direction(test_set) == test_set$dir
 print(paste("Opposite direction to the previous one accuracy:", round(opposite_direction_accuracy, 4)))
 ```
 
-We can see that giving the opposite direction to the previous one has the highest accuracy so far: `0.5342`, let's see how it compares with machine learning algorithms.
+We can see that giving the opposite direction to the previous one has the highest accuracy so far: `0.5342`. Let's see how it compares with machine learning algorithms.
 
 ## Machine learning algorithms
 
-For each of these machine learning algorithms we will use either 1, 3, 5, 7 or 12 lagged data.
-We will later fine tune that number of lagged candles to see what works the best.
+For each of these machine learning algorithms, we will use either 1, 3, 5, 7, or 15 lagged data.
+We will later fine-tune this number of lagged candles to determine the optimal value.
 
 ### OHLC features
 
-We will first try to use the lagged OHLC features got directly from the coinbase dataset:
+We will first try to use the lagged OHLC features obtained directly from the Coinbase dataset:
 
 - open
 
@@ -1277,15 +1277,15 @@ feature_set_summary <- feature_set_summary[order(-feature_set_summary$avg_accura
 knitr::kable(feature_set_summary, format = "simple", caption = "Summary of feature sets", row.names = FALSE)
 ```
 
-As we can see the best models are the ones using `Gradient boosting`  and the `candles` feature set seems to perform better overall.
+As we can see, the models using `Gradient boosting` generally perform best, and the `candles` feature set appears to yield good results overall.
 
-Also as expected the OHLC didn't perform well since it just uses raw data that are hard to use to train a machine learning algorithm.
+Also, as expected, the OHLC feature set did not perform well, likely because it uses raw price data which can be challenging for machine learning algorithms to utilize effectively without further transformation.
 
-But in order to proceed to the fine tuning we will use `gbm_model_candles_fg_chain_ta_lag_1` since it's outperforming the other models with an accuracy of `0.5498615`.
+But in order to proceed to the fine tuning, we will use `gbm_model_candles_fg_chain_ta_lag_1` since it is outperforming the other models with an accuracy of `0.5498615`.
 
 # Fine tuning
 
-Before proceeding to the fine tuning it's worth checking if the GBM model is not performing better with the same features and 2 lags instead of one.
+Before proceeding to the fine tuning, it's worth checking if the GBM model performs better with the same features and 2 lags instead of 1.
 
 ```{r gbm_model_candles_fg_chain_ta_lag_2, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 formula_candles_fg_chain_ta_lag_2 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 2)
@@ -1294,15 +1294,15 @@ gbm_model_candles_fg_chain_ta_lag_2 <- train_with_cache(formula_candles_fg_chain
 accuracy_gbm_model_candles_fg_chain_ta_lag_2 <- mean(predict(gbm_model_candles_fg_chain_ta_lag_2, test_set) == test_set$direction)
 accuracy_gbm_model_candles_fg_chain_ta_lag_2
 ```
-As we can see the GBM model with `candles_fg_chain_ta` feature set and 1 lag `gbm_model_candles_fg_chain_ta_lag_1` is still performing better.
+The results confirm that the GBM model using the `candles_fg_chain_ta` feature set with 1 lag (`gbm_model_candles_fg_chain_ta_lag_1`) still performs better.
 
-Let's use its tuning values and let's fine tune it.
+Let's use its tuning values and fine-tune it.
 
 ```{r gbm_model_candles_fg_chain_ta_lag_1_bestTune, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 knitr::kable(gbm_model_candles_fg_chain_ta_lag_1$bestTune, format = "simple", caption = "Best tuning values for the GBM model", row.names = FALSE)
 ```
 
-We will use values around those values to fine tune this algorithm. Also unlike all the others algorithms we will use cross-validation for avoiding overfitting and having a more robust prediction algorithm, that would perform better with any dataset than only the `test_set`.
+We will use a grid of values around these initial best parameters to fine-tune the algorithm. Also, unlike the previous training runs, we will use cross-validation for this step to promote a more robust prediction algorithm that should perform more reliably on unseen data compared to a model tuned only on the specific `test_set`.
 
 ```{r gbm_model_candles_fg_chain_ta_lag_1_tuned, cache=TRUE}
 # Define the tuning grid with the best values
@@ -1344,13 +1344,13 @@ if (!file.exists("models/gbm_model_candles_fg_chain_ta_lag_1_tuned.rds")) {
 accuracy_gbm_model_candles_fg_chain_ta_lag_1_tuned <- mean(predict(gbm_model_candles_fg_chain_ta_lag_1_tuned, test_set) == test_set$direction)
 print(paste("Fine-tuned model accuracy:", accuracy_gbm_model_candles_fg_chain_ta_lag_1_tuned))
 ```
-As we can see the result the model is performing slightly less good than the one without fine tuning, but it's still better than the third best model.
+As the result shows, the fine-tuned model performs slightly worse on the test set than the original non-tuned model, but its accuracy is still higher than the third-best model identified earlier.
 
 We can see below the values of the different parameters:
 ```{r gbm_model_candles_fg_chain_ta_lag_1_tuned_best_tune, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 knitr::kable(gbm_model_candles_fg_chain_ta_lag_1_tuned$bestTune, format = "simple", caption = "Best tuning values for the GBM model after fine tuning", row.names = FALSE)
 ```
-Now let's compare the results and analyse what we have got.
+Now let's compare the results and analyze what we have found.
 
 
 # Results
@@ -1407,11 +1407,11 @@ knitr::kable(all_best_models,
              col.names = c("Model", "Features", "Model Type", "Lag", "Accuracy"))
 ```
 
-While our best model has an accuracy of `0.5499`, we would still consider the fine tuned algorithm more robust with an accuracy of `0.5457`.
+While the non-tuned model achieved the highest accuracy (`0.5499`) on the test set, we consider the fine-tuned model (accuracy `0.5457`) potentially more robust due to the use of cross-validation during tuning.
 
 ## Most relevant features
 
-Now let's see what are the most important features of the algorithm.
+Now, let's examine the most important features identified by the fine-tuned algorithm.
 
 ```{r feature_importance, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Feature importance of the best model"}
 variable_importance <- varImp(gbm_model_candles_fg_chain_ta_lag_1_tuned)
@@ -1420,7 +1420,7 @@ ggplot(variable_importance, aes(x = reorder(feature, Overall), y = Overall)) +
   coord_flip() +
   labs(title = "Variable Importance", x = "Feature", y = "Importance")
 ```
-Interestingly the features with an importance higher than 25 are related to TA, Chain Data and Candles data.
+Interestingly, the features with an importance score higher than 25 include indicators from all three categories: Technical Analysis (TA), Chain Data, and Candle Data.
 
 ## Confusion matrix
 
@@ -1430,32 +1430,32 @@ confusion_matrix <- confusionMatrix(factor(predicted_values, levels = c("up", "d
                                    factor(test_set$direction, levels = c("up", "down")))
 confusion_matrix
 ```
-We can notice that the model is slightly better at predicting `down` than `up` at least with the `test_set`.
-Which means that in in future trading it would potentially get a better success rate at shorting rather than longing.
+We observe that the model is slightly better at predicting `down` candles than `up` candles, at least on this particular `test_set`.
+This suggests that in future trading it would potentially get a better success rate at shorting rather than longing.
 
 # Conclusion
 
-We have learned in this study that predictions using a trained model are better than luck.
+This study demonstrates that predictions using a trained model can outperform random chance.
 
-With an accuracy of `0.5457` it would be important for a trader to use the predictions along with a well defined target for take-profit and stop-loss where the profit targeted should be higher than the stop-loss targeted.
+With an accuracy of `0.5457`, it would be important for a trader to use the predictions along with well-defined targets for take-profit and stop-loss, where the potential profit outweighs the potential loss.
 
-Let's see what are the limitations of this study and what could be done next.
+Let's discuss the limitations of this study and what could be done next.
 
 ## Limitations
 
-As mentioned in the report, most of the training have been done without cross-validation, in order to save computation time, therefore some other algorithm may have performed better than the current one.
+As mentioned in the report, most of the training has been done without cross-validation in order to save computation time; therefore, some other algorithms or configurations might have performed better than the current one.
 
 ## Potential improvements
 
-A deeper study of the existing research could be used as a base to improve this algorithm, also there may be some other algorithms working even better than GBM that may be worth be trained.
+A deeper review of existing research could provide a stronger foundation for improving this algorithm. Furthermore, other algorithms might perform better than GBM and warrant investigation.
 
-Also, some other Technical Analysis indicator could be used to have better predictions maybe by coupling our hourly candles to a smaller time frame of candles.
+Also, some other Technical Analysis indicators could be used to potentially achieve better predictions, perhaps by coupling our hourly candles with data from smaller time frames.
 
-Last but not least, using different algorithm depending on the type of market could also be a good solution. By comparing how algorithms performs in a different type of market, bearish, bullish or sideway and switching to the right model depending on the type of market could also improve the accuracy.
+Last but not least, using different algorithms depending on the market conditions could also be a good solution. By comparing how algorithms perform in different market types (bearish, bullish, or sideways) and switching to the appropriate model depending on the type of market could also improve the accuracy.
 
 ## Trading application
 
-In order to be closer to the trading reality and test the ability of the model to make profit, I would recommend to start with backtesting to see how it performs setting good stop loss / take profit targets. Then after tuning the trading algorithm it would be worth doing some paper trading before doing actual real trading.
+In order to be closer to the trading reality and test the ability of the model to make profit, I would recommend starting with backtesting to see how it performs when setting appropriate stop-loss / take-profit targets. Then, after tuning the trading algorithm, it would be worthwhile to conduct paper trading before deploying the model for actual real-money trading.
 
 \newpage
 
