@@ -842,7 +842,7 @@ results_OHLC <- evaluate_models("OHLC", test_set)
 ```
 
 ```{r ohlc_features_table, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-knitr::kable(results_OHLC, format = "simple", caption = "Model comparison for OHLC features")
+knitr::kable(results_OHLC, format = "simple", caption = "Model comparison for OHLC features", row.names = FALSE)
 ```
 
 ```{r ohlc_stats, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
@@ -924,7 +924,7 @@ results_candles <- evaluate_models("candles", test_set)
 ```
 
 ```{r candles_features_table, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-knitr::kable(results_candles, format = "simple", caption = "Model comparison for candles features")
+knitr::kable(results_candles, format = "simple", caption = "Model comparison for candles features", row.names = FALSE)
 ```
 
 ```{r candles_stats, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
@@ -1006,7 +1006,7 @@ results_candles_fg <- evaluate_models("candles_fg", test_set)
 ```
 
 ```{r candles_fg_features_table, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-knitr::kable(results_candles_fg, format = "simple", caption = "Model comparison for candles features and fear and greed index")
+knitr::kable(results_candles_fg, format = "simple", caption = "Model comparison for candles features and fear and greed index", row.names = FALSE)
 ```
 
 ```{r candles_fg_stats, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
@@ -1098,7 +1098,7 @@ results_candles_fg_chain <- evaluate_models("candles_fg_chain", test_set)
 ```
 
 ```{r candles_fg_chain_features_table, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-knitr::kable(results_candles_fg_chain, format = "simple", caption = "Model comparison for candles features, fear and greed index and chain data")
+knitr::kable(results_candles_fg_chain, format = "simple", caption = "Model comparison for candles features, fear and greed index and chain data", row.names = FALSE)
 ```
 
 ```{r candles_fg_chain_stats, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
@@ -1204,7 +1204,7 @@ results_candles_fg_chain_ta <- evaluate_models("candles_fg_chain_ta", test_set)
 ```
 
 ```{r candles_fg_chain_ta_features_table, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-knitr::kable(results_candles_fg_chain_ta, format = "simple", caption = "Model comparison for candles features, fear and greed index, chain data and technical analysis indicators")
+knitr::kable(results_candles_fg_chain_ta, format = "simple", caption = "Model comparison for candles features, fear and greed index, chain data and technical analysis indicators", row.names = FALSE)
 ```
 
 ```{r candles_fg_chain_ta_stats, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
@@ -1248,7 +1248,7 @@ get_top_models <- function(test_set, n = 10) {
 
 top_models <- get_top_models(test_set)
 
-knitr::kable(top_models, format = "simple", caption = "Top models across all feature sets")
+knitr::kable(top_models, format = "simple", caption = "Top models across all feature sets", row.names = FALSE)
 ```
 
 ```{r best_features, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
