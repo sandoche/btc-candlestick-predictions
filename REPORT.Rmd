@@ -59,7 +59,7 @@ In this study we will try to predict the direction of the next candlestick of th
 
 ## Introduction to Bitcoin
 
-In recent years, Bitcoin (BTC) has been gaining attention not only from retail investors but also from institutional investors. In 2024 we've seen the emergence of spot Bitcoin exchange-traded funds (ETF) from institutions such as BlackRock, VanEck, Grayscale [@usnews2024bitcoin]. With a market capitalization of about 1.68 billion in dollars at the time of writing, Bitcoin started as a peer-to-peer currency, a free alternative to centralized currencies controlled by central banks. Now it is often used as an investment, a store of value and even considered strategic reserve assets by some countries [@reuters2025trump; @reuters2025elsalvador].
+In recent years, Bitcoin (BTC) has been gaining attention not only from retail investors but also from institutional investors. In 2024 we've seen the emergence of spot Bitcoin exchange-traded funds (ETF) from institutions such as BlackRock, VanEck, Grayscale [@usnews2024bitcoin]. With a market capitalization of about 1.68 trillion in dollars at the time of writing, Bitcoin started as a peer-to-peer currency, a free alternative to centralized currencies controlled by central banks. Now it is often used as an investment, a store of value and even considered strategic reserve assets by some countries [@reuters2025trump; @reuters2025elsalvador].
 
 Bitcoin owes its decentralization to its data structure, the blockchain — a chain of blocks that contains transactions, and to its consensus, the proof of work. Without going too much into details, it makes Bitcoin a currency that does not rely on a centralized server. Proof of work is a cryptographic algorithm that enables a competition between bitcoin servers (called nodes) to decide which transactions will be part of the next block added to the blockchain. They go through a process called mining where nodes have to use their computing power to find a number called nonce. This computing power is called the hashrate. The node that succeeds at "mining" successfully gets rewarded for that [@adittane2018cryptoguide].
 
@@ -108,7 +108,7 @@ candlestick_period <- 3600
 set.seed(1)
 ```
 
-The timeframe covers the entire year 2024 and the beginning of 2025, up until the day this study commenced. Note that since January 2024, Bitcoin ETF has officially been approved. The period `candlestick_period <- 3600` is the time of a candle; the candle closes 1h after it starts. Which means we have 24 candles per day [@coinbase2024api].
+The timeframe covers the period from January 2024 to March 2025, up until the day this study commenced. Note that since January 2024, Bitcoin ETF has officially been approved. The period `candlestick_period <- 3600` is the time of a candle; the candle closes 1h after it starts. Which means we have 24 candles per day [@coinbase2024api].
 
 I chose these settings to have a dataset of around `r format(10000, big.mark = ",")` candles. Also, since the Bitcoin ETF has been approved, the market may have taken on a different dynamic than in previous years.
 
@@ -229,9 +229,9 @@ If we isolate a candle, we can see the following features:
 
 - Size of the body
 
-- Size of the upper shadow / wicks
+- Size of the upper shadow
 
-- Size of the lower shadow / wicks
+- Size of the lower shadow
 
 - Direction of the candle (up or down)
 
@@ -301,8 +301,8 @@ First, let's check for NAs.
 
 ```{r dataset_preparation_find_na, cache=TRUE}
 na_indexes <- which(apply(candles_enhanced, 1, function(x) any(is.na(x))))
-knitr::kable(head(candles_enhanced[na_indexes, ] %>% select(direction, roc, macd, signal, rsi, mavg, pctB, value)), format = "simple", caption = "NAs of the dataset")
-knitr::kable(tail(candles_enhanced[na_indexes, ] %>% select(direction, roc, macd, signal, rsi, mavg, pctB, value)), format = "simple", caption = "NAs of the dataset")
+knitr::kable(head(candles_enhanced[na_indexes, ] %>% select(direction, roc, macd, signal, rsi, mavg, pctB, value)), format = "simple", caption = " NAs related to TA indicators and the Fear & Greed index - Head")
+knitr::kable(tail(candles_enhanced[na_indexes, ] %>% select(direction, roc, macd, signal, rsi, mavg, pctB, value)), format = "simple", caption = " NAs related to TA indicators and the Fear & Greed index - Tail")
 ```
 
 We can see in the table above that there are 2 types of NAs:
@@ -412,7 +412,7 @@ p8 <- candles_enhanced_cleaned_no_na %>%
   tail(24) %>%
   mutate(direction = ifelse(close >= open, "up", "down")) %>%
   ggplot(aes(x = time, y = close)) +
-  # The shadows (wicks)
+  # The shadows
   geom_segment(aes(xend = time, y = low, yend = high, color = direction), size = 0.5) +
   # The body
   geom_segment(aes(xend = time, y = open, yend = close, color = direction), size = 5) +
