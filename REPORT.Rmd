@@ -137,7 +137,7 @@ Keeping this in mind, I tried to find other dataset that could represent each of
 
 
 
-```{r fear_and_greed_index, cache=TRUE, echo=FALSE}
+```{r fear_and_greed_index, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 fear_and_greed_index <- read_csv(paste0("data/", trading_pair, "_fear_and_greed_index_", start_date, "_", end_date, ".csv"))
 fear_and_greed_index <- fear_and_greed_index %>% mutate(value = as.numeric(value))
 knitr::kable(head(fear_and_greed_index), format = "simple", caption = "Overview of the BTC fear and greed index dataset")
@@ -148,7 +148,7 @@ The data set contains `r nrow(fear_and_greed_index)` entries.
 
 The blockchain data (hash rate, average block size, number of transactions, and UTXO count) was sourced from Blockchain.com Explorer [@blockchain2024data], while the fear and greed index was obtained from Alternative.me [@alternative2024feargreed].
 
-```{r hash_rate, cache=TRUE}
+```{r hash_rate, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 hash_rate <- jsonlite::fromJSON("data/hash-rate.json")$`hash-rate` %>%
   rename(timestamp = x, hash_rate = y) %>%
   mutate(timestamp = as.POSIXct(timestamp / 1000, origin = "1970-01-01", tz = "UTC")) %>%
@@ -159,7 +159,7 @@ knitr::kable(head(hash_rate), format = "simple", caption = "Overview of the BTC 
 This dataset is a time serie of the daily hash rate, it is a value in TH/s.
 The data set contains `r nrow(hash_rate)` entries.
 
-```{r average_block_size, cache=TRUE}
+```{r average_block_size, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 average_block_size <- jsonlite::fromJSON("data/avg-block-size.json")$`avg-block-size` %>%
   rename(timestamp = x, avg_block_size = y) %>%
   mutate(timestamp = as.POSIXct(timestamp / 1000, origin = "1970-01-01", tz = "UTC")) %>%
@@ -170,7 +170,7 @@ knitr::kable(head(average_block_size), format = "simple", caption = "Overview of
 This dataset is a time serie of the daily average block size, it is a value in bytes.
 The data set contains `r nrow(average_block_size)` entries.
 
-```{r n_transactions, cache=TRUE}
+```{r n_transactions, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 n_transactions <- jsonlite::fromJSON("data/n-transactions.json")$`n-transactions` %>%
   rename(timestamp = x, n_transactions = y) %>%
   mutate(timestamp = as.POSIXct(timestamp / 1000, origin = "1970-01-01", tz = "UTC")) %>%
@@ -182,7 +182,7 @@ This dataset is a time serie of the daily number of transactions, it is a value 
 The data set contains `r nrow(n_transactions)` entries.
 
 
-```{r utxo_count, cache=TRUE}
+```{r utxo_count, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 utxo_count <- jsonlite::fromJSON("data/utxo-count.json")$`utxo-count` %>%
   rename(timestamp = x, utxo_count = y) %>%
   mutate(
@@ -202,7 +202,7 @@ As we can see `fear_and_greed_index` seems to miss one data point. We will see f
 
 We have different dataset that we will use for the predictions but we are still missing one important data used by traders, technical analysis indicator.
 
-Based on a previous research and blog post I wrote, I decided to include a few indicators that are very common in trading:
+Based on a previous research and blog post I wrote [@adittane2018chartanalysis], I decided to include a few indicators that are very common in trading :
 
 - Moving average convergence divergence (MACD)
 
@@ -211,8 +211,6 @@ Based on a previous research and blog post I wrote, I decided to include a few i
 - Bolinger Bands (BB)
 
 - Relative Strenght Index (RSI)
-
-TODO: add https://medium.com/learning-lab/become-a-better-crypto-trader-with-technical-and-chart-analysis-1496b2fc6b85
 
 Before preparing the dataset let's see what would be the features we can extract from the OHLC candlestick data.
 
@@ -232,10 +230,13 @@ If we isolate a candle we can see the following features:
 
 - Closing price
 
+- Volume
+
 We are now ready to prepare the dataset for the study.
 
 ## Preparation
 
+Preparation of the dataset is done in the following function:
 ```{r dataset_preparation, cache=TRUE}
 
 enhance_dataset <- function(candles_data, fear_and_greed_index_data, hash_rate_data, average_block_size_data, n_transactions_data, utxo_count_data) {
@@ -343,7 +344,7 @@ First of all let's plot the data to visually verify the data.
 
 TODO Fix rendering of this data (it was fixed previously, could be just a cache issue)
 
-```r
+```{r visual_analysis, cache=TRUE}
 p1 <- candles_enhanced_cleaned_no_na %>%
   ggplot(aes(x = time, y = close)) +
   geom_line(color = "blue") +
@@ -413,7 +414,7 @@ combined_plot
 
 Find below the candletick chart of BTC-USD.
 
-```r
+```{r visual_analysis_candlestick_chart, cache=TRUE}
 # For more readability we are only plotting the last 24 candles
 p7 <- candles_enhanced_cleaned_no_na %>%
   tail(24) %>%
@@ -438,7 +439,7 @@ And the plot of the different TA.
 
 TODO fix the following for rendering on pdf
 
-```r 
+```{r visual_analysis_ta, cache=TRUE}
 plot_data_ta <- candles_enhanced_cleaned_no_na %>% tail(100)
 
 # ROC Plot
@@ -489,11 +490,12 @@ combined_ta_plot + plot_annotation(
 )
 
 ```
+
 Comparing with the data from TradingView it seems that all the charts are correct.
 
 Let's now see how is the distribution of "up" and "down" candles.
 
-```{r visual_repartion, cache=TRUE}
+```{r visual_repartion, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Distribution of up and down candles in the dataset"}
 candles_enhanced_cleaned_no_na %>%
   mutate(direction = ifelse(close >= open, "up", "down")) %>%
   summarise(
@@ -513,7 +515,7 @@ candles_enhanced_cleaned_no_na %>%
 ```
 
 
-```{r distribution_data, cache=TRUE}
+```{r distribution_data, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 
 distribution_data <- candles_enhanced_cleaned_no_na %>%
   mutate(direction = ifelse(close >= open, "up", "down")) %>%
