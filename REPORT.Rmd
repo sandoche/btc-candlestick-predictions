@@ -10,6 +10,9 @@ output:
   pdf_document:
     fig_caption: true
     number_sections: true
+header-includes:
+  \usepackage{fvextra}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
 ---
 
 ```{r setup, include=FALSE}
@@ -38,6 +41,10 @@ library(patchwork)
 library(randomForest)
 library(TTR)
 library(gbm)
+
+# Run the following if needed
+# tinytex::install_tinytex()
+# tinytex::tlmgr_install('fvextra')
 ```
 
 \newpage
@@ -1449,6 +1456,8 @@ Last but not least, using different algorithm depending on the type of market co
 ## Trading application
 
 In order to be closer to the trading reality and test the ability of the model to make profit, I would recommend to start with backtesting to see how it performs setting good stop loss / take profit targets. Then after tuning the trading algorithm it would be worth doing some paper trading before doing actual real trading.
+
+\newpage
 
 # References
 
