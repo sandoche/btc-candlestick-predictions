@@ -276,8 +276,10 @@ random_guess_simulations <- replicate(1000, {
 })
 
 mean_accuracy <- mean(random_guess_simulations)
+standard_deviation <- sd(random_guess_simulations)
 print(paste("Random guess simulation results (1000 runs):"))
 print(paste("Mean accuracy:", round(mean_accuracy, 4)))
+print(paste("Standard deviation:", round(standard_deviation, 4)))
 
 # Return always "up"
 always_up <- function(test_set) {

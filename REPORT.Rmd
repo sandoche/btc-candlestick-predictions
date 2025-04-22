@@ -739,8 +739,10 @@ random_guess_simulations <- replicate(1000, {
 })
 
 mean_accuracy <- mean(random_guess_simulations)
-print(paste("Random guess simulation results (10000 runs):"))
+standard_deviation <- sd(random_guess_simulations)
+print(paste("Random guess simulation results (1000 runs):"))
 print(paste("Mean accuracy:", round(mean_accuracy, 4)))
+print(paste("Standard deviation:", round(standard_deviation, 4)))
 ```
 
 
@@ -748,7 +750,6 @@ print(paste("Mean accuracy:", round(mean_accuracy, 4)))
 
 We can also compare this with an always up strategy:
 ```{r always_up, cache=TRUE}
-# Return always "up"
 always_up <- function(test_set) {
   replicate(nrow(test_set), "up")
 }
