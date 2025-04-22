@@ -603,7 +603,7 @@ The number of rows reduced since adding lags introduced a lot of NAs in the firs
 
 ## Machine learning algorithms
 
-Based on some shallow research on the press, we selected the following machine learnings algorithms that seems to work better with our type of dataset:
+Based on some shallow research on the press, we selected the following machine learnings algorithms that seems to work better with our type of dataset [@neuroquantology2023candlestick; @nakano2016stock]:
 
 - Generalized Linear Model (GLM)
 
