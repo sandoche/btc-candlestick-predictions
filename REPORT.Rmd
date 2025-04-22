@@ -237,7 +237,7 @@ We are now ready to prepare the dataset for the study.
 ## Preparation
 
 Preparation of the dataset is done in the following function:
-```{r dataset_preparation, cache=TRUE}
+```{r dataset_preparation, cache=TRUE, message=FALSE, warning=FALSE}
 
 enhance_dataset <- function(candles_data, fear_and_greed_index_data, hash_rate_data, average_block_size_data, n_transactions_data, utxo_count_data) {
   candles_enhanced <- candles_data %>%
@@ -285,7 +285,7 @@ enhance_dataset <- function(candles_data, fear_and_greed_index_data, hash_rate_d
 }
 
 candles_enhanced <- enhance_dataset(candles, fear_and_greed_index, hash_rate, average_block_size, n_transactions, utxo_count)
-knitr::kable(head(candles_enhanced), format = "simple", caption = "Overview of the candlestick dataset enhanced")
+names(candles_enhanced)
 ```
 
 We have now a table with all the features discussed above. Before adding the lagged features let's explore our set.
@@ -294,7 +294,8 @@ First let's see if we have NAs.
 
 ```{r dataset_preparation_find_na, cache=TRUE}
 na_indexes <- which(apply(candles_enhanced, 1, function(x) any(is.na(x))))
-knitr::kable(candles_enhanced[na_indexes, ], format = "simple", caption = "NAs of the dataset")
+knitr::kable(head(candles_enhanced[na_indexes, ] %>% select(close, direction, hash_rate, avg_block_size, n_transactions, utxo_count, open, high, low, roc, macd, signal, rsi, mavg, pctB, value)), format = "simple", caption = "NAs of the dataset")
+knitr::kable(tail(candles_enhanced[na_indexes, ] %>% select(close, direction, hash_rate, avg_block_size, n_transactions, utxo_count, open, high, low, roc, macd, signal, rsi, mavg, pctB, value)), format = "simple", caption = "NAs of the dataset")
 ```
 
 We can see in the table above that there are 2 types of NAs:
@@ -327,7 +328,7 @@ Let's check the NAs again.
 ```{r dataset_preparation_find_na_corrected, cache=TRUE}
 candles_enhanced_cleaned <- enhance_dataset(candles, fear_and_greed_index_corrected, hash_rate, average_block_size, n_transactions, utxo_count)
 na_indexes <- which(apply(candles_enhanced_cleaned, 1, function(x) any(is.na(x))))
-knitr::kable(candles_enhanced_cleaned[na_indexes, ], format = "simple", caption = "NAs of the dataset cleaned")
+knitr::kable(tail(candles_enhanced[na_indexes, ] %>% select(close, direction, hash_rate, avg_block_size, n_transactions, utxo_count, open, high, low, roc, macd, signal, rsi, mavg, pctB, value)), format = "simple", caption = "NAs of the dataset cleaned")
 ```
 
 We can see now the only NAs are the missing TA values that we can clean with a simple line of code.
@@ -342,7 +343,7 @@ sum(is.na(candles_enhanced_cleaned_no_na))
 
 First of all let's plot the data to visually verify the data.
 
-```{r visual_analysis, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Visual analysis of BTC-USD data", fig.height=20}
+```{r visual_analysis, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Visual analysis of BTC-USD data", fig.height=20, fig.width=15}
 p1 <- candles_enhanced_cleaned_no_na %>%
   ggplot(aes(x = time, y = close)) +
   geom_line(color = "blue") +
