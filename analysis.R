@@ -268,8 +268,9 @@ evaluate_models <- function(feature_set, test_set, lags = c(1, 3, 5, 7, 15)) {
 }
 
 
-### Evaluate random guess ###
+### Models evaluation ###
 
+# Random guess
 random_guess_simulations <- replicate(1000, {
   estimated_direction <- replicate(nrow(test_set), sample(c("up", "down"), 1))
   mean(estimated_direction == test_set$direction)
@@ -559,14 +560,9 @@ feature_set_summary <- feature_set_summary[order(-feature_set_summary$avg_accura
 feature_set_summary
 
 
-# Best result:
-# 214 gbm_model_candles_fg_chain_ta_lag_1        gbm   1 0.5498615    1
-
-
-
 ### Fine tuning ###
 
-# First let's see if lag 2 is better than lag 1 for "candles_fg_chain_ta" and gbm model
+# Testing lag 2
 
 formula_candles_fg_chain_ta_lag_2 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 2)
 gbm_model_candles_fg_chain_ta_lag_2 <- train_with_cache(formula_candles_fg_chain_ta_lag_2, train_set, "gbm")
@@ -574,11 +570,8 @@ gbm_model_candles_fg_chain_ta_lag_2 <- train_with_cache(formula_candles_fg_chain
 accuracy_gbm_model_candles_fg_chain_ta_lag_2 <- mean(predict(gbm_model_candles_fg_chain_ta_lag_2, test_set) == test_set$direction)
 accuracy_gbm_model_candles_fg_chain_ta_lag_2
 
-# We can see that the best model is still gbm_model_candles_fg_chain_ta_lag_1
-# Now let's get the best tune for this model and fine tune it
+# Fine tuning bgm with lag 1 and candles_fg_chain_ta features
 
-
-# Fine tune the best model (gbm_model_candles_fg_chain_ta_lag_1) using cross-validation
 print("\nFine-tuning the best model (gbm_model_candles_fg_chain_ta_lag_1):")
 
 # Define the tuning grid with the best values
