@@ -1,7 +1,7 @@
 ---
 title: "Bitcoin candlestick predictions using lagged features and machine learning algorithm in R"
 subtitle: "Training various machine learning algorithms to predict the next candlestick of the bitcoin price using various lagged features"
-abstract: "This report explores how to achieve the best accuracy in predicting the next candlestick of the bitcoin chart using the previous ones. It compares different algorithms: Generalized Linear Model, Decision Tree, Random Forest, KNN, and Gradient Boosting, considering different numbers of lagged features. This project is part of the 'Data Science: Capstone' module of HarvardX PH125.9x on the edx platform."
+abstract: "This report explores how to achieve the best accuracy in predicting the next candlestick of the bitcoin chart using the previous ones. It compares different algorithms: Generalized Linear Model, Decision Tree, Random Forest, KNN, and Gradient Boosting, considering different numbers of lagged features.  We ended up getting an accuracy of 0.5457 with a fine tuned model using 1 lagged features and the Gradient Boosting algorithm. This project is part of the 'Data Science: Capstone' module of HarvardX PH125.9x on the edx platform."
 author: "Sandoche Adittane"
 date: "`r Sys.Date()`"
 bibliography: references.bib
