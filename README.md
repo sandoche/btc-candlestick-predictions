@@ -1,6 +1,6 @@
-# Bitcoin candlestick predictions using lagged features and machine learning algorithm in R
+# Bitcoin candlestick predictions using lagged features and machine learning algorithms in R
 
-> coming soon
+> Training machine learning algorithms to predict the next candlestick's direction of the bitcoin chart using a set of lagged features
 
 ## ⚙️ Dataset
 
@@ -19,9 +19,9 @@ If you want to download the data for different parameters, you can run the `data
 - Report in RMarkdown: [REPORT.Rmd](REPORT.Rmd)
 - Report in PDF: [REPORT.md](REPORT.pdf)
 
-## 🖥️ Training & results
+## 🖥 Model weights
 
-coming soon
+Coming soon
 
 ## 📄 License
 
@@ -31,7 +31,7 @@ coming soon
 ```
 @misc{bitcoin-candlestick-predictions,
   author = {Sandoche Adittane},
-  title = {Bitcoin candlestick predictions using lagged features and machine learning algorithm in R},
+  title = {Bitcoin candlestick predictions using lagged features and machine learning algorithms in R},
   year = {2025},
   url = {\url{https://github.com/sandoche/btc-candlestick-predictions}},
 }

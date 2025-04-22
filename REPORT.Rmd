@@ -1,7 +1,7 @@
 ---
-title: "Bitcoin candlestick predictions using lagged features and machine learning algorithm in R"
-subtitle: "Training various machine learning algorithms to predict the next candlestick of the bitcoin price using various lagged features"
-abstract: "This report explores how to achieve the best accuracy in predicting the next candlestick of the bitcoin chart using the previous ones. It compares different algorithms: Generalized Linear Model, Decision Tree, Random Forest, KNN, and Gradient Boosting, considering different numbers of lagged features.  We ended up getting an accuracy of 0.5457 with a fine tuned model using 1 lagged features and the Gradient Boosting algorithm. This project is part of the 'Data Science: Capstone' module of HarvardX PH125.9x on the edx platform."
+title: "Bitcoin candlestick predictions using lagged features and machine learning algorithms in R"
+subtitle: "Training machine learning algorithms to predict the next candlestick's direction of the Bitcoin chart using a set of lagged features"
+abstract: "This report explores how to achieve the best accuracy in predicting the next candlestick of the Bitcoin chart using the previous ones. It compares different algorithms: Generalized Linear Model, Decision Tree, Random Forest, KNN, and Gradient Boosting, considering different numbers of lagged features.  We ended up getting an accuracy of 0.5457 with a fine tuned model using 1 lagged features and the Gradient Boosting algorithm. This project is part of the 'Data Science: Capstone' module of HarvardX PH125.9x on the edx platform."
 author: "Sandoche Adittane"
 date: "`r Sys.Date()`"
 bibliography: references.bib
@@ -55,15 +55,15 @@ library(gbm)
 
 # Overview
 
-In this study we will try to predict the direction of the next candlestick of the bitcoin chart. Before starting, it's important to understand: what are Bitcoin and candlesticks, and the goal of this study.
+In this study we will try to predict the direction of the next candlestick of the Bitcoin chart. Before starting, it's important to understand: what are Bitcoin and candlesticks, and the goal of this study.
 
 ## Introduction to Bitcoin
 
 In recent years, Bitcoin (BTC) has been gaining attention not only from retail investors but also from institutional investors. In 2024 we've seen the emergence of spot Bitcoin exchange-traded funds (ETF) from institutions such as BlackRock, VanEck, Grayscale [@usnews2024bitcoin]. With a market capitalization of about 1.68 trillion in dollars at the time of writing, Bitcoin started as a peer-to-peer currency, a free alternative to centralized currencies controlled by central banks. Now it is often used as an investment, a store of value and even considered strategic reserve assets by some countries [@reuters2025trump; @reuters2025elsalvador].
 
-Bitcoin owes its decentralization to its data structure, the blockchain — a chain of blocks that contains transactions, and to its consensus, the proof of work. Without going too much into details, it makes Bitcoin a currency that does not rely on a centralized server. Proof of work is a cryptographic algorithm that enables a competition between bitcoin servers (called nodes) to decide which transactions will be part of the next block added to the blockchain. They go through a process called mining where nodes have to use their computing power to find a number called nonce. This computing power is called the hashrate. The node that succeeds at "mining" successfully gets rewarded for that [@adittane2018cryptoguide].
+Bitcoin owes its decentralization to its data structure, the blockchain — a chain of blocks that contains transactions, and to its consensus, the proof of work. Without going too much into details, it makes Bitcoin a currency that does not rely on a centralized server. Proof of work is a cryptographic algorithm that enables a competition between Bitcoin servers (called nodes) to decide which transactions will be part of the next block added to the blockchain. They go through a process called mining where nodes have to use their computing power to find a number called nonce. This computing power is called the hashrate. The node that succeeds at "mining" successfully gets rewarded for that [@adittane2018cryptoguide].
 
-Bitcoin is defined by its source code, and that's quite fascinating. Its ledger is visible and publicly available, which gives a lot of data available to analyze. Moreover, unlike stocks, BTC can be traded any time; there are no opening or closing hours, the bitcoin market never stops and it is very easy for anyone to buy and sell bitcoin. Those are two reasons worth studying Bitcoin's candlestick charts instead of other assets.
+Bitcoin is defined by its source code, and that's quite fascinating. Its ledger is visible and publicly available, which gives a lot of data available to analyze. Moreover, unlike stocks, BTC can be traded any time; there are no opening or closing hours, the Bitcoin market never stops and it is very easy for anyone to buy and sell Bitcoin. Those are two reasons worth studying Bitcoin's candlestick charts instead of other assets.
 
 ## What are candlesticks?
 
@@ -127,7 +127,7 @@ Bitcoin is used by 3 types of users:
 
 - Users — using the currency to do payments or to transfer money around the world
 
-- Miners — they mine bitcoin to sell it; their interest is that the price of bitcoin is higher than the cost of mining bitcoin
+- Miners — they mine Bitcoin to sell it; their interest is that the price of Bitcoin is higher than the cost of mining Bitcoin
 
 
 Keeping this in mind, I tried to find other datasets that could represent each type of user that could eventually help in our predictions, and I picked the following:
@@ -223,7 +223,7 @@ Before preparing the dataset, let's see what features we can extract from the OH
 
 ## Features
 
-Our candlesticks dataset from Coinbase gives us values that are based on the price of bitcoin, but using these raw absolute values directly in a machine learning algorithm will be difficult since the price always fluctuates. Therefore, we have to think about what defines the candlesticks we have seen above?
+Our candlesticks dataset from Coinbase gives us values that are based on the price of Vitcoin, but using these raw absolute values directly in a machine learning algorithm will be difficult since the price always fluctuates. Therefore, we have to think about what defines the candlesticks we have seen above?
 
 If we isolate a candle, we can see the following features:
 
