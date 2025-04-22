@@ -342,9 +342,7 @@ sum(is.na(candles_enhanced_cleaned_no_na))
 
 First of all let's plot the data to visually verify the data.
 
-TODO Fix rendering of this data (it was fixed previously, could be just a cache issue)
-
-```{r visual_analysis}
+```{r visual_analysis, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Visualis analysis of BTC-USD data"}
 p1 <- candles_enhanced_cleaned_no_na %>%
   ggplot(aes(x = time, y = close)) +
   geom_line(color = "blue") +
@@ -401,21 +399,7 @@ p7 <- candles_enhanced_cleaned_no_na %>%
   theme_tq() +
   theme(legend.position = "none")
 
-combined_plot <- (p1 / p2 / p3 / p4 / p5 / p6 / p7) +
-  plot_layout(ncol = 2, heights = c(1, 1, 1, 1)) +
-  plot_annotation(
-    title = "Bitcoin Price and Blockchain Metrics",
-    theme = theme(plot.title = element_text(hjust = 0.5, size = 16))
-  ) &
-  theme(axis.title.x = element_blank())
-
-combined_plot
-```
-
-Find below the candletick chart of BTC-USD.
-
-```{r visual_analysis_candlestick_chart, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-# For more readability we are only plotting the last 24 candles
+  # For more readability we are only plotting the last 24 candles
 p8 <- candles_enhanced_cleaned_no_na %>%
   tail(24) %>%
   mutate(direction = ifelse(close >= open, "up", "down")) %>%
@@ -434,16 +418,20 @@ p8 <- candles_enhanced_cleaned_no_na %>%
   ) +
   scale_y_continuous(labels = scales::comma)
 
-p8
+combined_plot <- (p1 / p2 / p3 / p4 / p5 / p6 / p7 / p8) +
+  plot_layout(ncol = 2, heights = c(1, 1, 1, 1)) +
+  plot_annotation(
+    title = "Bitcoin Price and Blockchain Metrics",
+    theme = theme(plot.title = element_text(hjust = 0.5, size = 16))
+  ) &
+  theme(axis.title.x = element_blank())
+
+combined_plot
 ```
-![BTC-USD Candlestick Chart (Last 24 Candles)](figures/visual_analysis_candlestick_chart)
 
+Find below the plot of the different TA.
 
-And the plot of the different TA.
-
-TODO fix the following for rendering on pdf
-
-```{r visual_analysis_ta, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Technical analysis indicators of BTC-USD"}
+```{r visual_analysis_ta, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Technical analysis indicators of BTC-USD"}
 plot_data_ta <- candles_enhanced_cleaned_no_na %>% tail(100)
 
 # ROC Plot
