@@ -615,10 +615,6 @@ Based on some shallow research on the press, we selected the following machine l
 
 - Gradient boosting (GBM)
 
-TODO add links reference
-https://www.neuroquantology.com/open-access/An+Optimized+Machine+Learning+Model+for+Candlestick+Chart+Analysis+to+Predict+Stock+Market+Trends_9861/?download=true
-https://arxiv.org/pdf/1606.00930
-
 We will also compare these algorithms with Random guess as a reference.
 
 ## Utility functions
