@@ -1267,7 +1267,7 @@ for (feature_set in feature_sets) {
   )
 }
 feature_set_summary <- feature_set_summary[order(-feature_set_summary$avg_accuracy), ]
-knitr::kable(feature_set_summary, format = "simple", caption = "Summary of feature sets")
+knitr::kable(feature_set_summary, format = "simple", caption = "Summary of feature sets", row.names = FALSE)
 ```
 
 As we can see the best models are the ones using `Gradient boosting`  and the `candles` feature set seems to perform better overall.
@@ -1292,7 +1292,7 @@ As we can see the GBM model with `candles_fg_chain_ta` feature set and 1 lag `gb
 Let's use its tuning values and let's fine tune it.
 
 ```{r gbm_model_candles_fg_chain_ta_lag_1_bestTune, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-gbm_model_candles_fg_chain_ta_lag_1$bestTune
+knitr::kable(gbm_model_candles_fg_chain_ta_lag_1$bestTune, format = "simple", caption = "Best tuning values for the GBM model", row.names = FALSE)
 ```
 
 We will use values around those values to fine tune this algorithm. Also unlike all the others algorithms we will use cross-validation for avoiding overfitting and having a more robust prediction algorithm, that would perform better with any dataset than only the `test_set`.
@@ -1341,7 +1341,7 @@ As we can see the result the model is performing slightly less good than the one
 
 We can see below the values of the different parameters:
 ```{r gbm_model_candles_fg_chain_ta_lag_1_tuned_best_tune, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-gbm_model_candles_fg_chain_ta_lag_1_tuned$bestTune
+knitr::kable(gbm_model_candles_fg_chain_ta_lag_1_tuned$bestTune, format = "simple", caption = "Best tuning values for the GBM model after fine tuning", row.names = FALSE)
 ```
 Now let's compare the results and analyse what we have got.
 
