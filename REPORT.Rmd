@@ -740,7 +740,6 @@ random_guess_simulations <- replicate(1000, {
 
 mean_accuracy <- mean(random_guess_simulations)
 standard_deviation <- sd(random_guess_simulations)
-print(paste("Random guess simulation results (1000 runs):"))
 print(paste("Mean accuracy:", round(mean_accuracy, 4)))
 print(paste("Standard deviation:", round(standard_deviation, 4)))
 ```
@@ -802,7 +801,7 @@ We will first try to use the lagged OHLC features got directly from the coinbase
 
 
 
-```{r ohlc_features, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+```{r ohlc_features, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
 formula_OHLC_lag_1 <- create_feature_formula(c("open", "high", "low", "close", "volume"), 1)
 formula_OHLC_lag_3 <- create_feature_formula(c("open", "high", "low", "close", "volume"), 3)
 formula_OHLC_lag_5 <- create_feature_formula(c("open", "high", "low", "close", "volume"), 5)
@@ -840,6 +839,9 @@ gbm_model_OHLC_lag_7 <- train_with_cache(formula_OHLC_lag_7, train_set, "gbm")
 gbm_model_OHLC_lag_15 <- train_with_cache(formula_OHLC_lag_15, train_set, "gbm")
 
 results_OHLC <- evaluate_models("OHLC", test_set)
+```
+
+```{r ohlc_features_table, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 knitr::kable(results_OHLC, format = "simple", caption = "Model comparison for OHLC features")
 ```
 
@@ -881,7 +883,7 @@ Now let's try to use the lagged candle features:
 
 
 
-```{r candles_features, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+```{r candles_features, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
 formula_candles_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 1)
 formula_candles_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 3)
 formula_candles_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "volume"), 5)
@@ -919,7 +921,10 @@ gbm_model_candles_lag_7 <- train_with_cache(formula_candles_lag_7, train_set, "g
 gbm_model_candles_lag_15 <- train_with_cache(formula_candles_lag_15, train_set, "gbm")
 
 results_candles <- evaluate_models("candles", test_set)
-results_candles
+```
+
+```{r candles_features_table, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(results_candles, format = "simple", caption = "Model comparison for candles features")
 ```
 
 ```{r candles_stats, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
@@ -960,7 +965,7 @@ Now let's try to use the lagged candles features and the fear and greed index:
 
 - volume
 
-```{r candles_fg_features, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+```{r candles_fg_features, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
 formula_candles_fg_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 1)
 formula_candles_fg_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 3)
 formula_candles_fg_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "volume"), 5)
@@ -998,7 +1003,10 @@ gbm_model_candles_fg_lag_7 <- train_with_cache(formula_candles_fg_lag_7, train_s
 gbm_model_candles_fg_lag_15 <- train_with_cache(formula_candles_fg_lag_15, train_set, "gbm")
 
 results_candles_fg <- evaluate_models("candles_fg", test_set)
-results_candles_fg
+```
+
+```{r candles_fg_features_table, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(results_candles_fg, format = "simple", caption = "Model comparison for candles features and fear and greed index")
 ```
 
 ```{r candles_fg_stats, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
@@ -1049,7 +1057,7 @@ We will try to use the lagged candles features, the fear and greed index and the
 
 
 
-```{r candles_fg_chain_features, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+```{r candles_fg_chain_features, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
 formula_candles_fg_chain_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "volume"), 1)
 formula_candles_fg_chain_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "volume"), 3)
 formula_candles_fg_chain_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "volume"), 5)
@@ -1087,7 +1095,10 @@ gbm_model_candles_fg_chain_lag_7 <- train_with_cache(formula_candles_fg_chain_la
 gbm_model_candles_fg_chain_lag_15 <- train_with_cache(formula_candles_fg_chain_lag_15, train_set, "gbm")
 
 results_candles_fg_chain <- evaluate_models("candles_fg_chain", test_set)
-results_candles_fg_chain
+```
+
+```{r candles_fg_chain_features_table, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(results_candles_fg_chain, format = "simple", caption = "Model comparison for candles features, fear and greed index and chain data")
 ```
 
 ```{r candles_fg_chain_stats, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
@@ -1152,7 +1163,7 @@ Finally let's add the technical analysis indicators to the model, so we will use
 
 - pctB
 
-```{r candles_fg_chain_ta_features, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+```{r candles_fg_chain_ta_features, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
 formula_candles_fg_chain_ta_lag_1 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 1)
 formula_candles_fg_chain_ta_lag_3 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 3)
 formula_candles_fg_chain_ta_lag_5 <- create_feature_formula(c("body_size", "upper_shadow_size", "lower_shadow_size", "direction", "close", "value", "hash_rate", "avg_block_size", "n_transactions", "utxo_count", "roc", "macd", "signal", "rsi", "up_bband", "mavg", "dn_bband", "pctB", "volume"), 5)
@@ -1190,7 +1201,10 @@ gbm_model_candles_fg_chain_ta_lag_7 <- train_with_cache(formula_candles_fg_chain
 gbm_model_candles_fg_chain_ta_lag_15 <- train_with_cache(formula_candles_fg_chain_ta_lag_15, train_set, "gbm")
 
 results_candles_fg_chain_ta <- evaluate_models("candles_fg_chain_ta", test_set)
-results_candles_fg_chain_ta
+```
+
+```{r candles_fg_chain_ta_features_table, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(results_candles_fg_chain_ta, format = "simple", caption = "Model comparison for candles features, fear and greed index, chain data and technical analysis indicators")
 ```
 
 ```{r candles_fg_chain_ta_stats, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
@@ -1232,7 +1246,9 @@ get_top_models <- function(test_set, n = 10) {
   head(all_results, n)
 }
 
-get_top_models(test_set)
+top_models <- get_top_models(test_set)
+
+knitr::kable(top_models, format = "simple", caption = "Top models across all feature sets")
 ```
 
 ```{r best_features, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
@@ -1251,7 +1267,7 @@ for (feature_set in feature_sets) {
   )
 }
 feature_set_summary <- feature_set_summary[order(-feature_set_summary$avg_accuracy), ]
-feature_set_summary
+knitr::kable(feature_set_summary, format = "simple", caption = "Summary of feature sets")
 ```
 
 As we can see the best models are the ones using `Gradient boosting`  and the `candles` feature set seems to perform better overall.
