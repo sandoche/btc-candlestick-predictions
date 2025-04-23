@@ -174,7 +174,7 @@ average_block_size <- jsonlite::fromJSON("data/avg-block-size.json")$`avg-block-
 knitr::kable(head(average_block_size), format = "simple", caption = "Overview of the BTC average block size dataset")
 ```
 
-This dataset is a time series of the daily average block size; it is a value in bytes.
+This dataset is a time series of the daily average block size; it is a value in megabytes.
 The dataset contains `r nrow(average_block_size)` entries.
 
 ```{r n_transactions, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
