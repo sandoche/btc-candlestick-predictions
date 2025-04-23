@@ -17,7 +17,7 @@ If you want to download the data for different parameters, you can run the `data
 ## 📊 Report
 
 - Report in RMarkdown: [REPORT.Rmd](REPORT.Rmd)
-- Report in PDF: [REPORT.md](REPORT.pdf)
+- Report in PDF: [REPORT.pdf](REPORT.pdf)
 
 ## 🖥 Analysis and weights
 
