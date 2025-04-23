@@ -19,9 +19,9 @@ If you want to download the data for different parameters, you can run the `data
 - Report in RMarkdown: [REPORT.Rmd](REPORT.Rmd)
 - Report in PDF: [REPORT.md](REPORT.pdf)
 
-## 🖥 Model weights
+## 🖥 Analysis and weights
 
-Coming soon
+- [Analysis](analysis.R)
 
 ## 📄 License
 
