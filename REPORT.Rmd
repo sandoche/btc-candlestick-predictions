@@ -185,7 +185,7 @@ n_transactions <- jsonlite::fromJSON("data/n-transactions.json")$`n-transactions
 knitr::kable(head(n_transactions), format = "simple", caption = "Overview of the BTC number of transactions dataset")
 ```
 
-This dataset is a time series of the daily number of transactions; it is a value in transactions.
+This dataset is a time series of the daily number of transactions.
 The dataset contains `r nrow(n_transactions)` entries.
 
 
