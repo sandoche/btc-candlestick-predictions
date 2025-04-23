@@ -17,7 +17,7 @@ header-includes:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, tidy.opts = list(width.cutoff = 60), tidy = TRUE)
-  
+
 if(!require(lubridate)) install.packages("lubridate", repos = "http://cran.us.r-project.org")
 if(!require(formatR)) install.packages("formatR", repos = "http://cran.us.r-project.org")
 if (!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
@@ -89,7 +89,7 @@ The goal of the study is to find a model able to predict the direction of a cand
 
 ## Applications
 
-Why does the direction of a candlestick matter? Because being able to predict the direction of the next candle could enable traders to buy and sell on the spot market when the predicted candle is green. Also, perpetual futures traders can go both ways; they can long when the prediction says "up" and "short" when the predictions says "down".
+Why does the direction of a candlestick matter? Because being able to predict the direction of the next candle could enable traders to buy and sell on the spot market when the predicted candle is green. Also, perpetual futures traders can go both ways; they can "long" when the prediction says "up" and "short" when the predictions says "down".
 
 # Exploratory data analysis
 
@@ -121,7 +121,7 @@ knitr::kable(head(candles), format = "simple", caption = "Overview of the BTC-US
 
 We have `r format(nrow(candles), big.mark=",")` entries in our candlestick dataset. As described in the overview, it contains the OHLC data, timestamp, and the volume of each candle.
 
-Bitcoin is used by 3 types of users: 
+Bitcoin is used by 3 types of users:
 
 - Traders — they are interested by the price and make profit
 
@@ -865,8 +865,8 @@ summary_stats_OHLC <- data.frame(
   max_accuracy = summary_stats_OHLC$accuracy[,"max"]
 )
 
-knitr::kable(summary_stats_OHLC, 
-             format = "simple", 
+knitr::kable(summary_stats_OHLC,
+             format = "simple",
              caption = "Summary statistics for OHLC features",
              digits = 4,
              col.names = c("Model Type", "Mean Accuracy", "SD Accuracy", "Max Accuracy"))
@@ -947,8 +947,8 @@ summary_stats_candles <- data.frame(
   max_accuracy = summary_stats_candles$accuracy[,"max"]
 )
 
-knitr::kable(summary_stats_candles, 
-             format = "simple", 
+knitr::kable(summary_stats_candles,
+             format = "simple",
              caption = "Summary statistics for candles features",
              digits = 4,
              col.names = c("Model Type", "Mean Accuracy", "SD Accuracy", "Max Accuracy"))
@@ -1029,8 +1029,8 @@ summary_stats_candles_fg <- data.frame(
   max_accuracy = summary_stats_candles_fg$accuracy[,"max"]
 )
 
-knitr::kable(summary_stats_candles_fg, 
-             format = "simple", 
+knitr::kable(summary_stats_candles_fg,
+             format = "simple",
              caption = "Summary statistics for candles features and fear and greed index",
              digits = 4,
              col.names = c("Model Type", "Mean Accuracy", "SD Accuracy", "Max Accuracy"))
@@ -1121,8 +1121,8 @@ summary_stats_candles_fg_chain <- data.frame(
   max_accuracy = summary_stats_candles_fg_chain$accuracy[,"max"]
 )
 
-knitr::kable(summary_stats_candles_fg_chain, 
-             format = "simple", 
+knitr::kable(summary_stats_candles_fg_chain,
+             format = "simple",
              caption = "Summary statistics for candles features, fear and greed index and chain data",
              digits = 4,
              col.names = c("Model Type", "Mean Accuracy", "SD Accuracy", "Max Accuracy"))
@@ -1227,8 +1227,8 @@ summary_stats_candles_fg_chain_ta <- data.frame(
   max_accuracy = summary_stats_candles_fg_chain_ta$accuracy[,"max"]
 )
 
-knitr::kable(summary_stats_candles_fg_chain_ta, 
-             format = "simple", 
+knitr::kable(summary_stats_candles_fg_chain_ta,
+             format = "simple",
              caption = "Summary statistics for candles features, fear and greed index, chain data and technical analysis indicators",
              digits = 4,
              col.names = c("Model Type", "Mean Accuracy", "SD Accuracy", "Max Accuracy"))
@@ -1400,8 +1400,8 @@ all_best_models <- rbind(
 all_best_models <- all_best_models[order(-all_best_models$accuracy), ]
 
 # Display the table
-knitr::kable(all_best_models, 
-             format = "simple", 
+knitr::kable(all_best_models,
+             format = "simple",
              caption = "Comparison of best models from each feature set and baseline methods",
              digits = 4,
              col.names = c("Model", "Features", "Model Type", "Lag", "Accuracy"))
@@ -1426,7 +1426,7 @@ Interestingly, the features with an importance score higher than 25 include indi
 
 ```{r confusion_matrix, echo=FALSE, message=FALSE, warning=FALSE}
 predicted_values <- predict(gbm_model_candles_fg_chain_ta_lag_1_tuned, test_set)
-confusion_matrix <- confusionMatrix(factor(predicted_values, levels = c("up", "down")), 
+confusion_matrix <- confusionMatrix(factor(predicted_values, levels = c("up", "down")),
                                    factor(test_set$direction, levels = c("up", "down")))
 confusion_matrix
 ```
@@ -1460,13 +1460,3 @@ In order to be closer to the trading reality and test the ability of the model t
 \newpage
 
 # References
-
-
-
-
-
-
-
-
-
-
