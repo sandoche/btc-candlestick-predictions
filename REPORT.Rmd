@@ -223,7 +223,7 @@ Before preparing the dataset, let's see what features we can extract from the OH
 
 ## Features
 
-Our candlesticks dataset from Coinbase gives us values that are based on the price of Vitcoin, but using these raw absolute values directly in a machine learning algorithm will be difficult since the price always fluctuates. Therefore, we have to think about what defines the candlesticks we have seen above?
+Our candlesticks dataset from Coinbase gives us values that are based on the price of Bitcoin, but using these raw absolute values directly in a machine learning algorithm will be difficult since the price always fluctuates. Therefore, we have to think about what defines the candlesticks we have seen above?
 
 If we isolate a candle, we can see the following features:
 
