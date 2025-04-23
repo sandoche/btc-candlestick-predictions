@@ -332,7 +332,7 @@ fear_and_greed_index_corrected %>% filter(timestamp == date_na) %>% nrow()
 
 Let's check the NAs again.
 
-```{r dataset_preparation_find_na_corrected, cache=TRUE}
+```{r dataset_preparation_find_na_corrected, cache=TRUE, message=FALSE, warning=FALSE}
 candles_enhanced_cleaned <- enhance_dataset(candles, fear_and_greed_index_corrected, hash_rate, average_block_size, n_transactions, utxo_count)
 na_indexes <- which(apply(candles_enhanced_cleaned, 1, function(x) any(is.na(x))))
 knitr::kable(tail(candles_enhanced_cleaned[na_indexes, ] %>% select(direction, roc, macd, signal, rsi, mavg, pctB, value)), format = "simple", caption = "NAs of the dataset cleaned")
@@ -533,6 +533,7 @@ knitr::kable(distribution_data, format = "simple", caption = "Distribution of up
 ```
 
 We can notice that the distribution is not exactly 50%.
+With a start price of `$42261.58` and an end price of `$84311.11` within the time frame we can consider the trend of this market as bullish.
 
 ## Adding lagged candles
 
