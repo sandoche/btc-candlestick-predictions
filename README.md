@@ -21,7 +21,15 @@ If you want to download the data for different parameters, you can run the `data
 
 ## 🖥 Analysis and weights
 
-- [Analysis](analysis.R)
+- Analysis script in R: [analysis.R](analysis.R)
+- Weights for the models:
+  - Pull them from hugging face into the `models` folder
+  - Weights for the models: [Weights on hugging face](https://huggingface.co/Sandoche/btc-candlestick-predictions)
+  - Run the following command to pull the weights:
+    ```bash
+    cd models
+    huggingface-cli download Sandoche/btc-candlestick-predictions --local-dir .
+    ```
 
 ## 📄 License
 
