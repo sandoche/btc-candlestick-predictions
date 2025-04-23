@@ -110,7 +110,7 @@ set.seed(1)
 
 The timeframe covers the period from January 2024 to March 2025, up until the day this study commenced. Note that since January 2024, Bitcoin ETF has officially been approved. The period `candlestick_period <- 3600` is the time of a candle; the candle closes 1h after it starts. Which means we have 24 candles per day [@coinbase2024api].
 
-I chose these settings to have a dataset of around `r format(10000, big.mark = ",")` candles. Also, since the Bitcoin ETF has been approved, the market may have taken on a different dynamic than in previous years.
+We chose these settings to have a dataset of around `r format(10000, big.mark = ",")` candles. Also, since the Bitcoin ETF has been approved, the market may have taken on a different dynamic than in previous years.
 
 Let's see how the dataset looks like.
 
@@ -130,7 +130,7 @@ Bitcoin is used by 3 types of users:
 - Miners — they mine Bitcoin to sell it; their interest is that the price of Bitcoin is higher than the cost of mining Bitcoin
 
 
-Keeping this in mind, I tried to find other datasets that could represent each type of user that could eventually help in our predictions, and I picked the following:
+Keeping this in mind, we tried to find other datasets that could represent each type of user that could eventually help in our predictions, and we picked the following:
 
 - Fear and greed index — represents the overall mood of the market (traders)
 
@@ -209,7 +209,7 @@ As we can see, `fear_and_greed_index` seems to be missing one data point. We wil
 
 We have different datasets that we will use for the predictions, but we are still missing one important piece of data used by traders: technical analysis indicators.
 
-Based on a previous research and blog post I wrote [@adittane2018chartanalysis], I decided to include a few indicators that are very common in trading :
+Based on a previous research and blog post I wrote [@adittane2018chartanalysis], we decided to include a few indicators that are very common in trading :
 
 - Moving average convergence divergence (MACD)
 
@@ -1351,6 +1351,7 @@ We can see below the values of the different parameters:
 ```{r gbm_model_candles_fg_chain_ta_lag_1_tuned_best_tune, cache=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 knitr::kable(gbm_model_candles_fg_chain_ta_lag_1_tuned$bestTune, format = "simple", caption = "Best tuning values for the GBM model after fine tuning", row.names = FALSE)
 ```
+
 Now let's compare the results and analyze what we have found.
 
 
@@ -1456,7 +1457,7 @@ Last but not least, using different algorithms depending on the market condition
 
 ## Trading application
 
-In order to be closer to the trading reality and test the ability of the model to make profit, I would recommend starting with backtesting to see how it performs when setting appropriate stop-loss / take-profit targets. Then, after tuning the trading algorithm, it would be worthwhile to conduct paper trading before deploying the model for actual real-money trading.
+In order to be closer to the trading reality and test the ability of the model to make profit, we would recommend starting with backtesting to see how it performs when setting appropriate stop-loss / take-profit targets. Then, after tuning the trading algorithm, it would be worthwhile to conduct paper trading before deploying the model for actual real-money trading.
 
 \newpage
 
